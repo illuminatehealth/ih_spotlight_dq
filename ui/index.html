@@ -1,0 +1,3498 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data Quality Results</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <style>
+      :root {
+        /* Token Reference
+           Typography: font stack, body scale, and compact utility sizes.
+           Surfaces: page, card, elevated card, selected row.
+           Borders/Shadows/Radii: modern but restrained data-density defaults.
+           Semantics: info/success/warning/danger with accessible text-on-tint.
+           Charts: colorblind-safer palette + separator/threshold tokens.
+        */
+        --font: system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
+        --font-sans: var(--font);
+        --text-body: 1rem;
+        --text-xs: 0.78rem;
+        --text-sm: 0.88rem;
+        --text-md: 0.94rem;
+        --line-height-body: 1.5;
+        --line-height-tight: 1.2;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-pill: 999px;
+        --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 20px rgb(16 24 40 / 5%);
+        --shadow-md: 0 12px 28px rgb(16 24 40 / 8%);
+        --shadow-text-contrast: 0 1px 1px rgb(16 24 40 / 22%);
+        --color-brand-primary: #2f6df4;
+        --color-brand-primary-strong: #1e4fd8;
+        --color-brand-secondary: #0d7f4d;
+        --surface-page: #f6f8fc;
+        --surface-card: #fff;
+        --surface-card-soft: #f8fbff;
+        --surface-accent: #eef2ff;
+        --surface-selected: #e6eeff;
+        --surface-overlay: rgb(255 255 255 / 84%);
+        --border-hairline: #d5deec;
+        --border-soft: #e6edf7;
+        --text-primary: #101828;
+        --text-secondary: #344054;
+        --text-subtle: #475467;
+        --text-on-accent: #fff;
+        --focus-ring-color: var(--color-brand-primary);
+        --focus-ring-shadow: 0 0 0 3px rgb(47 109 244 / 28%);
+        --color-info: var(--color-brand-primary);
+        --color-info-soft: rgb(47 109 244 / 14%);
+        --color-success: var(--color-brand-secondary);
+        --color-success-ink: #075c38;
+        --color-success-soft: rgb(13 127 77 / 14%);
+        --color-success-border: rgb(13 127 77 / 26%);
+        --color-warning: #9a6700;
+        --color-warning-ink: #7a5200;
+        --color-warning-soft: rgb(154 103 0 / 14%);
+        --color-warning-border: rgb(154 103 0 / 26%);
+        --color-danger: #c0362c;
+        --color-danger-ink: #8c2922;
+        --color-danger-soft: rgb(192 54 44 / 16%);
+        --color-danger-border: rgb(192 54 44 / 26%);
+        --color-null: #8fa2c1;
+        --chart-valid: var(--color-brand-primary);
+        --chart-invalid: #b86f00;
+        --chart-null: var(--color-null);
+        --chart-grid: rgb(16 24 40 / 16%);
+        --chart-separator: var(--surface-card);
+        --chart-threshold: #344054;
+        --chart-threshold-soft: rgb(52 64 84 / 12%);
+        --chart-bullet-track: #dbe4f2;
+        --chart-bullet-measure: var(--color-brand-primary);
+        --chart-bullet-bad: var(--chart-invalid);
+        --chart-bullet-threshold: var(--chart-threshold);
+        --chart-not-applicable: #9aa8bf;
+        --color-error-bg: #fff4f4;
+        --color-error-border: #f5c7c7;
+        --color-error-text: #8c2922;
+        --color-bg: var(--surface-page);
+        --color-surface: var(--surface-card);
+        --color-surface-muted: var(--surface-accent);
+        --color-border: var(--border-hairline);
+        --color-border-soft: var(--border-soft);
+        --color-text: var(--text-primary);
+        --color-muted: var(--text-secondary);
+        --color-accent: var(--color-brand-primary);
+        --color-accent-strong: var(--color-brand-primary-strong);
+        --color-on-accent: var(--text-on-accent);
+        --color-surface-soft: var(--surface-card-soft);
+        --color-surface-selected: var(--surface-selected);
+        --color-accent-soft: rgb(47 109 244 / 24%);
+        --color-threshold: var(--chart-threshold);
+        --color-threshold-soft: var(--chart-threshold-soft);
+        --color-danger-tint: rgb(192 54 44 / 12%);
+        --color-warning-tint: var(--color-warning-soft);
+        --color-grid: var(--chart-grid);
+        --bg: var(--color-bg);
+        --card: var(--color-surface);
+        --text: var(--color-text);
+        --muted: var(--color-muted);
+        --border: var(--color-border);
+        --accent: var(--color-accent);
+        --danger: var(--color-danger);
+        --success: var(--color-success);
+        --warning: var(--color-warning);
+        --shadow: var(--shadow-md);
+        --shadow-soft: var(--shadow-sm);
+        --radius: var(--radius-md);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font);
+        color: var(--text);
+        font-size: var(--text-body);
+        line-height: var(--line-height-body);
+        background: radial-gradient(
+          120% 140% at 0% 0%,
+          var(--color-surface-muted) 0%,
+          var(--color-bg) 48%,
+          var(--color-bg) 100%
+        );
+      }
+
+      .page-shell {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: clamp(16px, 2vw, 24px);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo-wrap {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+      }
+
+      .logo {
+        height: 28px;
+        width: auto;
+      }
+
+      .logo-fallback {
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .title {
+        margin: 0;
+        font-size: clamp(1.3rem, 1.8vw + 0.8rem, 1.9rem);
+        letter-spacing: -0.01em;
+        line-height: var(--line-height-tight);
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: var(--radius-pill);
+        padding: 10px 18px;
+        color: var(--color-on-accent);
+        background: var(--accent);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        line-height: var(--line-height-tight);
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: var(--shadow-soft);
+        transition:
+          background-color 120ms ease,
+          box-shadow 120ms ease,
+          transform 120ms ease;
+      }
+
+      .button:hover {
+        background: var(--color-accent-strong);
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+      }
+
+      .helper-text {
+        margin: 0;
+        color: var(--muted);
+        font-size: var(--text-sm);
+      }
+
+      .tab-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 12px;
+      }
+
+      .tab-button {
+        border: 1px solid var(--color-border);
+        background: var(--color-surface-soft);
+        color: var(--text);
+        border-radius: var(--radius-pill);
+        padding: 8px 14px;
+        font: inherit;
+        font-size: var(--text-sm);
+        font-weight: 700;
+        line-height: var(--line-height-tight);
+        cursor: pointer;
+      }
+
+      .tab-button[aria-selected="true"] {
+        background: var(--accent);
+        color: var(--color-on-accent);
+        border-color: var(--accent);
+      }
+
+      .view-panel[hidden] {
+        display: none !important;
+      }
+
+      .panel-stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .section-subtitle {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: var(--text-sm);
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .filter-grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .filter-grid.five {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .filter-box {
+        display: grid;
+        gap: 6px;
+      }
+
+      .filter-label {
+        font-size: var(--text-sm);
+        color: var(--muted);
+      }
+
+      .filter-select {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        color: var(--text);
+        background: var(--color-surface);
+        font: inherit;
+      }
+
+      .dual-table-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .simple-table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+        overflow: auto;
+        max-height: 380px;
+      }
+
+      .drop-zone {
+        display: block;
+        width: 100%;
+        border: 1px dashed var(--color-border);
+        border-radius: var(--radius);
+        background: var(--color-surface-soft);
+        color: var(--muted);
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        text-align: left;
+        font: inherit;
+        line-height: var(--line-height-tight);
+        cursor: pointer;
+        transition:
+          border-color 120ms ease,
+          background-color 120ms ease;
+      }
+
+      .drop-zone.drag-over {
+        border-color: var(--accent);
+        background: var(--color-surface-muted);
+        color: var(--text);
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .kpi-card {
+        background: var(--card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .kpi-label {
+        margin: 0;
+        font-size: var(--text-sm);
+        color: var(--muted);
+      }
+
+      .kpi-value {
+        margin: 6px 0 0;
+        font-size: clamp(1.4rem, 2.6vw, 2rem);
+        font-weight: 800;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1.95fr 1.05fr;
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .table-card {
+        padding: 14px;
+      }
+
+      .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+
+      .toolbar-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .filter-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .filter-input {
+        width: min(360px, 70vw);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        color: var(--text);
+        background: var(--color-surface);
+        font: inherit;
+      }
+
+      .run-select {
+        max-width: min(420px, 78vw);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        color: var(--text);
+        background: var(--color-surface);
+        font: inherit;
+      }
+
+      .count-text {
+        margin: 0;
+        color: var(--muted);
+        font-size: var(--text-sm);
+      }
+
+      .table-note {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: var(--text-xs);
+      }
+
+      .table-container {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+        overflow: auto;
+        max-height: 560px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid var(--color-border-soft);
+        font-size: var(--text-md);
+        white-space: nowrap;
+      }
+
+      thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--color-surface-soft);
+        font-size: var(--text-sm);
+      }
+
+      th:first-child,
+      td:first-child {
+        text-align: left;
+      }
+
+      th:not(:first-child),
+      td:not(:first-child) {
+        text-align: right;
+      }
+
+      .simple-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .simple-table th,
+      .simple-table td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--color-border-soft);
+        font-size: var(--text-sm);
+        white-space: nowrap;
+      }
+
+      .simple-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--color-surface-soft);
+        text-align: left;
+      }
+
+      .simple-table td.number {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .sort-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        gap: 4px;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: inherit;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      th:first-child .sort-button {
+        justify-content: flex-start;
+      }
+
+      .sort-indicator {
+        color: var(--muted);
+        font-size: var(--text-xs);
+      }
+
+      tbody tr {
+        outline: none;
+      }
+
+      tbody tr:hover {
+        background: var(--color-surface-soft);
+      }
+
+      tbody tr.selected {
+        background: var(--color-surface-selected);
+      }
+
+      .metric-cell {
+        max-width: 360px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .valid-pct-cell {
+        min-width: 188px;
+      }
+
+      .valid-meter {
+        position: relative;
+        height: 24px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-pill);
+        background: var(--chart-bullet-track);
+        overflow: hidden;
+      }
+
+      .valid-meter-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        background: var(--chart-bullet-measure);
+      }
+
+      .valid-meter-fill.fail {
+        background: var(--chart-bullet-bad);
+      }
+
+      .valid-meter-threshold {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--chart-bullet-threshold);
+      }
+
+      .valid-meter-label {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        color: var(--text);
+        background: var(--surface-overlay);
+        border-radius: var(--radius-pill);
+        padding: 1px 6px;
+        font-size: var(--text-xs);
+        font-weight: 700;
+        text-shadow: var(--shadow-text-contrast);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-pill);
+        padding: 3px 8px;
+        font-size: var(--text-xs);
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .status-pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentcolor;
+      }
+
+      .status-pass {
+        color: var(--color-success-ink);
+        background: var(--color-success-soft);
+        border-color: var(--color-success-border);
+      }
+
+      .status-fail {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-tint);
+        border-color: var(--color-danger-border);
+      }
+
+      .status-unknown {
+        color: var(--color-warning-ink);
+        background: var(--color-warning-tint);
+        border-color: var(--color-warning-border);
+      }
+
+      .chart-card {
+        padding: 16px;
+      }
+
+      .chart-title {
+        margin: 0;
+        font-size: 1rem;
+        line-height: var(--line-height-tight);
+      }
+
+      .rule-text {
+        margin: 6px 0 12px;
+        color: var(--muted);
+        font-size: var(--text-xs);
+      }
+
+      .detail-content {
+        display: grid;
+        gap: 12px;
+      }
+
+      .detail-block {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px;
+        background: var(--color-surface-soft);
+      }
+
+      .detail-heading {
+        margin: 0 0 8px;
+        font-size: var(--text-xs);
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .chart-canvas-wrap {
+        position: relative;
+        width: 100%;
+        height: 86px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--color-surface);
+        padding: 8px;
+      }
+
+      .chart-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .decision-summary {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: var(--text-sm);
+      }
+
+      .decision-summary strong {
+        color: var(--text);
+      }
+
+      .legend {
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: var(--text-sm);
+      }
+
+      .legend-value {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .legend-start {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .swatch {
+        width: 11px;
+        height: 11px;
+        border-radius: 2px;
+        border: 1px solid var(--color-border);
+      }
+
+      .swatch-valid {
+        background: var(--chart-valid);
+      }
+
+      .swatch-invalid {
+        background: var(--chart-invalid);
+      }
+
+      .swatch-null {
+        background: var(--chart-null);
+      }
+
+      .swatch-not-applicable {
+        background: var(--chart-not-applicable);
+      }
+
+      .detail-grid {
+        margin: 0;
+        display: grid;
+        gap: 6px;
+      }
+
+      .detail-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .detail-grid dt {
+        color: var(--muted);
+        font-size: var(--text-sm);
+      }
+
+      .detail-grid dd {
+        margin: 0;
+        font-size: var(--text-sm);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .detail-source {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: var(--text-xs);
+      }
+
+      .error-banner {
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        background: var(--color-error-bg);
+        border: 1px solid var(--color-error-border);
+        color: var(--color-error-text);
+      }
+
+      .empty-state {
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--muted);
+        padding: 20px;
+        background: var(--color-surface-soft);
+        text-align: center;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--focus-ring-color);
+        outline-offset: 2px;
+        box-shadow: var(--focus-ring-shadow);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 1ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      @media (width <= 940px) {
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .filter-grid,
+        .filter-grid.three,
+        .filter-grid.five {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="header">
+        <div class="brand">
+          <div class="logo-wrap">
+            <img
+              id="logoImage"
+              class="logo"
+              src="assets/illuminate-logo-transparent.png"
+              alt="illuminate-health"
+            />
+            <span id="logoFallback" class="logo-fallback" hidden>illuminate-health</span>
+          </div>
+          <h1 class="title">Data Quality Results</h1>
+        </div>
+        <div class="controls">
+          <label for="csvInput" class="button">Choose CSV</label>
+          <input id="csvInput" type="file" accept=".csv,text/csv" class="sr-only" />
+          <p class="helper-text">or drag &amp; drop</p>
+        </div>
+      </header>
+
+      <main id="mainContent">
+        <button id="dropZone" class="drop-zone" type="button">
+          Drop a CSV file here, or click Choose CSV.
+        </button>
+
+        <div id="errorBanner" class="error-banner" role="alert" hidden></div>
+        <div class="tab-strip" role="tablist" aria-label="Data quality dashboards">
+          <button
+            id="tabTerminology"
+            class="tab-button"
+            role="tab"
+            type="button"
+            data-view="terminology"
+            aria-controls="panelTerminology"
+            aria-selected="true"
+          >
+            Terminology DQ
+          </button>
+          <button
+            id="tabReconciliation"
+            class="tab-button"
+            role="tab"
+            type="button"
+            data-view="reconciliation"
+            aria-controls="panelReconciliation"
+            aria-selected="false"
+          >
+            Reconciliation Summary
+          </button>
+          <button
+            id="tabMapping"
+            class="tab-button"
+            role="tab"
+            type="button"
+            data-view="mapping"
+            aria-controls="panelMapping"
+            aria-selected="false"
+          >
+            Input Layer DQ
+          </button>
+        </div>
+
+        <section id="panelTerminology" class="view-panel" aria-label="Terminology view">
+          <section class="kpi-grid" aria-label="Data quality KPIs">
+            <article class="kpi-card">
+              <p class="kpi-label">Total rows</p>
+              <p id="kpiTotalRows" class="kpi-value">--</p>
+            </article>
+            <article class="kpi-card">
+              <p class="kpi-label">Overall null_pct</p>
+              <p id="kpiNullPct" class="kpi-value">--</p>
+            </article>
+            <article class="kpi-card">
+              <p class="kpi-label">Overall invalid_pct</p>
+              <p id="kpiInvalidPct" class="kpi-value">--</p>
+            </article>
+          </section>
+
+          <section class="content-grid" aria-label="Detailed results">
+            <div class="card table-card">
+              <div class="table-toolbar">
+                <div class="toolbar-controls">
+                  <div id="runFilterWrap" class="filter-wrap" hidden>
+                    <label for="runFilterSelect">Run</label>
+                    <select
+                      id="runFilterSelect"
+                      class="run-select"
+                      aria-describedby="runFilterHint"
+                    ></select>
+                    <span id="runFilterHint" class="sr-only">
+                      Select a run_id to filter table rows, KPI summaries, and detail panel data.
+                    </span>
+                  </div>
+                  <div class="filter-wrap">
+                    <label for="modelFilterSelect">Model</label>
+                    <select id="modelFilterSelect" class="run-select"></select>
+                  </div>
+                  <div class="filter-wrap">
+                    <label for="tableFilter">Filter metric</label>
+                    <input
+                      id="tableFilter"
+                      class="filter-input"
+                      type="text"
+                      placeholder="Type to filter by metric"
+                      aria-label="Filter metrics"
+                    />
+                  </div>
+                </div>
+                <p id="rowCountText" class="count-text">0 rows</p>
+              </div>
+              <p class="table-note">
+                Valid % includes an in-cell bullet bar with a threshold marker. Failed metrics use
+                an orange fill and status labels so color is not the only cue.
+              </p>
+
+              <div id="emptyState" class="empty-state">
+                Load a CSV with Choose CSV or drag it into the drop zone to view results.
+              </div>
+
+              <div id="tableContainer" class="table-container" hidden>
+                <table id="resultsTable">
+                  <thead>
+                    <tr>
+                      <th scope="col" data-key="metric">
+                        <button class="sort-button" type="button">
+                          metric <span class="sort-indicator">↕</span>
+                        </button>
+                      </th>
+                      <th scope="col" data-key="valid_pct">
+                        <button class="sort-button" type="button">
+                          valid % (applicable) <span class="sort-indicator">↕</span>
+                        </button>
+                      </th>
+                      <th scope="col" data-key="status">
+                        <button class="sort-button" type="button">
+                          status <span class="sort-indicator">↕</span>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="resultsBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <section
+              class="card chart-card"
+              aria-live="polite"
+              aria-label="Selected metric details"
+            >
+              <h2 id="chartTitle" class="chart-title">Select a metric</h2>
+              <p id="detailRule" class="rule-text">
+                Status rule: valid % must be greater than or equal to threshold.
+              </p>
+              <div id="detailEmpty" class="empty-state">Select a row to view details.</div>
+
+              <div id="detailContent" class="detail-content" hidden>
+                <div class="detail-block">
+                  <h3 class="detail-heading">Validity vs threshold</h3>
+                  <dl class="detail-grid">
+                    <div class="detail-row">
+                      <dt>Valid % (applicable)</dt>
+                      <dd id="detailValidPct">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Threshold (min valid %)</dt>
+                      <dd id="detailThreshold">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Margin</dt>
+                      <dd id="detailMargin">--</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div class="detail-block">
+                  <h3 class="detail-heading">Distribution</h3>
+                  <div class="chart-canvas-wrap">
+                    <canvas
+                      id="distributionChart"
+                      class="chart-canvas"
+                      role="img"
+                      aria-label="100 percent stacked bar chart showing valid, invalid, null, and not applicable percentages with a threshold marker"
+                    >
+                      Selected metric distribution chart with valid, invalid, null, and not
+                      applicable segments. Use the summary and legend text below for exact
+                      percentages and row counts.
+                    </canvas>
+                  </div>
+                  <p id="detailDecision" class="decision-summary">
+                    Valid % threshold comparison appears after selecting a metric.
+                  </p>
+                  <ul class="legend">
+                    <li class="legend-item">
+                      <span class="legend-start"
+                        ><span class="swatch swatch-valid"></span>Valid</span
+                      >
+                      <strong id="legendValid" class="legend-value">--</strong>
+                    </li>
+                    <li class="legend-item">
+                      <span class="legend-start"
+                        ><span class="swatch swatch-invalid"></span>Invalid (orange)</span
+                      >
+                      <strong id="legendInvalid" class="legend-value">--</strong>
+                    </li>
+                    <li class="legend-item">
+                      <span class="legend-start"><span class="swatch swatch-null"></span>Null</span>
+                      <strong id="legendNull" class="legend-value">--</strong>
+                    </li>
+                    <li class="legend-item">
+                      <span class="legend-start"
+                        ><span class="swatch swatch-not-applicable"></span>Not applicable</span
+                      >
+                      <strong id="legendNotApplicable" class="legend-value">--</strong>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="detail-block">
+                  <h3 class="detail-heading">Counts</h3>
+                  <dl class="detail-grid">
+                    <div class="detail-row">
+                      <dt>Total rows</dt>
+                      <dd id="detailTotalRows">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Applicable rows</dt>
+                      <dd id="detailApplicableRows">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Valid rows</dt>
+                      <dd id="detailValidCount">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Invalid rows</dt>
+                      <dd id="detailInvalidCount">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Null rows</dt>
+                      <dd id="detailNullCount">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Not applicable rows</dt>
+                      <dd id="detailNotApplicableCount">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Invalid %</dt>
+                      <dd id="detailInvalidPct">--</dd>
+                    </div>
+                    <div class="detail-row">
+                      <dt>Null %</dt>
+                      <dd id="detailNullPct">--</dd>
+                    </div>
+                  </dl>
+                  <div id="detailSourceStatus" class="detail-source" hidden></div>
+                </div>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section
+          id="panelReconciliation"
+          class="view-panel panel-stack"
+          aria-label="Reconciliation summary view"
+          hidden
+        >
+          <div class="card table-card">
+            <p class="section-subtitle">
+              Load CSV exported from <code>spotlight.reconciliation__monthly_summary</code>.
+            </p>
+            <div class="filter-grid">
+              <div class="filter-box">
+                <label class="filter-label" for="recFilterRunId">run_id</label>
+                <select id="recFilterRunId" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="recFilterDataSource">data_source</label>
+                <select id="recFilterDataSource" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="recFilterPayer">payer</label>
+                <select id="recFilterPayer" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="recFilterPlan">plan</label>
+                <select id="recFilterPlan" class="filter-select"></select>
+              </div>
+            </div>
+          </div>
+
+          <section class="kpi-grid" aria-label="Reconciliation KPIs">
+            <article class="kpi-card">
+              <p class="kpi-label">Filtered rows</p>
+              <p id="recKpiRows" class="kpi-value">--</p>
+            </article>
+            <article class="kpi-card">
+              <p class="kpi-label">Member months</p>
+              <p id="recKpiMemberMonths" class="kpi-value">--</p>
+            </article>
+            <article class="kpi-card">
+              <p class="kpi-label">Claims</p>
+              <p id="recKpiClaims" class="kpi-value">--</p>
+            </article>
+          </section>
+
+          <div class="dual-table-grid">
+            <div class="card table-card">
+              <p class="section-subtitle">Monthly aggregated summary.</p>
+              <div class="simple-table-wrap">
+                <table id="recMonthlyTable" class="simple-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">year_month</th>
+                      <th scope="col">member_months</th>
+                      <th scope="col">members</th>
+                      <th scope="col">claims</th>
+                      <th scope="col">claim_lines</th>
+                      <th scope="col">paid_amount</th>
+                      <th scope="col">members_with_claims</th>
+                      <th scope="col">pct_members_with_claims</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recMonthlyBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card table-card">
+              <p class="section-subtitle">Detail rows at model grain (first 1000 rows).</p>
+              <div class="simple-table-wrap">
+                <table id="recDetailTable" class="simple-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">data_source</th>
+                      <th scope="col">payer</th>
+                      <th scope="col">plan</th>
+                      <th scope="col">year_month</th>
+                      <th scope="col">member_months</th>
+                      <th scope="col">claims</th>
+                      <th scope="col">paid_amount</th>
+                      <th scope="col">pmpm_paid</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recDetailBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="panelMapping"
+          class="view-panel panel-stack"
+          aria-label="Input layer field summary view"
+          hidden
+        >
+          <div class="card table-card">
+            <p class="section-subtitle">
+              Load CSV exported from <code>spotlight.dq_results__input_layer_field_summary</code>.
+            </p>
+            <div class="filter-grid five">
+              <div class="filter-box">
+                <label class="filter-label" for="mapFilterRunId">run_id</label>
+                <select id="mapFilterRunId" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="mapFilterDataSource">data_source</label>
+                <select id="mapFilterDataSource" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="mapFilterPayer">payer</label>
+                <select id="mapFilterPayer" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="mapFilterPlan">plan</label>
+                <select id="mapFilterPlan" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="mapFilterModel">model_name</label>
+                <select id="mapFilterModel" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="mapFilterField">field_name</label>
+                <select id="mapFilterField" class="filter-select"></select>
+              </div>
+            </div>
+          </div>
+
+          <section class="kpi-grid" aria-label="Mapping validity KPIs">
+            <article class="kpi-card">
+              <p class="kpi-label">Filtered rows</p>
+              <p id="mapKpiRows" class="kpi-value">--</p>
+            </article>
+            <article class="kpi-card">
+              <p class="kpi-label">Total rows</p>
+              <p id="mapKpiTotalRows" class="kpi-value">--</p>
+            </article>
+            <article class="kpi-card">
+              <p class="kpi-label">Non-null rate (applicable)</p>
+              <p id="mapKpiNonNullRateApplicable" class="kpi-value">--</p>
+            </article>
+          </section>
+
+          <div class="dual-table-grid">
+            <div class="card table-card">
+              <p class="section-subtitle">Field-level validity summary.</p>
+              <div class="simple-table-wrap">
+                <table id="mapFieldSummaryTable" class="simple-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">model_name</th>
+                      <th scope="col">field_name</th>
+                      <th scope="col">total_rows</th>
+                      <th scope="col">applicable_rows</th>
+                      <th scope="col">non_null_rows</th>
+                      <th scope="col">null_rows</th>
+                      <th scope="col">not_applicable_rows</th>
+                      <th scope="col">non_null_rate_applicable</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mapFieldSummaryBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card table-card">
+              <p class="section-subtitle">Detail rows at model grain (first 1500 rows).</p>
+              <div class="simple-table-wrap">
+                <table id="mapDetailTable" class="simple-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">data_source</th>
+                      <th scope="col">payer</th>
+                      <th scope="col">plan</th>
+                      <th scope="col">model_name</th>
+                      <th scope="col">field_name</th>
+                      <th scope="col">total_rows</th>
+                      <th scope="col">applicable_rows</th>
+                      <th scope="col">not_applicable_rows</th>
+                      <th scope="col">null_rows</th>
+                      <th scope="col">non_null_rows</th>
+                      <th scope="col">non_null_rows_pct</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mapDetailBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="vendor/chart.js/chart.umd.js"></script>
+    <script>
+      (() => {
+        "use strict";
+
+        const DEFAULT_VALID_THRESHOLD_PCT = 0.95;
+        const PERCENT_SUM_TOLERANCE = 0.01;
+        const CHART_COLORS = Object.freeze({
+          valid: "--chart-valid",
+          invalid: "--chart-invalid",
+          null: "--chart-null",
+          notApplicable: "--chart-not-applicable",
+          threshold: "--chart-threshold",
+          grid: "--chart-grid",
+          separator: "--chart-separator",
+        });
+        const TERMINOLOGY_REQUIRED_FIELDS = [
+          "run_id",
+          "run_ts",
+          "data_source",
+          "payer",
+          "plan",
+          "model_name",
+          "field_name",
+          "terminology_table",
+          "terminology_field",
+          "total_rows",
+          "applicable_rows",
+          "not_applicable_rows",
+          "null_rows",
+          "non_null_rows",
+          "valid_rows",
+          "invalid_rows",
+          "null_rows_pct",
+          "valid_rows_pct",
+          "invalid_rows_pct",
+          "valid_rows_applicable_pct",
+        ];
+        const VIEWS = Object.freeze({
+          terminology: "terminology",
+          reconciliation: "reconciliation",
+          mapping: "mapping",
+        });
+        const RECONCILIATION_REQUIRED_FIELDS = [
+          "run_id",
+          "run_ts",
+          "data_source",
+          "payer",
+          "plan",
+          "year_month_int",
+          "year_month",
+          "member_months",
+          "members",
+          "claims",
+          "claim_lines",
+          "paid_amount",
+          "members_with_claims",
+          "pmpm_paid",
+        ];
+        const MAPPING_REQUIRED_FIELDS = [
+          "run_id",
+          "run_ts",
+          "data_source",
+          "payer",
+          "plan",
+          "model_name",
+          "field_name",
+          "total_rows",
+          "applicable_rows",
+          "not_applicable_rows",
+          "null_rows",
+          "non_null_rows",
+          "total_rows_pct",
+          "applicable_rows_pct",
+          "not_applicable_rows_pct",
+          "null_rows_pct",
+          "non_null_rows_pct",
+        ];
+
+        const COLUMN_TYPES = {
+          metric: "text",
+          valid_pct: "number",
+          status: "status",
+        };
+
+        const state = {
+          activeView: VIEWS.terminology,
+          rows: [],
+          runScopedRows: [],
+          filteredRows: [],
+          runOptions: [],
+          selectedRunId: "",
+          selectedRowId: null,
+          sortKey: "status",
+          sortDir: "asc",
+          filterText: "",
+          modelFilter: "__all__",
+          hasLoadedFile: false,
+          missingFields: [],
+          detectedHeaders: [],
+          detailChart: null,
+          hasShownChartLoadError: false,
+          loadedFileNameByView: {
+            [VIEWS.terminology]: "",
+            [VIEWS.reconciliation]: "",
+            [VIEWS.mapping]: "",
+          },
+        };
+
+        const recState = {
+          hasLoadedFile: false,
+          rows: [],
+          filteredRows: [],
+          filters: { run_id: "__all__", data_source: "__all__", payer: "__all__", plan: "__all__" },
+        };
+
+        const mapState = {
+          hasLoadedFile: false,
+          rows: [],
+          filteredRows: [],
+          filters: {
+            run_id: "__all__",
+            data_source: "__all__",
+            payer: "__all__",
+            plan: "__all__",
+            model_name: "__all__",
+            field_name: "__all__",
+          },
+        };
+
+        const els = {
+          logoImage: document.getElementById("logoImage"),
+          logoFallback: document.getElementById("logoFallback"),
+          csvInput: document.getElementById("csvInput"),
+          dropZone: document.getElementById("dropZone"),
+          errorBanner: document.getElementById("errorBanner"),
+          tabButtons: document.querySelectorAll(".tab-button"),
+          panelTerminology: document.getElementById("panelTerminology"),
+          panelReconciliation: document.getElementById("panelReconciliation"),
+          panelMapping: document.getElementById("panelMapping"),
+          runFilterWrap: document.getElementById("runFilterWrap"),
+          runFilterSelect: document.getElementById("runFilterSelect"),
+          modelFilterSelect: document.getElementById("modelFilterSelect"),
+          tableFilter: document.getElementById("tableFilter"),
+          rowCountText: document.getElementById("rowCountText"),
+          emptyState: document.getElementById("emptyState"),
+          tableContainer: document.getElementById("tableContainer"),
+          tableBody: document.getElementById("resultsBody"),
+          tableHead: document.querySelector("#resultsTable thead"),
+          kpiTotalRows: document.getElementById("kpiTotalRows"),
+          kpiNullPct: document.getElementById("kpiNullPct"),
+          kpiInvalidPct: document.getElementById("kpiInvalidPct"),
+          chartTitle: document.getElementById("chartTitle"),
+          detailRule: document.getElementById("detailRule"),
+          detailEmpty: document.getElementById("detailEmpty"),
+          detailContent: document.getElementById("detailContent"),
+          distributionChart: document.getElementById("distributionChart"),
+          detailDecision: document.getElementById("detailDecision"),
+          legendValid: document.getElementById("legendValid"),
+          legendInvalid: document.getElementById("legendInvalid"),
+          legendNull: document.getElementById("legendNull"),
+          legendNotApplicable: document.getElementById("legendNotApplicable"),
+          detailValidPct: document.getElementById("detailValidPct"),
+          detailThreshold: document.getElementById("detailThreshold"),
+          detailMargin: document.getElementById("detailMargin"),
+          detailTotalRows: document.getElementById("detailTotalRows"),
+          detailApplicableRows: document.getElementById("detailApplicableRows"),
+          detailValidCount: document.getElementById("detailValidCount"),
+          detailInvalidCount: document.getElementById("detailInvalidCount"),
+          detailNullCount: document.getElementById("detailNullCount"),
+          detailNotApplicableCount: document.getElementById("detailNotApplicableCount"),
+          detailInvalidPct: document.getElementById("detailInvalidPct"),
+          detailNullPct: document.getElementById("detailNullPct"),
+          detailSourceStatus: document.getElementById("detailSourceStatus"),
+          recFilterRunId: document.getElementById("recFilterRunId"),
+          recFilterDataSource: document.getElementById("recFilterDataSource"),
+          recFilterPayer: document.getElementById("recFilterPayer"),
+          recFilterPlan: document.getElementById("recFilterPlan"),
+          recKpiRows: document.getElementById("recKpiRows"),
+          recKpiMemberMonths: document.getElementById("recKpiMemberMonths"),
+          recKpiClaims: document.getElementById("recKpiClaims"),
+          recMonthlyBody: document.getElementById("recMonthlyBody"),
+          recDetailBody: document.getElementById("recDetailBody"),
+          mapFilterRunId: document.getElementById("mapFilterRunId"),
+          mapFilterDataSource: document.getElementById("mapFilterDataSource"),
+          mapFilterPayer: document.getElementById("mapFilterPayer"),
+          mapFilterPlan: document.getElementById("mapFilterPlan"),
+          mapFilterModel: document.getElementById("mapFilterModel"),
+          mapFilterField: document.getElementById("mapFilterField"),
+          mapKpiRows: document.getElementById("mapKpiRows"),
+          mapKpiTotalRows: document.getElementById("mapKpiTotalRows"),
+          mapKpiNonNullRateApplicable: document.getElementById("mapKpiNonNullRateApplicable"),
+          mapFieldSummaryBody: document.getElementById("mapFieldSummaryBody"),
+          mapDetailBody: document.getElementById("mapDetailBody"),
+        };
+
+        init();
+
+        function getCssColorToken(tokenName) {
+          return getComputedStyle(document.documentElement).getPropertyValue(tokenName).trim();
+        }
+
+        function init() {
+          bindEvents();
+          bindLogoFallback();
+          initDetailChart();
+          populateSelectWithOptions(els.modelFilterSelect, ["__all__"], state.modelFilter);
+          initializeReconciliationView();
+          initializeMappingView();
+          updateActiveView(VIEWS.terminology);
+          renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
+          renderRunFilter();
+          renderTable([]);
+          renderDetailPanel(null);
+          updateDropZonePrompt();
+        }
+
+        function bindEvents() {
+          els.tabButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              updateActiveView(button.dataset.view);
+            });
+          });
+
+          els.csvInput.addEventListener("change", (event) => {
+            const [file] = event.target.files || [];
+            if (file) {
+              handleFile(file);
+            }
+          });
+
+          els.dropZone.addEventListener("click", () => {
+            els.csvInput.click();
+          });
+
+          ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+            els.dropZone.addEventListener(eventName, preventDefault);
+            document.body.addEventListener(eventName, preventDefault);
+          });
+
+          ["dragenter", "dragover"].forEach((eventName) => {
+            els.dropZone.addEventListener(eventName, () => {
+              els.dropZone.classList.add("drag-over");
+            });
+          });
+
+          ["dragleave", "drop"].forEach((eventName) => {
+            els.dropZone.addEventListener(eventName, () => {
+              els.dropZone.classList.remove("drag-over");
+            });
+          });
+
+          els.dropZone.addEventListener("drop", (event) => {
+            const [file] = event.dataTransfer?.files || [];
+            if (file) {
+              handleFile(file);
+            }
+          });
+
+          els.tableFilter.addEventListener("input", () => {
+            state.filterText = els.tableFilter.value.trim().toLowerCase();
+            applyView();
+          });
+
+          els.runFilterSelect.addEventListener("change", () => {
+            const nextRunId = els.runFilterSelect.value;
+            if (!nextRunId || nextRunId === state.selectedRunId) {
+              return;
+            }
+            state.selectedRunId = nextRunId;
+            syncRunIdToUrl(nextRunId);
+            applyView();
+          });
+
+          els.modelFilterSelect.addEventListener("change", () => {
+            state.modelFilter = els.modelFilterSelect.value;
+            applyView();
+          });
+
+          els.tableHead.addEventListener("click", (event) => {
+            const button = event.target.closest("button.sort-button");
+            if (!button) {
+              return;
+            }
+
+            const th = button.closest("th[data-key]");
+            if (!th) {
+              return;
+            }
+
+            const key = th.dataset.key;
+            if (state.sortKey === key) {
+              state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+            } else {
+              state.sortKey = key;
+              state.sortDir = "asc";
+            }
+
+            applyView();
+          });
+
+          els.tableBody.addEventListener("click", (event) => {
+            const row = event.target.closest("tr[data-row-id]");
+            if (!row) {
+              return;
+            }
+
+            selectRowById(Number(row.dataset.rowId));
+          });
+
+          els.tableBody.addEventListener("keydown", (event) => {
+            const row = event.target.closest("tr[data-row-id]");
+            if (!row) {
+              return;
+            }
+
+            const currentId = Number(row.dataset.rowId);
+            const rowIds = state.filteredRows.map((candidate) => candidate.id);
+            const currentIndex = rowIds.indexOf(currentId);
+            if (currentIndex < 0) {
+              return;
+            }
+
+            let nextId = null;
+            if (event.key === "ArrowDown") {
+              nextId = rowIds[Math.min(currentIndex + 1, rowIds.length - 1)];
+            } else if (event.key === "ArrowUp") {
+              nextId = rowIds[Math.max(currentIndex - 1, 0)];
+            } else if (event.key === "Home") {
+              nextId = rowIds[0];
+            } else if (event.key === "End") {
+              nextId = rowIds[rowIds.length - 1];
+            } else if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              selectRowById(currentId, { focus: true });
+              return;
+            } else {
+              return;
+            }
+
+            event.preventDefault();
+            if (Number.isFinite(nextId)) {
+              selectRowById(nextId, { focus: true });
+            }
+          });
+
+          [
+            els.recFilterRunId,
+            els.recFilterDataSource,
+            els.recFilterPayer,
+            els.recFilterPlan,
+          ].forEach((input) => {
+            input.addEventListener("change", () => {
+              recState.filters.run_id = els.recFilterRunId.value;
+              recState.filters.data_source = els.recFilterDataSource.value;
+              recState.filters.payer = els.recFilterPayer.value;
+              recState.filters.plan = els.recFilterPlan.value;
+              renderReconciliationView();
+            });
+          });
+
+          [
+            els.mapFilterRunId,
+            els.mapFilterDataSource,
+            els.mapFilterPayer,
+            els.mapFilterPlan,
+            els.mapFilterModel,
+            els.mapFilterField,
+          ].forEach((input) => {
+            input.addEventListener("change", () => {
+              mapState.filters.run_id = els.mapFilterRunId.value;
+              mapState.filters.data_source = els.mapFilterDataSource.value;
+              mapState.filters.payer = els.mapFilterPayer.value;
+              mapState.filters.plan = els.mapFilterPlan.value;
+              mapState.filters.model_name = els.mapFilterModel.value;
+              mapState.filters.field_name = els.mapFilterField.value;
+              renderMappingView();
+            });
+          });
+        }
+
+        function bindLogoFallback() {
+          const showFallback = () => {
+            els.logoImage.hidden = true;
+            els.logoFallback.hidden = false;
+          };
+
+          els.logoImage.addEventListener("error", showFallback);
+          if (els.logoImage.complete && !els.logoImage.naturalWidth) {
+            showFallback();
+          }
+        }
+
+        function initDetailChart() {
+          if (typeof window.Chart !== "function") {
+            if (!state.hasShownChartLoadError) {
+              showGenericError(
+                "Chart.js failed to load. Ensure vendor/chart.js/chart.umd.js is present.",
+              );
+              state.hasShownChartLoadError = true;
+            }
+            return;
+          }
+
+          const thresholdLinePlugin = {
+            id: "thresholdLineMarker",
+            afterDatasetsDraw(chart, _args, pluginOptions) {
+              const threshold = pluginOptions?.threshold;
+              if (!Number.isFinite(threshold)) {
+                return;
+              }
+
+              const { ctx, chartArea, scales } = chart;
+              const xScale = scales.x;
+              if (!xScale || !chartArea) {
+                return;
+              }
+
+              const xPixel = xScale.getPixelForValue(threshold);
+              if (xPixel < chartArea.left || xPixel > chartArea.right) {
+                return;
+              }
+
+              ctx.save();
+              ctx.strokeStyle = getCssColorToken(CHART_COLORS.threshold);
+              ctx.lineWidth = 2;
+              ctx.setLineDash([4, 4]);
+              ctx.beginPath();
+              ctx.moveTo(xPixel, chartArea.top + 4);
+              ctx.lineTo(xPixel, chartArea.bottom - 4);
+              ctx.stroke();
+              ctx.fillStyle = getCssColorToken(CHART_COLORS.threshold);
+              ctx.beginPath();
+              ctx.moveTo(xPixel, chartArea.top + 4);
+              ctx.lineTo(xPixel - 4, chartArea.top + 10);
+              ctx.lineTo(xPixel + 4, chartArea.top + 10);
+              ctx.closePath();
+              ctx.fill();
+              ctx.restore();
+            },
+          };
+
+          const chartContext = els.distributionChart.getContext("2d");
+          if (!chartContext) {
+            return;
+          }
+
+          const chartColorPalette = {
+            valid: getCssColorToken(CHART_COLORS.valid),
+            invalid: getCssColorToken(CHART_COLORS.invalid),
+            null: getCssColorToken(CHART_COLORS.null),
+            notApplicable: getCssColorToken(CHART_COLORS.notApplicable),
+            grid: getCssColorToken(CHART_COLORS.grid),
+            separator: getCssColorToken(CHART_COLORS.separator),
+          };
+
+          state.detailChart = new window.Chart(els.distributionChart, {
+            type: "bar",
+            data: {
+              labels: ["Selected metric"],
+              datasets: [
+                {
+                  label: "Valid %",
+                  data: [0],
+                  backgroundColor: chartColorPalette.valid,
+                  borderColor: chartColorPalette.separator,
+                  borderRadius: 8,
+                  borderWidth: 2,
+                  borderSkipped: false,
+                  barThickness: 24,
+                },
+                {
+                  label: "Invalid %",
+                  data: [0],
+                  backgroundColor: chartColorPalette.invalid,
+                  borderColor: chartColorPalette.separator,
+                  borderRadius: 8,
+                  borderWidth: 2,
+                  borderSkipped: false,
+                  barThickness: 24,
+                },
+                {
+                  label: "Null %",
+                  data: [0],
+                  backgroundColor: chartColorPalette.null,
+                  borderColor: chartColorPalette.separator,
+                  borderRadius: 8,
+                  borderWidth: 2,
+                  borderSkipped: false,
+                  barThickness: 24,
+                },
+                {
+                  label: "Not applicable %",
+                  data: [0],
+                  backgroundColor: chartColorPalette.notApplicable,
+                  borderColor: chartColorPalette.separator,
+                  borderRadius: 8,
+                  borderWidth: 2,
+                  borderSkipped: false,
+                  barThickness: 24,
+                },
+              ],
+            },
+            options: {
+              animation: false,
+              maintainAspectRatio: false,
+              responsive: true,
+              indexAxis: "y",
+              scales: {
+                x: {
+                  min: 0,
+                  max: 100,
+                  stacked: true,
+                  grid: { color: chartColorPalette.grid },
+                  ticks: {
+                    stepSize: 10,
+                    callback: (value) => `${value}%`,
+                  },
+                },
+                y: {
+                  stacked: true,
+                  display: false,
+                  grid: { display: false },
+                  border: { display: false },
+                },
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label(context) {
+                      return `${context.dataset.label}: ${context.parsed.x.toFixed(1)}%`;
+                    },
+                  },
+                },
+                thresholdLineMarker: { threshold: null },
+              },
+            },
+            plugins: [thresholdLinePlugin],
+          });
+        }
+
+        function preventDefault(event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        function handleFile(file) {
+          state.loadedFileNameByView[state.activeView] = file.name;
+          updateDropZonePrompt();
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            const text = String(reader.result || "");
+            if (state.activeView === VIEWS.terminology) {
+              state.hasLoadedFile = true;
+              processCsv(text);
+              return;
+            }
+            if (state.activeView === VIEWS.reconciliation) {
+              recState.hasLoadedFile = true;
+              processReconciliationCsv(text);
+              return;
+            }
+            mapState.hasLoadedFile = true;
+            processMappingCsv(text);
+          };
+          reader.onerror = () => {
+            showGenericError("Unable to read file. Please choose a UTF-8 CSV file.");
+          };
+          reader.readAsText(file, "UTF-8");
+        }
+
+        function updateActiveView(viewName) {
+          if (!Object.values(VIEWS).includes(viewName)) {
+            return;
+          }
+
+          state.activeView = viewName;
+
+          els.tabButtons.forEach((button) => {
+            const isActive = button.dataset.view === viewName;
+            button.setAttribute("aria-selected", String(isActive));
+          });
+
+          els.panelTerminology.hidden = viewName !== VIEWS.terminology;
+          els.panelReconciliation.hidden = viewName !== VIEWS.reconciliation;
+          els.panelMapping.hidden = viewName !== VIEWS.mapping;
+          hideErrorBanner();
+          updateDropZonePrompt();
+        }
+
+        function updateDropZonePrompt() {
+          const viewLabel =
+            state.activeView === VIEWS.terminology
+              ? "Terminology DQ"
+              : state.activeView === VIEWS.reconciliation
+                ? "Reconciliation Summary"
+                : "Input Layer DQ";
+          const fileName = state.loadedFileNameByView[state.activeView];
+          if (fileName) {
+            els.dropZone.textContent = `Loaded for ${viewLabel}: ${fileName}. Drop or choose another CSV to replace it.`;
+            return;
+          }
+          els.dropZone.textContent = `Drop a CSV for ${viewLabel}, or click Choose CSV.`;
+        }
+
+        function initializeReconciliationView() {
+          populateSelectWithOptions(els.recFilterRunId, ["__all__"], recState.filters.run_id);
+          populateSelectWithOptions(
+            els.recFilterDataSource,
+            ["__all__"],
+            recState.filters.data_source,
+          );
+          populateSelectWithOptions(els.recFilterPayer, ["__all__"], recState.filters.payer);
+          populateSelectWithOptions(els.recFilterPlan, ["__all__"], recState.filters.plan);
+          renderReconciliationView();
+        }
+
+        function initializeMappingView() {
+          populateSelectWithOptions(els.mapFilterRunId, ["__all__"], mapState.filters.run_id);
+          populateSelectWithOptions(
+            els.mapFilterDataSource,
+            ["__all__"],
+            mapState.filters.data_source,
+          );
+          populateSelectWithOptions(els.mapFilterPayer, ["__all__"], mapState.filters.payer);
+          populateSelectWithOptions(els.mapFilterPlan, ["__all__"], mapState.filters.plan);
+          populateSelectWithOptions(els.mapFilterModel, ["__all__"], mapState.filters.model_name);
+          populateSelectWithOptions(els.mapFilterField, ["__all__"], mapState.filters.field_name);
+          renderMappingView();
+        }
+
+        function processReconciliationCsv(text) {
+          const parsed = parseCSV(text);
+          if (parsed.length < 2) {
+            recState.rows = [];
+            recState.filteredRows = [];
+            renderReconciliationView();
+            showGenericError("Reconciliation CSV appears to be empty or missing data rows.");
+            return;
+          }
+
+          const rawHeaders = parsed[0].map((header) => String(header || ""));
+          const normalizedHeaders = normalizeHeaders(rawHeaders);
+          const headerSet = new Set(normalizedHeaders);
+          const missingFields = RECONCILIATION_REQUIRED_FIELDS.filter(
+            (field) => !headerSet.has(field),
+          );
+
+          if (missingFields.length > 0) {
+            recState.rows = [];
+            recState.filteredRows = [];
+            renderReconciliationView();
+            showGenericError(
+              `Missing required reconciliation fields: ${missingFields.join(", ")}. Detected headers: ${normalizedHeaders.join(", ") || "(none)"}.`,
+            );
+            return;
+          }
+
+          hideErrorBanner();
+          const rows = [];
+          for (let rowIndex = 1; rowIndex < parsed.length; rowIndex += 1) {
+            const cells = parsed[rowIndex];
+            if (cells.every((cell) => String(cell || "").trim() === "")) {
+              continue;
+            }
+
+            const row = mapRowToHeaders(cells, normalizedHeaders);
+            const yearMonthInt = parseYearMonthInt(row.year_month_int, row.year_month);
+            const yearMonth = normalizeYearMonthLabel(row.year_month, yearMonthInt);
+            rows.push({
+              run_id: (row.run_id || "").trim(),
+              run_ts: (row.run_ts || "").trim(),
+              data_source: (row.data_source || "").trim(),
+              payer: (row.payer || "").trim(),
+              plan: (row.plan || "").trim(),
+              year_month_int: yearMonthInt,
+              year_month: yearMonth,
+              member_months: parseNumber(row.member_months) ?? 0,
+              members: parseNumber(row.members) ?? 0,
+              claims: parseNumber(row.claims) ?? 0,
+              claim_lines: parseNumber(row.claim_lines) ?? 0,
+              paid_amount: parseNumber(row.paid_amount) ?? 0,
+              members_with_claims: parseNumber(row.members_with_claims) ?? 0,
+              pct_members_with_claims: parsePercent(row.pct_members_with_claims),
+              claims_per_1000: parseNumber(row.claims_per_1000),
+              pmpm_paid: parseNumber(row.pmpm_paid),
+              avg_paid_per_claim: parseNumber(row.avg_paid_per_claim),
+            });
+          }
+
+          recState.rows = rows;
+          recState.filters.run_id = "__all__";
+          recState.filters.data_source = "__all__";
+          recState.filters.payer = "__all__";
+          recState.filters.plan = "__all__";
+          rebuildReconciliationFilters();
+          renderReconciliationView();
+        }
+
+        function rebuildReconciliationFilters() {
+          const runIds = uniqueSorted(recState.rows.map((row) => row.run_id));
+          const dataSources = uniqueSorted(recState.rows.map((row) => row.data_source));
+          const payers = uniqueSorted(recState.rows.map((row) => row.payer));
+          const plans = uniqueSorted(recState.rows.map((row) => row.plan));
+
+          populateSelectWithOptions(
+            els.recFilterRunId,
+            ["__all__", ...runIds],
+            recState.filters.run_id,
+          );
+          populateSelectWithOptions(
+            els.recFilterDataSource,
+            ["__all__", ...dataSources],
+            recState.filters.data_source,
+          );
+          populateSelectWithOptions(
+            els.recFilterPayer,
+            ["__all__", ...payers],
+            recState.filters.payer,
+          );
+          populateSelectWithOptions(
+            els.recFilterPlan,
+            ["__all__", ...plans],
+            recState.filters.plan,
+          );
+
+          recState.filters.run_id = els.recFilterRunId.value;
+          recState.filters.data_source = els.recFilterDataSource.value;
+          recState.filters.payer = els.recFilterPayer.value;
+          recState.filters.plan = els.recFilterPlan.value;
+        }
+
+        function renderReconciliationView() {
+          const filteredRows = recState.rows.filter((row) => {
+            if (recState.filters.run_id !== "__all__" && row.run_id !== recState.filters.run_id) {
+              return false;
+            }
+            if (
+              recState.filters.data_source !== "__all__" &&
+              row.data_source !== recState.filters.data_source
+            ) {
+              return false;
+            }
+            if (recState.filters.payer !== "__all__" && row.payer !== recState.filters.payer) {
+              return false;
+            }
+            if (recState.filters.plan !== "__all__" && row.plan !== recState.filters.plan) {
+              return false;
+            }
+            return true;
+          });
+          recState.filteredRows = filteredRows;
+
+          const memberMonths = filteredRows.reduce(
+            (total, row) => total + (row.member_months || 0),
+            0,
+          );
+          const claims = filteredRows.reduce((total, row) => total + (row.claims || 0), 0);
+          els.recKpiRows.textContent = formatInteger(filteredRows.length);
+          els.recKpiMemberMonths.textContent = formatInteger(memberMonths);
+          els.recKpiClaims.textContent = formatInteger(claims);
+
+          const monthlyMap = new Map();
+          filteredRows.forEach((row) => {
+            const key = row.year_month_int || row.year_month;
+            if (!key) {
+              return;
+            }
+            const current = monthlyMap.get(key) || {
+              year_month_int: row.year_month_int,
+              year_month: row.year_month,
+              member_months: 0,
+              members: 0,
+              claims: 0,
+              claim_lines: 0,
+              paid_amount: 0,
+              members_with_claims: 0,
+            };
+            current.member_months += row.member_months || 0;
+            current.members += row.members || 0;
+            current.claims += row.claims || 0;
+            current.claim_lines += row.claim_lines || 0;
+            current.paid_amount += row.paid_amount || 0;
+            current.members_with_claims += row.members_with_claims || 0;
+            monthlyMap.set(key, current);
+          });
+
+          const monthlyRows = Array.from(monthlyMap.values()).sort((left, right) => {
+            const leftKey = Number.isFinite(left.year_month_int)
+              ? left.year_month_int
+              : Number.MAX_SAFE_INTEGER;
+            const rightKey = Number.isFinite(right.year_month_int)
+              ? right.year_month_int
+              : Number.MAX_SAFE_INTEGER;
+            if (leftKey !== rightKey) {
+              return leftKey - rightKey;
+            }
+            return String(left.year_month).localeCompare(String(right.year_month));
+          });
+
+          const monthlyFragment = document.createDocumentFragment();
+          monthlyRows.forEach((row) => {
+            const tr = document.createElement("tr");
+            appendTextCell(tr, row.year_month || formatYearMonth(row.year_month_int));
+            appendNumberCell(tr, formatInteger(row.member_months));
+            appendNumberCell(tr, formatInteger(row.members));
+            appendNumberCell(tr, formatInteger(row.claims));
+            appendNumberCell(tr, formatInteger(row.claim_lines));
+            appendNumberCell(tr, formatCurrency(row.paid_amount));
+            appendNumberCell(tr, formatInteger(row.members_with_claims));
+            const pctMembers =
+              row.member_months > 0 ? row.members_with_claims / row.member_months : null;
+            appendNumberCell(tr, formatPercent(pctMembers));
+            monthlyFragment.appendChild(tr);
+          });
+          els.recMonthlyBody.replaceChildren(monthlyFragment);
+
+          const detailFragment = document.createDocumentFragment();
+          [...filteredRows]
+            .sort((left, right) => {
+              if (left.data_source !== right.data_source) {
+                return left.data_source.localeCompare(right.data_source);
+              }
+              if (left.payer !== right.payer) {
+                return left.payer.localeCompare(right.payer);
+              }
+              if (left.plan !== right.plan) {
+                return left.plan.localeCompare(right.plan);
+              }
+              const leftKey = Number.isFinite(left.year_month_int)
+                ? left.year_month_int
+                : Number.MAX_SAFE_INTEGER;
+              const rightKey = Number.isFinite(right.year_month_int)
+                ? right.year_month_int
+                : Number.MAX_SAFE_INTEGER;
+              return leftKey - rightKey;
+            })
+            .slice(0, 1000)
+            .forEach((row) => {
+              const tr = document.createElement("tr");
+              appendTextCell(tr, row.data_source);
+              appendTextCell(tr, row.payer);
+              appendTextCell(tr, row.plan);
+              appendTextCell(tr, row.year_month || formatYearMonth(row.year_month_int));
+              appendNumberCell(tr, formatInteger(row.member_months));
+              appendNumberCell(tr, formatInteger(row.claims));
+              appendNumberCell(tr, formatCurrency(row.paid_amount));
+              appendNumberCell(tr, formatCurrency(row.pmpm_paid));
+              detailFragment.appendChild(tr);
+            });
+          els.recDetailBody.replaceChildren(detailFragment);
+        }
+
+        function processMappingCsv(text) {
+          const parsed = parseCSV(text);
+          if (parsed.length < 2) {
+            mapState.rows = [];
+            mapState.filteredRows = [];
+            renderMappingView();
+            showGenericError(
+              "Input layer field summary CSV appears to be empty or missing data rows.",
+            );
+            return;
+          }
+
+          const rawHeaders = parsed[0].map((header) => String(header || ""));
+          const normalizedHeaders = normalizeHeaders(rawHeaders);
+          const headerSet = new Set(normalizedHeaders);
+          const missingFields = MAPPING_REQUIRED_FIELDS.filter((field) => !headerSet.has(field));
+
+          if (missingFields.length > 0) {
+            mapState.rows = [];
+            mapState.filteredRows = [];
+            renderMappingView();
+            showGenericError(
+              `Missing required mapping fields: ${missingFields.join(", ")}. Detected headers: ${normalizedHeaders.join(", ") || "(none)"}.`,
+            );
+            return;
+          }
+
+          hideErrorBanner();
+          const rows = [];
+          for (let rowIndex = 1; rowIndex < parsed.length; rowIndex += 1) {
+            const cells = parsed[rowIndex];
+            if (cells.every((cell) => String(cell || "").trim() === "")) {
+              continue;
+            }
+
+            const row = mapRowToHeaders(cells, normalizedHeaders);
+            rows.push({
+              run_id: (row.run_id || "").trim(),
+              run_ts: (row.run_ts || "").trim(),
+              data_source: (row.data_source || "").trim(),
+              payer: (row.payer || "").trim(),
+              plan: (row.plan || "").trim(),
+              model_name: (row.model_name || "").trim(),
+              field_name: (row.field_name || "").trim(),
+              total_rows: parseNumber(row.total_rows) ?? 0,
+              applicable_rows: parseNumber(row.applicable_rows) ?? 0,
+              not_applicable_rows: parseNumber(row.not_applicable_rows) ?? 0,
+              null_rows: parseNumber(row.null_rows) ?? 0,
+              non_null_rows: parseNumber(row.non_null_rows) ?? 0,
+              total_rows_pct: parsePercent(row.total_rows_pct),
+              applicable_rows_pct: parsePercent(row.applicable_rows_pct),
+              not_applicable_rows_pct: parsePercent(row.not_applicable_rows_pct),
+              null_rows_pct: parsePercent(row.null_rows_pct),
+              non_null_rows_pct: parsePercent(row.non_null_rows_pct),
+            });
+          }
+
+          mapState.rows = rows;
+          mapState.filters.run_id = "__all__";
+          mapState.filters.data_source = "__all__";
+          mapState.filters.payer = "__all__";
+          mapState.filters.plan = "__all__";
+          mapState.filters.model_name = "__all__";
+          mapState.filters.field_name = "__all__";
+          rebuildMappingFilters();
+          renderMappingView();
+        }
+
+        function rebuildMappingFilters() {
+          const runIds = uniqueSorted(mapState.rows.map((row) => row.run_id));
+          const dataSources = uniqueSorted(mapState.rows.map((row) => row.data_source));
+          const payers = uniqueSorted(mapState.rows.map((row) => row.payer));
+          const plans = uniqueSorted(mapState.rows.map((row) => row.plan));
+          const models = uniqueSorted(mapState.rows.map((row) => row.model_name));
+          const fields = uniqueSorted(mapState.rows.map((row) => row.field_name));
+
+          populateSelectWithOptions(
+            els.mapFilterRunId,
+            ["__all__", ...runIds],
+            mapState.filters.run_id,
+          );
+          populateSelectWithOptions(
+            els.mapFilterDataSource,
+            ["__all__", ...dataSources],
+            mapState.filters.data_source,
+          );
+          populateSelectWithOptions(
+            els.mapFilterPayer,
+            ["__all__", ...payers],
+            mapState.filters.payer,
+          );
+          populateSelectWithOptions(
+            els.mapFilterPlan,
+            ["__all__", ...plans],
+            mapState.filters.plan,
+          );
+          populateSelectWithOptions(
+            els.mapFilterModel,
+            ["__all__", ...models],
+            mapState.filters.model_name,
+          );
+          populateSelectWithOptions(
+            els.mapFilterField,
+            ["__all__", ...fields],
+            mapState.filters.field_name,
+          );
+
+          mapState.filters.run_id = els.mapFilterRunId.value;
+          mapState.filters.data_source = els.mapFilterDataSource.value;
+          mapState.filters.payer = els.mapFilterPayer.value;
+          mapState.filters.plan = els.mapFilterPlan.value;
+          mapState.filters.model_name = els.mapFilterModel.value;
+          mapState.filters.field_name = els.mapFilterField.value;
+        }
+
+        function renderMappingView() {
+          const filteredRows = mapState.rows.filter((row) => {
+            if (mapState.filters.run_id !== "__all__" && row.run_id !== mapState.filters.run_id) {
+              return false;
+            }
+            if (
+              mapState.filters.data_source !== "__all__" &&
+              row.data_source !== mapState.filters.data_source
+            ) {
+              return false;
+            }
+            if (mapState.filters.payer !== "__all__" && row.payer !== mapState.filters.payer) {
+              return false;
+            }
+            if (mapState.filters.plan !== "__all__" && row.plan !== mapState.filters.plan) {
+              return false;
+            }
+            if (
+              mapState.filters.model_name !== "__all__" &&
+              row.model_name !== mapState.filters.model_name
+            ) {
+              return false;
+            }
+            if (
+              mapState.filters.field_name !== "__all__" &&
+              row.field_name !== mapState.filters.field_name
+            ) {
+              return false;
+            }
+            return true;
+          });
+          mapState.filteredRows = filteredRows;
+
+          const totalRows = filteredRows.reduce((total, row) => total + (row.total_rows || 0), 0);
+          const applicableRows = filteredRows.reduce(
+            (total, row) => total + (row.applicable_rows || 0),
+            0,
+          );
+          const nonNullRows = filteredRows.reduce(
+            (total, row) => total + (row.non_null_rows || 0),
+            0,
+          );
+          const nonNullRateApplicable = applicableRows > 0 ? nonNullRows / applicableRows : null;
+
+          els.mapKpiRows.textContent = formatInteger(filteredRows.length);
+          els.mapKpiTotalRows.textContent = formatInteger(totalRows);
+          els.mapKpiNonNullRateApplicable.textContent = formatPercent(nonNullRateApplicable);
+
+          const fieldMap = new Map();
+          filteredRows.forEach((row) => {
+            const key = `${row.model_name || "(blank)"}__${row.field_name || "(blank)"}`;
+            const current = fieldMap.get(key) || {
+              model_name: row.model_name || "(blank)",
+              field_name: row.field_name || "(blank)",
+              total_rows: 0,
+              applicable_rows: 0,
+              not_applicable_rows: 0,
+              non_null_rows: 0,
+              null_rows: 0,
+            };
+            current.total_rows += row.total_rows || 0;
+            current.applicable_rows += row.applicable_rows || 0;
+            current.not_applicable_rows += row.not_applicable_rows || 0;
+            current.non_null_rows += row.non_null_rows || 0;
+            current.null_rows += row.null_rows || 0;
+            fieldMap.set(key, current);
+          });
+
+          const fieldRows = Array.from(fieldMap.values()).sort((left, right) => {
+            if (left.model_name !== right.model_name) {
+              return left.model_name.localeCompare(right.model_name);
+            }
+            return left.field_name.localeCompare(right.field_name);
+          });
+          const fieldFragment = document.createDocumentFragment();
+          fieldRows.forEach((row) => {
+            const tr = document.createElement("tr");
+            appendTextCell(tr, row.model_name);
+            appendTextCell(tr, row.field_name);
+            appendNumberCell(tr, formatInteger(row.total_rows));
+            appendNumberCell(tr, formatInteger(row.applicable_rows));
+            appendNumberCell(tr, formatInteger(row.non_null_rows));
+            appendNumberCell(tr, formatInteger(row.null_rows));
+            appendNumberCell(tr, formatInteger(row.not_applicable_rows));
+            const nonNullRate =
+              row.applicable_rows > 0 ? row.non_null_rows / row.applicable_rows : null;
+            appendNumberCell(tr, formatPercent(nonNullRate));
+            fieldFragment.appendChild(tr);
+          });
+          els.mapFieldSummaryBody.replaceChildren(fieldFragment);
+
+          const detailFragment = document.createDocumentFragment();
+          [...filteredRows]
+            .sort((left, right) => {
+              if (left.data_source !== right.data_source) {
+                return left.data_source.localeCompare(right.data_source);
+              }
+              if (left.payer !== right.payer) {
+                return left.payer.localeCompare(right.payer);
+              }
+              if (left.plan !== right.plan) {
+                return left.plan.localeCompare(right.plan);
+              }
+              if (left.model_name !== right.model_name) {
+                return left.model_name.localeCompare(right.model_name);
+              }
+              return left.field_name.localeCompare(right.field_name);
+            })
+            .slice(0, 1500)
+            .forEach((row) => {
+              const tr = document.createElement("tr");
+              appendTextCell(tr, row.data_source);
+              appendTextCell(tr, row.payer);
+              appendTextCell(tr, row.plan);
+              appendTextCell(tr, row.model_name);
+              appendTextCell(tr, row.field_name);
+              appendNumberCell(tr, formatInteger(row.total_rows));
+              appendNumberCell(tr, formatInteger(row.applicable_rows));
+              appendNumberCell(tr, formatInteger(row.not_applicable_rows));
+              appendNumberCell(tr, formatInteger(row.null_rows));
+              appendNumberCell(tr, formatInteger(row.non_null_rows));
+              appendNumberCell(tr, formatPercent(row.non_null_rows_pct));
+              detailFragment.appendChild(tr);
+            });
+          els.mapDetailBody.replaceChildren(detailFragment);
+        }
+
+        function populateSelectWithOptions(selectElement, options, selectedValue) {
+          const fragment = document.createDocumentFragment();
+          options.forEach((optionValue) => {
+            const option = document.createElement("option");
+            option.value = optionValue;
+            option.textContent = optionValue === "__all__" ? "All" : optionValue || "(blank)";
+            fragment.appendChild(option);
+          });
+          selectElement.replaceChildren(fragment);
+          if (options.includes(selectedValue)) {
+            selectElement.value = selectedValue;
+          } else {
+            selectElement.value = "__all__";
+          }
+        }
+
+        function appendTextCell(rowElement, text) {
+          const td = document.createElement("td");
+          td.textContent = text || "";
+          rowElement.appendChild(td);
+        }
+
+        function appendNumberCell(rowElement, text) {
+          const td = document.createElement("td");
+          td.className = "number";
+          td.textContent = text || "--";
+          rowElement.appendChild(td);
+        }
+
+        function parseYearMonthInt(value, fallbackYearMonth = "") {
+          const direct = parseNumber(String(value || ""));
+          if (Number.isFinite(direct)) {
+            const asInt = Math.round(direct);
+            if (String(asInt).length === 6) {
+              return asInt;
+            }
+          }
+
+          const cleaned = String(fallbackYearMonth || "").trim();
+          const match = /^(\d{4})[-/](\d{2})$/.exec(cleaned);
+          if (!match) {
+            return null;
+          }
+          return Number(`${match[1]}${match[2]}`);
+        }
+
+        function normalizeYearMonthLabel(yearMonthLabel, yearMonthInt) {
+          const cleaned = String(yearMonthLabel || "").trim();
+          if (/^\d{4}[-/]\d{2}$/.test(cleaned)) {
+            return cleaned.replace("/", "-");
+          }
+          return formatYearMonth(yearMonthInt);
+        }
+
+        function formatYearMonth(yearMonthInt) {
+          if (!Number.isFinite(yearMonthInt)) {
+            return "";
+          }
+          const text = String(Math.round(yearMonthInt));
+          if (text.length !== 6) {
+            return text;
+          }
+          return `${text.slice(0, 4)}-${text.slice(4, 6)}`;
+        }
+
+        function uniqueSorted(values) {
+          return Array.from(new Set(values.map((value) => String(value || "").trim()))).sort(
+            (left, right) => left.localeCompare(right),
+          );
+        }
+
+        function processCsv(text) {
+          const parsed = parseCSV(text);
+          if (parsed.length < 2) {
+            state.rows = [];
+            state.runScopedRows = [];
+            state.filteredRows = [];
+            state.runOptions = [];
+            state.selectedRunId = "";
+            state.missingFields = [];
+            showGenericError("CSV appears to be empty or missing data rows.");
+            renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
+            renderRunFilter();
+            renderTable([]);
+            renderDetailPanel(null);
+            return;
+          }
+
+          const rawHeaders = parsed[0].map((header) => String(header || ""));
+          const normalizedHeaders = normalizeHeaders(rawHeaders);
+          state.detectedHeaders = normalizedHeaders;
+          const headerSet = new Set(normalizedHeaders);
+
+          const missingFields = TERMINOLOGY_REQUIRED_FIELDS.filter(
+            (field) => !headerSet.has(field),
+          );
+          state.missingFields = missingFields;
+
+          if (missingFields.length > 0) {
+            state.rows = [];
+            state.runScopedRows = [];
+            state.filteredRows = [];
+            state.runOptions = [];
+            state.selectedRunId = "";
+            renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
+            renderRunFilter();
+            renderMissingFieldsError(missingFields, normalizedHeaders);
+            renderTable([]);
+            renderDetailPanel(null);
+            return;
+          }
+
+          hideErrorBanner();
+
+          const rowData = [];
+          for (let rowIndex = 1; rowIndex < parsed.length; rowIndex += 1) {
+            const cells = parsed[rowIndex];
+            if (cells.every((cell) => String(cell || "").trim() === "")) {
+              continue;
+            }
+
+            const row = mapRowToHeaders(cells, normalizedHeaders);
+            rowData.push({
+              id: rowData.length + 1,
+              run_id: (row.run_id || "").trim(),
+              run_ts: (row.run_ts || "").trim(),
+              run_ts_ms: parseRunTimestamp(row.run_ts),
+              data_source: (row.data_source || "").trim(),
+              payer: (row.payer || "").trim(),
+              plan: (row.plan || "").trim(),
+              model_name: (row.model_name || "").trim(),
+              field_name: (row.field_name || "").trim(),
+              terminology_table: (row.terminology_table || "").trim(),
+              terminology_field: (row.terminology_field || "").trim(),
+              total_rows: parseNumber(row.total_rows) ?? 0,
+              applicable_rows: parseNumber(row.applicable_rows) ?? 0,
+              not_applicable_rows: parseNumber(row.not_applicable_rows) ?? 0,
+              null_rows: parseNumber(row.null_rows) ?? 0,
+              non_null_rows: parseNumber(row.non_null_rows) ?? 0,
+              valid_rows: parseNumber(row.valid_rows) ?? 0,
+              invalid_rows: parseNumber(row.invalid_rows) ?? 0,
+              total_rows_pct: parsePercent(row.total_rows_pct),
+              applicable_rows_pct: parsePercent(row.applicable_rows_pct),
+              not_applicable_rows_pct: parsePercent(row.not_applicable_rows_pct),
+              null_rows_pct: parsePercent(row.null_rows_pct),
+              non_null_rows_pct: parsePercent(row.non_null_rows_pct),
+              valid_rows_pct: parsePercent(row.valid_rows_pct),
+              invalid_rows_pct: parsePercent(row.invalid_rows_pct),
+              valid_rows_applicable_pct: parsePercent(row.valid_rows_applicable_pct),
+            });
+          }
+
+          state.rows = computeDerivedMetrics(rowData);
+          state.runOptions = computeRunOptions(state.rows);
+          state.selectedRunId = resolveInitialRunId(state.runOptions);
+          syncRunIdToUrl(state.selectedRunId);
+          renderRunFilter();
+          state.selectedRowId = null;
+          applyView();
+        }
+
+        function normalizeHeaders(headers) {
+          return headers.map((header) =>
+            String(header || "")
+              .trim()
+              .toLowerCase()
+              .replace(/\s+/g, "_"),
+          );
+        }
+
+        function parseCSV(text) {
+          const rows = [];
+          let row = [];
+          let cell = "";
+          let inQuotes = false;
+          let index = 0;
+
+          while (index < text.length) {
+            const char = text[index];
+
+            if (inQuotes) {
+              if (char === '"') {
+                if (text[index + 1] === '"') {
+                  cell += '"';
+                  index += 2;
+                } else {
+                  inQuotes = false;
+                  index += 1;
+                }
+              } else {
+                cell += char;
+                index += 1;
+              }
+              continue;
+            }
+
+            if (char === '"') {
+              inQuotes = true;
+              index += 1;
+              continue;
+            }
+
+            if (char === ",") {
+              row.push(cell);
+              cell = "";
+              index += 1;
+              continue;
+            }
+
+            if (char === "\n") {
+              row.push(cell);
+              rows.push(row);
+              row = [];
+              cell = "";
+              index += 1;
+              continue;
+            }
+
+            if (char === "\r") {
+              row.push(cell);
+              rows.push(row);
+              row = [];
+              cell = "";
+              if (text[index + 1] === "\n") {
+                index += 2;
+              } else {
+                index += 1;
+              }
+              continue;
+            }
+
+            cell += char;
+            index += 1;
+          }
+
+          row.push(cell);
+          rows.push(row);
+
+          return rows.filter((candidate) =>
+            candidate.some((value) => String(value || "").trim() !== ""),
+          );
+        }
+
+        function mapRowToHeaders(cells, normalizedHeaders) {
+          const mapped = {};
+          normalizedHeaders.forEach((header, index) => {
+            mapped[header] = String(cells[index] || "").trim();
+          });
+          return mapped;
+        }
+
+        function computeDerivedMetrics(rows) {
+          return rows.map((row) => {
+            const totalRows = row.total_rows;
+            const applicableRows = row.applicable_rows;
+            const validCount = row.valid_rows;
+            const invalidCount = row.invalid_rows;
+            const nullCount = row.null_rows;
+            const notApplicableCount = row.not_applicable_rows;
+
+            const hasTotalCounts = Number.isFinite(totalRows) && totalRows > 0;
+            const hasApplicableCounts = Number.isFinite(applicableRows) && applicableRows > 0;
+
+            const validPctApplicable = Number.isFinite(row.valid_rows_applicable_pct)
+              ? row.valid_rows_applicable_pct
+              : hasApplicableCounts
+                ? validCount / applicableRows
+                : null;
+
+            let validPctTotal = Number.isFinite(row.valid_rows_pct)
+              ? row.valid_rows_pct
+              : hasTotalCounts
+                ? validCount / totalRows
+                : null;
+
+            let invalidPct = Number.isFinite(row.invalid_rows_pct)
+              ? row.invalid_rows_pct
+              : hasTotalCounts
+                ? invalidCount / totalRows
+                : null;
+
+            let nullPct = Number.isFinite(row.null_rows_pct)
+              ? row.null_rows_pct
+              : hasTotalCounts
+                ? nullCount / totalRows
+                : null;
+
+            let notApplicablePct = Number.isFinite(row.not_applicable_rows_pct)
+              ? row.not_applicable_rows_pct
+              : hasTotalCounts
+                ? notApplicableCount / totalRows
+                : null;
+
+            const hasDistributionPercents =
+              Number.isFinite(validPctTotal) &&
+              Number.isFinite(invalidPct) &&
+              Number.isFinite(nullPct) &&
+              Number.isFinite(notApplicablePct);
+            const percentSum = hasDistributionPercents
+              ? validPctTotal + invalidPct + nullPct + notApplicablePct
+              : null;
+
+            if (
+              hasTotalCounts &&
+              Number.isFinite(percentSum) &&
+              percentSum > 1 + PERCENT_SUM_TOLERANCE
+            ) {
+              validPctTotal = validCount / totalRows;
+              invalidPct = invalidCount / totalRows;
+              nullPct = nullCount / totalRows;
+              notApplicablePct = notApplicableCount / totalRows;
+            }
+
+            const threshold = DEFAULT_VALID_THRESHOLD_PCT;
+
+            let status = "Unknown";
+            if (Number.isFinite(validPctApplicable) && Number.isFinite(threshold)) {
+              status = validPctApplicable >= threshold ? "Pass" : "Fail";
+            }
+
+            const marginPctPoints =
+              Number.isFinite(validPctApplicable) && Number.isFinite(threshold)
+                ? (validPctApplicable - threshold) * 100
+                : null;
+
+            return {
+              ...row,
+              metric: formatMetricLabel(row.model_name, row.field_name),
+              denominator: totalRows,
+              applicable_denominator: applicableRows,
+              valid_count: validCount,
+              invalid_count: invalidCount,
+              null_count: nullCount,
+              not_applicable_count: notApplicableCount,
+              valid_pct: clampPercent(validPctApplicable),
+              valid_pct_total: clampPercent(validPctTotal),
+              invalid_pct: clampPercent(invalidPct),
+              null_pct: clampPercent(nullPct),
+              not_applicable_pct: clampPercent(notApplicablePct),
+              threshold,
+              margin_pct_points: marginPctPoints,
+              status,
+              source_status: "",
+            };
+          });
+        }
+
+        function formatMetricLabel(modelName, fieldName) {
+          if (modelName && fieldName) {
+            return `${modelName} / ${fieldName}`;
+          }
+          return fieldName || modelName || "(unnamed metric)";
+        }
+
+        function computeRunOptions(rows) {
+          const runMap = new Map();
+
+          rows.forEach((row) => {
+            const runId = String(row.run_id || "").trim();
+            if (!runId) {
+              return;
+            }
+
+            if (!runMap.has(runId)) {
+              runMap.set(runId, {
+                runId,
+                latestRunTsMs: null,
+                latestRunTsRaw: "",
+              });
+            }
+
+            const option = runMap.get(runId);
+            if (
+              Number.isFinite(row.run_ts_ms) &&
+              (!Number.isFinite(option.latestRunTsMs) || row.run_ts_ms > option.latestRunTsMs)
+            ) {
+              option.latestRunTsMs = row.run_ts_ms;
+              option.latestRunTsRaw = row.run_ts;
+            }
+          });
+
+          return Array.from(runMap.values()).sort(compareRunOptions);
+        }
+
+        function compareRunOptions(left, right) {
+          const leftHasTs = Number.isFinite(left.latestRunTsMs);
+          const rightHasTs = Number.isFinite(right.latestRunTsMs);
+          if (leftHasTs && rightHasTs && left.latestRunTsMs !== right.latestRunTsMs) {
+            return right.latestRunTsMs - left.latestRunTsMs;
+          }
+          if (leftHasTs && !rightHasTs) {
+            return -1;
+          }
+          if (!leftHasTs && rightHasTs) {
+            return 1;
+          }
+          return String(right.runId).localeCompare(String(left.runId));
+        }
+
+        function resolveInitialRunId(runOptions) {
+          if (!runOptions.length) {
+            return "";
+          }
+
+          const runIdFromUrl = getRunIdFromUrl();
+          if (runIdFromUrl && runOptions.some((option) => option.runId === runIdFromUrl)) {
+            return runIdFromUrl;
+          }
+
+          return resolveLatestRunId(runOptions);
+        }
+
+        function resolveLatestRunId(runOptions) {
+          const withTimestamp = runOptions.filter((option) =>
+            Number.isFinite(option.latestRunTsMs),
+          );
+          if (!withTimestamp.length) {
+            return runOptions
+              .map((option) => option.runId)
+              .sort((left, right) => String(right).localeCompare(String(left)))[0];
+          }
+
+          const maxTimestamp = Math.max(...withTimestamp.map((option) => option.latestRunTsMs));
+          const tiedRunIds = withTimestamp
+            .filter((option) => option.latestRunTsMs === maxTimestamp)
+            .map((option) => option.runId)
+            .sort((left, right) => String(right).localeCompare(String(left)));
+          return tiedRunIds[0];
+        }
+
+        function getRunIdFromUrl() {
+          const params = new URLSearchParams(window.location.search);
+          const runId = params.get("run_id");
+          return runId ? runId.trim() : "";
+        }
+
+        function syncRunIdToUrl(runId) {
+          const url = new URL(window.location.href);
+          if (runId) {
+            url.searchParams.set("run_id", runId);
+          } else {
+            url.searchParams.delete("run_id");
+          }
+          window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+        }
+
+        function getRunScopedRows() {
+          if (
+            state.runOptions.length > 0 &&
+            !state.runOptions.some((option) => option.runId === state.selectedRunId)
+          ) {
+            state.selectedRunId = resolveLatestRunId(state.runOptions);
+            syncRunIdToUrl(state.selectedRunId);
+          }
+
+          if (!state.selectedRunId) {
+            return [...state.rows];
+          }
+          return state.rows.filter((row) => row.run_id === state.selectedRunId);
+        }
+
+        function applyView() {
+          renderRunFilter();
+          state.runScopedRows = getRunScopedRows();
+          rebuildTerminologyModelFilter(state.runScopedRows);
+          const filtered = state.runScopedRows.filter((row) => {
+            if (state.modelFilter !== "__all__" && row.model_name !== state.modelFilter) {
+              return false;
+            }
+            return row.metric.toLowerCase().includes(state.filterText);
+          });
+          filtered.sort((left, right) => compareRows(left, right, state.sortKey, state.sortDir));
+          state.filteredRows = filtered;
+
+          const hasSelected = filtered.some((row) => row.id === state.selectedRowId);
+          if (!hasSelected) {
+            state.selectedRowId = filtered.length > 0 ? filtered[0].id : null;
+          }
+
+          renderKpis(calculateKpis(state.runScopedRows));
+          renderTable(filtered);
+          renderDetailPanel(getSelectedRow());
+        }
+
+        function selectRowById(rowId, options = {}) {
+          if (!Number.isFinite(rowId)) {
+            return;
+          }
+
+          state.selectedRowId = rowId;
+          renderTable(state.filteredRows, options.focus ? rowId : null);
+          renderDetailPanel(getSelectedRow());
+        }
+
+        function calculateKpis(rows) {
+          const denominators = rows
+            .map((row) => row.denominator)
+            .filter((value) => Number.isFinite(value) && value > 0);
+
+          const totalRows = denominators.length ? Math.max(...denominators) : null;
+
+          let nullCountSum = 0;
+          let invalidCountSum = 0;
+          let weightedDenominator = 0;
+
+          rows.forEach((row) => {
+            const hasCounts =
+              Number.isFinite(row.denominator) &&
+              row.denominator > 0 &&
+              Number.isFinite(row.null_count) &&
+              Number.isFinite(row.invalid_count);
+
+            if (!hasCounts) {
+              return;
+            }
+
+            nullCountSum += row.null_count;
+            invalidCountSum += row.invalid_count;
+            weightedDenominator += row.denominator;
+          });
+
+          const overallNullPct =
+            weightedDenominator > 0 ? nullCountSum / weightedDenominator : null;
+          const overallInvalidPct =
+            weightedDenominator > 0 ? invalidCountSum / weightedDenominator : null;
+
+          return { totalRows, overallNullPct, overallInvalidPct };
+        }
+
+        function renderKpis({ totalRows, overallNullPct, overallInvalidPct }) {
+          els.kpiTotalRows.textContent = Number.isFinite(totalRows)
+            ? formatInteger(totalRows)
+            : "--";
+          els.kpiNullPct.textContent = Number.isFinite(overallNullPct)
+            ? formatPercent(overallNullPct)
+            : "--";
+          els.kpiInvalidPct.textContent = Number.isFinite(overallInvalidPct)
+            ? formatPercent(overallInvalidPct)
+            : "--";
+        }
+
+        function renderRunFilter() {
+          const options = state.runOptions;
+          const shouldShow = options.length > 1 && state.missingFields.length === 0;
+          els.runFilterWrap.hidden = !shouldShow;
+          els.runFilterSelect.disabled = !shouldShow;
+
+          if (!options.length) {
+            els.runFilterSelect.replaceChildren();
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          options.forEach((option) => {
+            const item = document.createElement("option");
+            item.value = option.runId;
+            item.textContent = option.runId;
+            fragment.appendChild(item);
+          });
+          els.runFilterSelect.replaceChildren(fragment);
+
+          if (
+            state.selectedRunId &&
+            options.some((option) => option.runId === state.selectedRunId)
+          ) {
+            els.runFilterSelect.value = state.selectedRunId;
+          } else {
+            els.runFilterSelect.value = options[0].runId;
+          }
+        }
+
+        function rebuildTerminologyModelFilter(rows) {
+          const models = uniqueSorted(rows.map((row) => row.model_name));
+          populateSelectWithOptions(
+            els.modelFilterSelect,
+            ["__all__", ...models],
+            state.modelFilter,
+          );
+          state.modelFilter = els.modelFilterSelect.value;
+        }
+
+        function renderTable(rows, focusRowId = null) {
+          const noDataLoaded = !state.hasLoadedFile;
+          const blockedBySchema = state.missingFields.length > 0;
+          const noRows = rows.length === 0;
+
+          if (noDataLoaded) {
+            els.emptyState.hidden = false;
+            els.emptyState.textContent =
+              "Load a CSV with Choose CSV or drag it into the drop zone to view results.";
+            els.tableContainer.hidden = true;
+          } else if (blockedBySchema) {
+            els.emptyState.hidden = false;
+            els.emptyState.textContent = "Fix missing required fields and reload the CSV.";
+            els.tableContainer.hidden = true;
+          } else if (noRows) {
+            els.emptyState.hidden = false;
+            els.emptyState.textContent =
+              state.filterText.length > 0
+                ? "No rows match the current run and metric filter."
+                : "No rows found for the selected run.";
+            els.tableContainer.hidden = true;
+          } else {
+            els.emptyState.hidden = true;
+            els.tableContainer.hidden = false;
+          }
+
+          els.rowCountText.textContent = `${rows.length.toLocaleString()} rows`;
+          updateSortHeaderState();
+
+          if (blockedBySchema || noRows) {
+            els.tableBody.replaceChildren();
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          rows.forEach((row) => {
+            const tr = document.createElement("tr");
+            tr.dataset.rowId = String(row.id);
+            tr.tabIndex = row.id === state.selectedRowId ? 0 : -1;
+            tr.setAttribute("aria-selected", String(row.id === state.selectedRowId));
+
+            if (row.id === state.selectedRowId) {
+              tr.classList.add("selected");
+            }
+
+            appendMetricCell(tr, row.metric);
+            appendValidPctCell(tr, row);
+            appendStatusCell(tr, row.status);
+            fragment.appendChild(tr);
+          });
+
+          els.tableBody.replaceChildren(fragment);
+
+          if (Number.isFinite(focusRowId)) {
+            const focusRow = els.tableBody.querySelector(`tr[data-row-id="${focusRowId}"]`);
+            if (focusRow) {
+              focusRow.focus();
+            }
+          }
+        }
+
+        function appendMetricCell(tr, metric) {
+          const td = document.createElement("td");
+          td.className = "metric-cell";
+          td.textContent = metric;
+          tr.appendChild(td);
+        }
+
+        function appendValidPctCell(tr, row) {
+          const td = document.createElement("td");
+          td.className = "valid-pct-cell";
+
+          if (!Number.isFinite(row.valid_pct)) {
+            td.textContent = "--";
+            tr.appendChild(td);
+            return;
+          }
+
+          const meter = document.createElement("div");
+          meter.className = "valid-meter";
+
+          const fill = document.createElement("div");
+          fill.className = "valid-meter-fill";
+          const validWidth = clampToPercent(row.valid_pct * 100);
+          fill.style.width = `${validWidth}%`;
+
+          const hasThreshold = Number.isFinite(row.threshold);
+          const isFail = hasThreshold && row.valid_pct < row.threshold;
+          if (isFail) {
+            fill.classList.add("fail");
+          }
+
+          meter.appendChild(fill);
+
+          if (hasThreshold) {
+            const marker = document.createElement("div");
+            marker.className = "valid-meter-threshold";
+            marker.style.left = `${clampToPercent(row.threshold * 100)}%`;
+            meter.appendChild(marker);
+          }
+
+          const label = document.createElement("span");
+          label.className = "valid-meter-label";
+          label.textContent = formatPercent(row.valid_pct);
+          meter.appendChild(label);
+
+          const thresholdText = hasThreshold ? formatPercent(row.threshold) : "--";
+          td.setAttribute(
+            "aria-label",
+            `Valid ${formatPercent(row.valid_pct)}; threshold ${thresholdText}; status ${row.status}`,
+          );
+
+          td.appendChild(meter);
+          tr.appendChild(td);
+        }
+
+        function appendStatusCell(tr, status) {
+          const td = document.createElement("td");
+          td.style.textAlign = "right";
+
+          const pill = document.createElement("span");
+          pill.className = "status-pill";
+          pill.textContent = status;
+
+          if (status === "Pass") {
+            pill.classList.add("status-pass");
+          } else if (status === "Fail") {
+            pill.classList.add("status-fail");
+          } else {
+            pill.classList.add("status-unknown");
+          }
+
+          td.appendChild(pill);
+          tr.appendChild(td);
+        }
+
+        function updateSortHeaderState() {
+          const headers = els.tableHead.querySelectorAll("th[data-key]");
+          headers.forEach((header) => {
+            const key = header.dataset.key;
+            const indicator = header.querySelector(".sort-indicator");
+            const isActive = key === state.sortKey;
+            let ariaSort = "none";
+
+            if (isActive) {
+              if (state.sortDir === "asc") {
+                indicator.textContent = "↑";
+                ariaSort = "ascending";
+              } else {
+                indicator.textContent = "↓";
+                ariaSort = "descending";
+              }
+            } else {
+              indicator.textContent = "↕";
+            }
+
+            header.setAttribute("aria-sort", ariaSort);
+          });
+        }
+
+        function renderDetailPanel(row) {
+          if (state.missingFields.length > 0 || !row) {
+            els.chartTitle.textContent = "Select a metric";
+            els.detailRule.textContent =
+              "Status rule: valid_rows_applicable_pct must be greater than or equal to 95%.";
+            els.detailEmpty.hidden = false;
+            els.detailContent.hidden = true;
+            resetDistributionLegend();
+            updateDetailChart(null);
+            return;
+          }
+
+          els.chartTitle.textContent = row.metric;
+          els.detailRule.textContent =
+            "Status rule: valid_rows_applicable_pct must be greater than or equal to 95%.";
+          els.detailEmpty.hidden = true;
+          els.detailContent.hidden = false;
+
+          els.detailValidPct.textContent = formatPercent(row.valid_pct);
+          els.detailThreshold.textContent = formatPercent(row.threshold);
+          els.detailMargin.textContent = formatPctPointDelta(row.margin_pct_points);
+          els.detailTotalRows.textContent = formatInteger(row.denominator);
+          els.detailApplicableRows.textContent = formatInteger(row.applicable_denominator);
+          els.detailValidCount.textContent = formatInteger(row.valid_count);
+          els.detailInvalidCount.textContent = formatInteger(row.invalid_count);
+          els.detailNullCount.textContent = formatInteger(row.null_count);
+          els.detailNotApplicableCount.textContent = formatInteger(row.not_applicable_count);
+          els.detailInvalidPct.textContent = formatPercent(row.invalid_pct);
+          els.detailNullPct.textContent = formatPercent(row.null_pct);
+
+          if (row.source_status) {
+            els.detailSourceStatus.hidden = false;
+            els.detailSourceStatus.textContent = `Source status: ${row.source_status}`;
+          } else {
+            els.detailSourceStatus.hidden = true;
+            els.detailSourceStatus.textContent = "";
+          }
+
+          const hasPercents =
+            Number.isFinite(row.valid_pct_total) &&
+            Number.isFinite(row.invalid_pct) &&
+            Number.isFinite(row.null_pct) &&
+            Number.isFinite(row.not_applicable_pct);
+
+          if (!hasPercents) {
+            resetDistributionLegend();
+            els.detailDecision.textContent =
+              "Distribution unavailable: valid, invalid, null, and not applicable percentages are required.";
+            updateDetailChart(null);
+            return;
+          }
+
+          els.legendValid.textContent = formatLegendValue(row.valid_pct_total, row.valid_count);
+          els.legendInvalid.textContent = formatLegendValue(row.invalid_pct, row.invalid_count);
+          els.legendNull.textContent = formatLegendValue(row.null_pct, row.null_count);
+          els.legendNotApplicable.textContent = formatLegendValue(
+            row.not_applicable_pct,
+            row.not_applicable_count,
+          );
+          els.detailDecision.textContent = formatValidDecisionSummary(
+            row.status,
+            row.valid_pct,
+            row.threshold,
+            row.margin_pct_points,
+            row.valid_count,
+          );
+          updateDetailChart({
+            validPct: row.valid_pct_total,
+            invalidPct: row.invalid_pct,
+            nullPct: row.null_pct,
+            notApplicablePct: row.not_applicable_pct,
+            threshold: row.threshold,
+          });
+        }
+
+        function updateDetailChart(payload) {
+          if (!state.detailChart) {
+            return;
+          }
+
+          if (
+            !payload ||
+            !Number.isFinite(payload.validPct) ||
+            !Number.isFinite(payload.invalidPct) ||
+            !Number.isFinite(payload.nullPct) ||
+            !Number.isFinite(payload.notApplicablePct)
+          ) {
+            state.detailChart.data.datasets[0].data[0] = 0;
+            state.detailChart.data.datasets[1].data[0] = 0;
+            state.detailChart.data.datasets[2].data[0] = 0;
+            state.detailChart.data.datasets[3].data[0] = 0;
+            state.detailChart.options.plugins.thresholdLineMarker.threshold = null;
+            state.detailChart.update();
+            return;
+          }
+
+          state.detailChart.data.datasets[0].data[0] = clampToPercent(payload.validPct * 100);
+          state.detailChart.data.datasets[1].data[0] = clampToPercent(payload.invalidPct * 100);
+          state.detailChart.data.datasets[2].data[0] = clampToPercent(payload.nullPct * 100);
+          state.detailChart.data.datasets[3].data[0] = clampToPercent(
+            payload.notApplicablePct * 100,
+          );
+          state.detailChart.options.plugins.thresholdLineMarker.threshold = Number.isFinite(
+            payload.threshold,
+          )
+            ? clampToPercent(payload.threshold * 100)
+            : null;
+          state.detailChart.update();
+        }
+
+        function resetDistributionLegend() {
+          els.legendValid.textContent = "--";
+          els.legendInvalid.textContent = "--";
+          els.legendNull.textContent = "--";
+          els.legendNotApplicable.textContent = "--";
+          els.detailDecision.textContent =
+            "Valid % threshold comparison appears after selecting a metric.";
+        }
+
+        function formatLegendValue(percent, count) {
+          if (!Number.isFinite(percent)) {
+            return "--";
+          }
+          return `${formatPercent(percent)} (${formatInteger(count)} rows)`;
+        }
+
+        function formatValidDecisionSummary(
+          status,
+          validPct,
+          threshold,
+          marginPctPoints,
+          validCount,
+        ) {
+          const validText = Number.isFinite(validPct)
+            ? `${formatPercent(validPct)} (${formatInteger(validCount)} rows)`
+            : "--";
+          const thresholdText = Number.isFinite(threshold) ? formatPercent(threshold) : "--";
+
+          if (!Number.isFinite(validPct) || !Number.isFinite(threshold)) {
+            return `Valid %: ${validText}. Threshold: ${thresholdText}.`;
+          }
+
+          const margin = Number.isFinite(marginPctPoints)
+            ? marginPctPoints
+            : (validPct - threshold) * 100;
+          const distanceText = `${Math.abs(margin).toFixed(1)} pp ${
+            margin >= 0 ? "over" : "under"
+          } threshold`;
+          return `Valid %: ${validText}. Threshold: ${thresholdText}. Status: ${status} (${distanceText}).`;
+        }
+
+        function renderMissingFieldsError(missingFields, detectedHeaders) {
+          const missingList = missingFields.join(", ");
+          const detected = detectedHeaders.length ? detectedHeaders.join(", ") : "(none)";
+          const message =
+            `Missing required terminology fields: ${missingList}. ` +
+            `Detected headers: ${detected}. ` +
+            "Add required columns and reload the CSV.";
+          showGenericError(message);
+        }
+
+        function showGenericError(message) {
+          els.errorBanner.textContent = message;
+          els.errorBanner.hidden = false;
+        }
+
+        function hideErrorBanner() {
+          els.errorBanner.hidden = true;
+          els.errorBanner.textContent = "";
+        }
+
+        function getSelectedRow() {
+          return state.filteredRows.find((row) => row.id === state.selectedRowId) || null;
+        }
+
+        function compareRows(left, right, key, direction) {
+          const multiplier = direction === "asc" ? 1 : -1;
+
+          if (COLUMN_TYPES[key] === "number") {
+            const leftValue = Number.isFinite(left[key]) ? left[key] : Number.NEGATIVE_INFINITY;
+            const rightValue = Number.isFinite(right[key]) ? right[key] : Number.NEGATIVE_INFINITY;
+            return (leftValue - rightValue) * multiplier;
+          }
+
+          if (COLUMN_TYPES[key] === "status") {
+            const rankDiff = (statusRank(left.status) - statusRank(right.status)) * multiplier;
+            if (rankDiff !== 0) {
+              return rankDiff;
+            }
+            const leftValid = Number.isFinite(left.valid_pct)
+              ? left.valid_pct
+              : Number.POSITIVE_INFINITY;
+            const rightValid = Number.isFinite(right.valid_pct)
+              ? right.valid_pct
+              : Number.POSITIVE_INFINITY;
+            return (leftValid - rightValid) * multiplier;
+          }
+
+          const leftText = String(left[key] || "").toLowerCase();
+          const rightText = String(right[key] || "").toLowerCase();
+          return leftText.localeCompare(rightText) * multiplier;
+        }
+
+        function statusRank(status) {
+          if (status === "Fail") {
+            return 0;
+          }
+          if (status === "Unknown") {
+            return 1;
+          }
+          if (status === "Pass") {
+            return 2;
+          }
+          return 3;
+        }
+
+        function parseRunTimestamp(value) {
+          if (typeof value !== "string") {
+            return null;
+          }
+
+          const trimmed = value.trim();
+          if (!trimmed) {
+            return null;
+          }
+
+          const attempts = [trimmed];
+          if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(trimmed)) {
+            attempts.push(trimmed.replace(/\s+/, "T"));
+          }
+          if (trimmed.includes("/")) {
+            attempts.push(trimmed.replace(/\//g, "-"));
+          }
+
+          for (const candidate of attempts) {
+            const parsed = Date.parse(candidate);
+            if (Number.isFinite(parsed)) {
+              return parsed;
+            }
+          }
+
+          const regex =
+            /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?(?:\s*(Z|[+-]\d{2}:?\d{2}))?$/;
+          const parts = regex.exec(trimmed);
+          if (!parts) {
+            return null;
+          }
+
+          const year = Number(parts[1]);
+          const month = Number(parts[2]);
+          const day = Number(parts[3]);
+          const hour = Number(parts[4] || "0");
+          const minute = Number(parts[5] || "0");
+          const second = Number(parts[6] || "0");
+          const timezone = parts[7] || "Z";
+
+          if (
+            !Number.isFinite(year) ||
+            !Number.isFinite(month) ||
+            !Number.isFinite(day) ||
+            !Number.isFinite(hour) ||
+            !Number.isFinite(minute) ||
+            !Number.isFinite(second)
+          ) {
+            return null;
+          }
+
+          let offsetMinutes = 0;
+          if (timezone !== "Z") {
+            const tzMatch = /^([+-])(\d{2}):?(\d{2})$/.exec(timezone);
+            if (!tzMatch) {
+              return null;
+            }
+            const sign = tzMatch[1] === "-" ? -1 : 1;
+            offsetMinutes = sign * (Number(tzMatch[2]) * 60 + Number(tzMatch[3]));
+          }
+
+          return Date.UTC(year, month - 1, day, hour, minute, second) - offsetMinutes * 60 * 1000;
+        }
+
+        function parseNumber(value) {
+          if (typeof value !== "string") {
+            return null;
+          }
+
+          const trimmed = value.trim();
+          if (!trimmed) {
+            return null;
+          }
+
+          const normalized = trimmed.replace(/,/g, "");
+          const numeric = Number(normalized);
+          return Number.isFinite(numeric) ? numeric : null;
+        }
+
+        function parsePercent(value) {
+          const numeric = parseNumberWithOptionalPercent(value);
+          return normalizeFraction(numeric);
+        }
+
+        function parseNumberWithOptionalPercent(value) {
+          if (typeof value !== "string") {
+            return null;
+          }
+
+          const trimmed = value.trim();
+          if (!trimmed) {
+            return null;
+          }
+
+          const hasPercent = trimmed.endsWith("%");
+          const stripped = hasPercent ? trimmed.slice(0, -1) : trimmed;
+          const numeric = parseNumber(stripped);
+          if (!Number.isFinite(numeric)) {
+            return null;
+          }
+
+          return hasPercent ? numeric / 100 : numeric;
+        }
+
+        function normalizeFraction(value) {
+          if (!Number.isFinite(value)) {
+            return null;
+          }
+
+          let normalized = value;
+          if (normalized > 1 && normalized <= 100) {
+            normalized /= 100;
+          }
+
+          if (normalized < 0 || normalized > 1) {
+            return null;
+          }
+
+          return normalized;
+        }
+
+        function clampPercent(value) {
+          if (!Number.isFinite(value)) {
+            return null;
+          }
+          if (value < 0 || value > 1) {
+            return null;
+          }
+          return value;
+        }
+
+        function clampToPercent(value) {
+          if (!Number.isFinite(value)) {
+            return 0;
+          }
+          return Math.max(0, Math.min(100, value));
+        }
+
+        function formatInteger(value) {
+          return Number.isFinite(value) ? Math.round(value).toLocaleString() : "--";
+        }
+
+        function formatPercent(value) {
+          return Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : "--";
+        }
+
+        function formatCurrency(value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          return Number(value).toLocaleString(undefined, {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        }
+
+        function formatPctPointDelta(value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          const sign = value >= 0 ? "+" : "-";
+          return `${sign}${Math.abs(value).toFixed(1)} pp`;
+        }
+      })();
+    </script>
+  </body>
+</html>

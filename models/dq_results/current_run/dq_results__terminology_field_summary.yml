@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: dq_results__terminology_field_summary
+    description: >
+      PHI-safe aggregated terminology validation summary across input-layer fields.
+      Includes eligibility, medical claim, and pharmacy claim terminology joins at
+      the grain of data_source, payer, plan, model_name, and field_name for each
+      dbt run.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - run_id
+            - data_source
+            - payer
+            - plan
+            - model_name
+            - field_name
+    columns:
+      - name: run_id
+        description: Unique identifier for the dbt invocation that produced this summary table.
+        tests:
+          - not_null
+      - name: run_ts
+        description: Timestamp for the dbt invocation that produced this summary table.
+        tests:
+          - not_null
+      - name: data_source
+        description: Input-layer data source for the evaluated records.
+        tests:
+          - not_null
+      - name: payer
+        description: Input-layer payer for the evaluated records.
+      - name: plan
+        description: Input-layer plan for the evaluated records.
+      - name: model_name
+        description: Source input-layer model being evaluated.
+        tests:
+          - not_null
+      - name: field_name
+        description: Source field being evaluated against terminology.
+        tests:
+          - not_null
+      - name: terminology_table
+        description: Referenced terminology model name.
+      - name: terminology_field
+        description: Referenced terminology column used for validation.
+      - name: total_rows
+        description: Total number of rows evaluated for the grain.
+      - name: applicable_rows
+        description: Rows where the field is applicable for validation (not not_applicable).
+      - name: not_applicable_rows
+        description: Rows where the field is not applicable by claim-type logic.
+      - name: null_rows
+        description: Rows where the field value is null or blank.
+      - name: non_null_rows
+        description: Rows where the field value is non-null/non-blank and applicable.
+      - name: valid_rows
+        description: Applicable non-null rows that match the referenced terminology value.
+      - name: invalid_rows
+        description: Applicable non-null rows that do not match the referenced terminology value.
+      - name: total_rows_pct
+        description: Percent of rows represented by total_rows (100 when total_rows is greater than 0).
+      - name: applicable_rows_pct
+        description: Percent of total rows where the field is applicable.
+      - name: not_applicable_rows_pct
+        description: Percent of total rows where the field is not applicable.
+      - name: null_rows_pct
+        description: Percent of total rows where the field is null or blank.
+      - name: non_null_rows_pct
+        description: Percent of total rows where the field is non-null/non-blank and applicable.
+      - name: valid_rows_pct
+        description: Percent of total rows where applicable non-null values match terminology.
+      - name: invalid_rows_pct
+        description: Percent of total rows where applicable non-null values do not match terminology.
+      - name: valid_rows_applicable_pct
+        description: Percent of applicable rows where values match terminology.

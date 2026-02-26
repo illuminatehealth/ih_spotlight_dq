@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: reconciliation__monthly_summary
+    description: >
+      Month-level reconciliation summary at the grain of
+      data_source, payer, plan, and month.
+      Uses the Tuva calendar table for month alignment and does not rely on
+      SQL date-part extraction logic.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - run_id
+              - data_source
+              - payer
+              - plan
+              - year_month_int
+    columns:
+      - name: run_id
+        description: Run identifier for the dbt invocation that produced this summary.
+        tests:
+          - not_null
+      - name: run_ts
+        description: Timestamp for the dbt invocation that produced this summary.
+        tests:
+          - not_null
+      - name: data_source
+        description: Data source from Tuva core marts.
+        tests:
+          - not_null
+      - name: payer
+        description: Payer from member_months and medical_claim.
+      - name: plan
+        description: Plan from member_months and medical_claim.
+      - name: year_month_int
+        description: Calendar month key as YYYYMM.
+        tests:
+          - not_null
+      - name: year_month
+        description: Calendar month label as YYYY-MM.
+        tests:
+          - not_null
+      - name: member_months
+        description: Number of member-month rows.
+      - name: members
+        description: Distinct members in the month.
+      - name: claims
+        description: Distinct claim_id count.
+      - name: claim_lines
+        description: Total claim line count.
+      - name: paid_amount
+        description: Sum of paid_amount across claim lines.
+      - name: members_with_claims
+        description: Distinct members with at least one claim in the same month.
+      - name: pct_members_with_claims
+        description: members_with_claims divided by member_months.
+      - name: claims_per_1000
+        description: Claims per 1,000 member months.
+      - name: pmpm_paid
+        description: Paid amount per member month.
+      - name: avg_paid_per_claim
+        description: Average paid amount per claim.
+      - name: tuva_last_run
+        description: Run timestamp metadata inherited from Tuva conventions.

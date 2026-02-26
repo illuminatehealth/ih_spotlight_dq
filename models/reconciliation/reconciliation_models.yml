@@ -14,7 +14,7 @@ models:
               - run_id
               - data_source
               - payer
-              - plan
+              - "{{ '[plan]' if target.type == 'fabric' else 'plan' }}"
               - year_month_int
     columns:
       - name: run_id

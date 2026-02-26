@@ -9,13 +9,14 @@ models:
       dbt run.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - run_id
-            - data_source
-            - payer
-            - plan
-            - model_name
-            - field_name
+          arguments:
+            combination_of_columns:
+              - run_id
+              - data_source
+              - payer
+              - "{{ '[plan]' if target.type == 'fabric' else 'plan' }}"
+              - model_name
+              - field_name
     columns:
       - name: run_id
         description: Unique identifier for the dbt invocation that produced this summary table.

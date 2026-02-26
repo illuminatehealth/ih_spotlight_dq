@@ -1,8 +1,10 @@
+{% set dq_plan_unique_key = '[plan]' if target.type == 'fabric' else 'plan' %}
+
 {{ config(
     materialized='incremental',
     schema='spotlight',
     tags=['spotlight', 'reconciliation_dashboard', 'dq_history'],
-    unique_key=['run_id', 'data_source', 'payer', 'plan', 'year_month_int'],
+    unique_key=['run_id', 'data_source', 'payer', dq_plan_unique_key, 'year_month_int'],
     incremental_strategy=dq_history_incremental_strategy(),
     on_schema_change='append_new_columns'
 ) }}
@@ -16,7 +18,7 @@
         run_ts,
         data_source,
         payer,
-        plan,
+        {{ the_tuva_project.quote_column('plan') }},
         year_month_int,
         year_month,
         member_months,
@@ -39,7 +41,7 @@
         run_ts,
         data_source,
         payer,
-        plan,
+        {{ the_tuva_project.quote_column('plan') }},
         year_month_int,
         year_month,
         member_months,

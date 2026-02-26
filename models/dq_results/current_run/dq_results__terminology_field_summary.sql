@@ -518,9 +518,3 @@ select
     coalesce({{ dbt_utils.safe_divide('100.0 * a.valid_rows', 'a.applicable_rows') }}, 0.0) as valid_rows_applicable_pct
 from aggregated as a
 cross join run_meta as rm
-order by
-    a.data_source,
-    a.payer,
-    a.plan_name,
-    a.model_name,
-    a.field_name

@@ -1,8 +1,10 @@
+{% set dq_plan_unique_key = '[plan]' if target.type == 'fabric' else 'plan' %}
+
 {{ config(
     materialized='incremental',
     schema='spotlight',
     tags=['spotlight', 'dq_results', 'dq_history'],
-    unique_key=['run_id', 'data_source', 'payer', 'plan', 'model_name', 'field_name'],
+    unique_key=['run_id', 'data_source', 'payer', dq_plan_unique_key, 'model_name', 'field_name'],
     incremental_strategy=dq_history_incremental_strategy(),
     on_schema_change='append_new_columns'
 ) }}

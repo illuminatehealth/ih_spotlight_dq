@@ -176,6 +176,24 @@
         gap: 10px;
       }
 
+      .header-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-pill);
+        background: var(--color-surface-soft);
+        color: var(--muted);
+        font-size: var(--text-sm);
+        white-space: nowrap;
+      }
+
+      .header-toggle input {
+        margin: 0;
+        accent-color: var(--accent);
+      }
+
       .button {
         display: inline-flex;
         align-items: center;
@@ -835,7 +853,11 @@
         <div class="controls">
           <label for="csvInput" class="button">Choose CSV</label>
           <input id="csvInput" type="file" accept=".csv,text/csv" class="sr-only" />
-          <p class="helper-text">or drag &amp; drop</p>
+          <p class="helper-text">or drag &amp; drop (with or without headers)</p>
+          <label class="header-toggle" for="csvHasHeadersToggle">
+            <input id="csvHasHeadersToggle" type="checkbox" checked />
+            CSV has headers
+          </label>
         </div>
       </header>
 
@@ -935,7 +957,8 @@
               </p>
 
               <div id="emptyState" class="empty-state">
-                Load a CSV with Choose CSV or drag it into the drop zone to view results.
+                Load a CSV (with or without headers) using Choose CSV or drag it into the drop
+                zone to view results.
               </div>
 
               <div id="tableContainer" class="table-container" hidden>
@@ -1351,6 +1374,53 @@
           "null_rows_pct",
           "non_null_rows_pct",
         ];
+        const TERMINOLOGY_POSITIONAL_FIELDS = [
+          "run_id",
+          "run_ts",
+          "data_source",
+          "payer",
+          "plan",
+          "model_name",
+          "field_name",
+          "terminology_table",
+          "terminology_field",
+          "total_rows",
+          "applicable_rows",
+          "not_applicable_rows",
+          "null_rows",
+          "non_null_rows",
+          "valid_rows",
+          "invalid_rows",
+          "total_rows_pct",
+          "applicable_rows_pct",
+          "not_applicable_rows_pct",
+          "null_rows_pct",
+          "non_null_rows_pct",
+          "valid_rows_pct",
+          "invalid_rows_pct",
+          "valid_rows_applicable_pct",
+        ];
+        const RECONCILIATION_POSITIONAL_FIELDS = [
+          "run_id",
+          "run_ts",
+          "data_source",
+          "payer",
+          "plan",
+          "year_month_int",
+          "year_month",
+          "member_months",
+          "members",
+          "claims",
+          "claim_lines",
+          "paid_amount",
+          "members_with_claims",
+          "pct_members_with_claims",
+          "claims_per_1000",
+          "pmpm_paid",
+          "avg_paid_per_claim",
+          "tuva_last_run",
+        ];
+        const MAPPING_POSITIONAL_FIELDS = [...MAPPING_REQUIRED_FIELDS];
 
         const COLUMN_TYPES = {
           metric: "text",
@@ -1375,7 +1445,13 @@
           detectedHeaders: [],
           detailChart: null,
           hasShownChartLoadError: false,
+          csvHasHeaders: true,
           loadedFileNameByView: {
+            [VIEWS.terminology]: "",
+            [VIEWS.reconciliation]: "",
+            [VIEWS.mapping]: "",
+          },
+          loadedFileTextByView: {
             [VIEWS.terminology]: "",
             [VIEWS.reconciliation]: "",
             [VIEWS.mapping]: "",
@@ -1407,6 +1483,7 @@
           logoImage: document.getElementById("logoImage"),
           logoFallback: document.getElementById("logoFallback"),
           csvInput: document.getElementById("csvInput"),
+          csvHasHeadersToggle: document.getElementById("csvHasHeadersToggle"),
           dropZone: document.getElementById("dropZone"),
           errorBanner: document.getElementById("errorBanner"),
           tabButtons: document.querySelectorAll(".tab-button"),
@@ -1479,6 +1556,7 @@
           bindEvents();
           bindLogoFallback();
           initDetailChart();
+          els.csvHasHeadersToggle.checked = state.csvHasHeaders;
           populateSelectWithOptions(els.modelFilterSelect, ["__all__"], state.modelFilter);
           initializeReconciliationView();
           initializeMappingView();
@@ -1502,6 +1580,11 @@
             if (file) {
               handleFile(file);
             }
+          });
+
+          els.csvHasHeadersToggle.addEventListener("change", () => {
+            state.csvHasHeaders = Boolean(els.csvHasHeadersToggle.checked);
+            reprocessActiveView();
           });
 
           els.dropZone.addEventListener("click", () => {
@@ -1821,29 +1904,49 @@
         }
 
         function handleFile(file) {
-          state.loadedFileNameByView[state.activeView] = file.name;
+          const targetView = state.activeView;
+          state.loadedFileNameByView[targetView] = file.name;
           updateDropZonePrompt();
 
           const reader = new FileReader();
           reader.onload = () => {
             const text = String(reader.result || "");
-            if (state.activeView === VIEWS.terminology) {
-              state.hasLoadedFile = true;
-              processCsv(text);
-              return;
-            }
-            if (state.activeView === VIEWS.reconciliation) {
-              recState.hasLoadedFile = true;
-              processReconciliationCsv(text);
-              return;
-            }
-            mapState.hasLoadedFile = true;
-            processMappingCsv(text);
+            state.loadedFileTextByView[targetView] = text;
+            processTextForView(targetView, text, { markLoaded: true });
           };
           reader.onerror = () => {
             showGenericError("Unable to read file. Please choose a UTF-8 CSV file.");
           };
           reader.readAsText(file, "UTF-8");
+        }
+
+        function processTextForView(viewName, text, { markLoaded = false } = {}) {
+          if (viewName === VIEWS.terminology) {
+            if (markLoaded) {
+              state.hasLoadedFile = true;
+            }
+            processCsv(text);
+            return;
+          }
+          if (viewName === VIEWS.reconciliation) {
+            if (markLoaded) {
+              recState.hasLoadedFile = true;
+            }
+            processReconciliationCsv(text);
+            return;
+          }
+          if (markLoaded) {
+            mapState.hasLoadedFile = true;
+          }
+          processMappingCsv(text);
+        }
+
+        function reprocessActiveView() {
+          const text = state.loadedFileTextByView[state.activeView];
+          if (!text) {
+            return;
+          }
+          processTextForView(state.activeView, text);
         }
 
         function updateActiveView(viewName) {
@@ -1908,7 +2011,7 @@
 
         function processReconciliationCsv(text) {
           const parsed = parseCSV(text);
-          if (parsed.length < 2) {
+          if (parsed.length < 1) {
             recState.rows = [];
             recState.filteredRows = [];
             renderReconciliationView();
@@ -1916,26 +2019,36 @@
             return;
           }
 
-          const rawHeaders = parsed[0].map((header) => String(header || ""));
-          const normalizedHeaders = normalizeHeaders(rawHeaders);
-          const headerSet = new Set(normalizedHeaders);
-          const missingFields = RECONCILIATION_REQUIRED_FIELDS.filter(
-            (field) => !headerSet.has(field),
+          const csvHeaders = resolveCsvHeaders(
+            parsed,
+            RECONCILIATION_REQUIRED_FIELDS,
+            RECONCILIATION_POSITIONAL_FIELDS,
+            state.csvHasHeaders,
           );
+          const normalizedHeaders = csvHeaders.normalizedHeaders;
+          const missingFields = csvHeaders.missingFields;
 
           if (missingFields.length > 0) {
             recState.rows = [];
             recState.filteredRows = [];
             renderReconciliationView();
             showGenericError(
-              `Missing required reconciliation fields: ${missingFields.join(", ")}. Detected headers: ${normalizedHeaders.join(", ") || "(none)"}.`,
+              `Missing required reconciliation fields: ${missingFields.join(", ")}. Detected headers: ${csvHeaders.detectedHeaders.join(", ") || "(none)"}. If your CSV has no headers, keep the default export column order.`,
             );
+            return;
+          }
+
+          if (parsed.length <= csvHeaders.dataStartRow) {
+            recState.rows = [];
+            recState.filteredRows = [];
+            renderReconciliationView();
+            showGenericError("Reconciliation CSV appears to be empty or missing data rows.");
             return;
           }
 
           hideErrorBanner();
           const rows = [];
-          for (let rowIndex = 1; rowIndex < parsed.length; rowIndex += 1) {
+          for (let rowIndex = csvHeaders.dataStartRow; rowIndex < parsed.length; rowIndex += 1) {
             const cells = parsed[rowIndex];
             if (cells.every((cell) => String(cell || "").trim() === "")) {
               continue;
@@ -2130,7 +2243,7 @@
 
         function processMappingCsv(text) {
           const parsed = parseCSV(text);
-          if (parsed.length < 2) {
+          if (parsed.length < 1) {
             mapState.rows = [];
             mapState.filteredRows = [];
             renderMappingView();
@@ -2140,24 +2253,38 @@
             return;
           }
 
-          const rawHeaders = parsed[0].map((header) => String(header || ""));
-          const normalizedHeaders = normalizeHeaders(rawHeaders);
-          const headerSet = new Set(normalizedHeaders);
-          const missingFields = MAPPING_REQUIRED_FIELDS.filter((field) => !headerSet.has(field));
+          const csvHeaders = resolveCsvHeaders(
+            parsed,
+            MAPPING_REQUIRED_FIELDS,
+            MAPPING_POSITIONAL_FIELDS,
+            state.csvHasHeaders,
+          );
+          const normalizedHeaders = csvHeaders.normalizedHeaders;
+          const missingFields = csvHeaders.missingFields;
 
           if (missingFields.length > 0) {
             mapState.rows = [];
             mapState.filteredRows = [];
             renderMappingView();
             showGenericError(
-              `Missing required mapping fields: ${missingFields.join(", ")}. Detected headers: ${normalizedHeaders.join(", ") || "(none)"}.`,
+              `Missing required mapping fields: ${missingFields.join(", ")}. Detected headers: ${csvHeaders.detectedHeaders.join(", ") || "(none)"}. If your CSV has no headers, keep the default export column order.`,
+            );
+            return;
+          }
+
+          if (parsed.length <= csvHeaders.dataStartRow) {
+            mapState.rows = [];
+            mapState.filteredRows = [];
+            renderMappingView();
+            showGenericError(
+              "Input layer field summary CSV appears to be empty or missing data rows.",
             );
             return;
           }
 
           hideErrorBanner();
           const rows = [];
-          for (let rowIndex = 1; rowIndex < parsed.length; rowIndex += 1) {
+          for (let rowIndex = csvHeaders.dataStartRow; rowIndex < parsed.length; rowIndex += 1) {
             const cells = parsed[rowIndex];
             if (cells.every((cell) => String(cell || "").trim() === "")) {
               continue;
@@ -2443,7 +2570,7 @@
 
         function processCsv(text) {
           const parsed = parseCSV(text);
-          if (parsed.length < 2) {
+          if (parsed.length < 1) {
             state.rows = [];
             state.runScopedRows = [];
             state.filteredRows = [];
@@ -2458,14 +2585,16 @@
             return;
           }
 
-          const rawHeaders = parsed[0].map((header) => String(header || ""));
-          const normalizedHeaders = normalizeHeaders(rawHeaders);
-          state.detectedHeaders = normalizedHeaders;
-          const headerSet = new Set(normalizedHeaders);
-
-          const missingFields = TERMINOLOGY_REQUIRED_FIELDS.filter(
-            (field) => !headerSet.has(field),
+          const csvHeaders = resolveCsvHeaders(
+            parsed,
+            TERMINOLOGY_REQUIRED_FIELDS,
+            TERMINOLOGY_POSITIONAL_FIELDS,
+            state.csvHasHeaders,
           );
+          const normalizedHeaders = csvHeaders.normalizedHeaders;
+          state.detectedHeaders = csvHeaders.detectedHeaders;
+
+          const missingFields = csvHeaders.missingFields;
           state.missingFields = missingFields;
 
           if (missingFields.length > 0) {
@@ -2476,7 +2605,22 @@
             state.selectedRunId = "";
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
             renderRunFilter();
-            renderMissingFieldsError(missingFields, normalizedHeaders);
+            renderMissingFieldsError(missingFields, csvHeaders.detectedHeaders);
+            renderTable([]);
+            renderDetailPanel(null);
+            return;
+          }
+
+          if (parsed.length <= csvHeaders.dataStartRow) {
+            state.rows = [];
+            state.runScopedRows = [];
+            state.filteredRows = [];
+            state.runOptions = [];
+            state.selectedRunId = "";
+            state.missingFields = [];
+            showGenericError("CSV appears to be empty or missing data rows.");
+            renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
+            renderRunFilter();
             renderTable([]);
             renderDetailPanel(null);
             return;
@@ -2485,7 +2629,7 @@
           hideErrorBanner();
 
           const rowData = [];
-          for (let rowIndex = 1; rowIndex < parsed.length; rowIndex += 1) {
+          for (let rowIndex = csvHeaders.dataStartRow; rowIndex < parsed.length; rowIndex += 1) {
             const cells = parsed[rowIndex];
             if (cells.every((cell) => String(cell || "").trim() === "")) {
               continue;
@@ -2538,6 +2682,45 @@
               .toLowerCase()
               .replace(/\s+/g, "_"),
           );
+        }
+
+        function resolveCsvHeaders(
+          parsedRows,
+          requiredFields,
+          positionalFields,
+          csvHasHeaders,
+        ) {
+          const firstRow = Array.isArray(parsedRows[0]) ? parsedRows[0] : [];
+          const rawFirstRow = firstRow.map((cell) => String(cell || ""));
+          const normalizedFirstRow = normalizeHeaders(rawFirstRow);
+          const firstRowHeaderSet = new Set(normalizedFirstRow);
+          const missingFromHeaderRow = requiredFields.filter(
+            (field) => !firstRowHeaderSet.has(field),
+          );
+
+          if (csvHasHeaders) {
+            return {
+              normalizedHeaders: normalizedFirstRow,
+              dataStartRow: 1,
+              missingFields: missingFromHeaderRow,
+              detectedHeaders: normalizedFirstRow,
+            };
+          }
+
+          const normalizedPositionalFields = normalizeHeaders(positionalFields);
+          const missingFromPositionalRow = requiredFields.filter((field) => {
+            const columnIndex = normalizedPositionalFields.indexOf(field);
+            return columnIndex < 0 || columnIndex >= firstRow.length;
+          });
+          return {
+            normalizedHeaders: normalizedPositionalFields,
+            dataStartRow: 0,
+            missingFields: missingFromPositionalRow,
+            detectedHeaders: normalizedPositionalFields.slice(
+              0,
+              Math.min(firstRow.length, normalizedPositionalFields.length),
+            ),
+          };
         }
 
         function parseCSV(text) {
@@ -3268,7 +3451,7 @@
           const message =
             `Missing required terminology fields: ${missingList}. ` +
             `Detected headers: ${detected}. ` +
-            "Add required columns and reload the CSV.";
+            "Add required columns and reload the CSV. If your CSV has no headers, keep the default export column order.";
           showGenericError(message);
         }
 

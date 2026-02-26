@@ -112,7 +112,7 @@ Add this package to your downstream `packages.yml`:
 
 ```yml
 packages:
-  - git: "https://github.com/<your-org>/ih_spotlight_dq.git"
+  - git: "https://github.com/illuminatehealth/ih_spotlight_dq.git"
     revision: "main"
 ```
 

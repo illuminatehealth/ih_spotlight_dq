@@ -267,6 +267,11 @@
       .filter-box {
         display: grid;
         gap: 6px;
+        min-width: 0;
+      }
+
+      .filter-box-span {
+        grid-column: 1 / -1;
       }
 
       .filter-label {
@@ -275,12 +280,23 @@
       }
 
       .filter-select {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
         border: 1px solid var(--border);
         border-radius: var(--radius-sm);
         padding: 8px 10px;
         color: var(--text);
         background: var(--color-surface);
         font: inherit;
+      }
+
+      .rec-filter-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+
+      .rec-filter-grid .filter-select {
+        padding: 6px 8px;
       }
 
       .dual-table-grid {
@@ -389,7 +405,7 @@
 
       .trend-canvas-wrap {
         position: relative;
-        height: 82px;
+        height: 124px;
         border: 1px solid var(--border);
         border-radius: var(--radius-sm);
         background: var(--color-surface);
@@ -406,6 +422,114 @@
         margin: 8px 0 0;
         color: var(--muted);
         font-size: var(--text-xs);
+      }
+
+      .range-control {
+        display: grid;
+        gap: 6px;
+      }
+
+      .range-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: var(--text-xs);
+        color: var(--muted);
+      }
+
+      .range-boundary {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+
+      .range-boundary strong {
+        color: var(--text);
+      }
+
+      .dual-slider {
+        position: relative;
+        height: 28px;
+        display: grid;
+        align-items: center;
+      }
+
+      .dual-slider-track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--chart-bullet-track);
+      }
+
+      .dual-slider-selection {
+        position: absolute;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--accent);
+        left: 0%;
+        width: 100%;
+      }
+
+      .range-input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        margin: 0;
+        pointer-events: none;
+        appearance: none;
+        background: transparent;
+      }
+
+      .range-input::-webkit-slider-runnable-track {
+        height: 6px;
+        background: transparent;
+      }
+
+      .range-input::-moz-range-track {
+        height: 6px;
+        background: transparent;
+        border: 0;
+      }
+
+      .range-input::-webkit-slider-thumb {
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        margin-top: -5px;
+        border-radius: 50%;
+        border: 2px solid var(--accent);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-soft);
+        pointer-events: auto;
+        cursor: pointer;
+      }
+
+      .range-input::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid var(--accent);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-soft);
+        pointer-events: auto;
+        cursor: pointer;
+      }
+
+      .range-input-start {
+        z-index: 2;
+      }
+
+      .range-input-end {
+        z-index: 3;
+      }
+
+      .range-summary {
+        margin: 0;
+        font-size: var(--text-xs);
+        color: var(--muted);
       }
 
       .content-grid {
@@ -584,6 +708,20 @@
         max-width: 360px;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      .metric-badge {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 6px;
+        padding: 1px 6px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface-soft);
+        color: var(--muted);
+        font-size: var(--text-xs);
+        font-weight: 700;
+        vertical-align: middle;
       }
 
       .valid-pct-cell {
@@ -947,9 +1085,33 @@
         </div>
 
         <section id="panelTerminology" class="view-panel" aria-label="Terminology view">
+          <div class="card table-card">
+            <p class="section-subtitle">
+              Load CSV exported from <code>spotlight.dq_results__terminology_field_summary</code>.
+            </p>
+            <div class="filter-grid rec-filter-grid">
+              <div class="filter-box">
+                <label class="filter-label" for="termFilterRunId">run_id</label>
+                <select id="termFilterRunId" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="termFilterDataSource">data_source</label>
+                <select id="termFilterDataSource" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="termFilterPayer">payer</label>
+                <select id="termFilterPayer" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="termFilterPlan">plan</label>
+                <select id="termFilterPlan" class="filter-select"></select>
+              </div>
+            </div>
+          </div>
+
           <section class="kpi-grid" aria-label="Data quality KPIs">
             <article class="kpi-card">
-              <p class="kpi-label">Total rows</p>
+              <p class="kpi-label">Filtered metrics</p>
               <p id="kpiTotalRows" class="kpi-value">--</p>
             </article>
             <article class="kpi-card">
@@ -996,7 +1158,8 @@
               </div>
               <p class="table-note">
                 Valid % includes an in-cell bullet bar with a threshold marker. Failed metrics use
-                an orange fill and status labels so color is not the only cue.
+                an orange fill and status labels so color is not the only cue. An <code>xN</code>
+                badge indicates multiple CSV rows share the same visible metric label.
               </p>
 
               <div id="emptyState" class="empty-state">
@@ -1138,6 +1301,10 @@
                       <dd id="detailNullPct">--</dd>
                     </div>
                   </dl>
+                  <p id="detailApplicableDefinition" class="detail-source">
+                    Applicable rows are rows where this terminology check applies. Rows outside the
+                    rule scope are counted as not applicable and excluded from valid % (applicable).
+                  </p>
                   <div id="detailSourceStatus" class="detail-source" hidden></div>
                 </div>
               </div>
@@ -1155,7 +1322,7 @@
             <p class="section-subtitle">
               Load CSV exported from <code>spotlight.reconciliation__monthly_summary</code>.
             </p>
-            <div class="filter-grid">
+            <div class="filter-grid rec-filter-grid">
               <div class="filter-box">
                 <label class="filter-label" for="recFilterRunId">run_id</label>
                 <select id="recFilterRunId" class="filter-select"></select>
@@ -1172,17 +1339,51 @@
                 <label class="filter-label" for="recFilterPlan">plan</label>
                 <select id="recFilterPlan" class="filter-select"></select>
               </div>
+              <div class="filter-box filter-box-span">
+                <label class="filter-label" for="recDateStart">year_month range</label>
+                <div class="range-control">
+                  <div class="range-header">
+                    <span class="range-boundary"
+                      >From <strong id="recDateStartLabel">--</strong></span
+                    >
+                    <span class="range-boundary">To <strong id="recDateEndLabel">--</strong></span>
+                  </div>
+                  <div id="recDateSlider" class="dual-slider">
+                    <div class="dual-slider-track"></div>
+                    <div id="recDateSelection" class="dual-slider-selection"></div>
+                    <input
+                      id="recDateStart"
+                      class="range-input range-input-start"
+                      type="range"
+                      min="0"
+                      max="0"
+                      value="0"
+                      aria-label="Reconciliation date range start month"
+                    />
+                    <input
+                      id="recDateEnd"
+                      class="range-input range-input-end"
+                      type="range"
+                      min="0"
+                      max="0"
+                      value="0"
+                      aria-label="Reconciliation date range end month"
+                    />
+                  </div>
+                  <p id="recDateRangeSummary" class="range-summary">All months</p>
+                </div>
+              </div>
             </div>
           </div>
 
           <section class="kpi-grid" aria-label="Reconciliation KPIs">
             <article class="kpi-card">
-              <p class="kpi-label">Filtered rows</p>
-              <p id="recKpiRows" class="kpi-value">--</p>
+              <p class="kpi-label">Average PMPM</p>
+              <p id="recKpiAvgPmpm" class="kpi-value">--</p>
             </article>
             <article class="kpi-card">
-              <p class="kpi-label">Member months</p>
-              <p id="recKpiMemberMonths" class="kpi-value">--</p>
+              <p class="kpi-label">Average member months</p>
+              <p id="recKpiAvgMemberMonths" class="kpi-value">--</p>
             </article>
             <article class="kpi-card">
               <p class="kpi-label">Claims</p>
@@ -1197,47 +1398,56 @@
             <ul id="recTrendGrid" class="trend-grid trend-list"></ul>
           </div>
 
-          <div class="dual-table-grid">
-            <div class="card table-card">
-              <p class="section-subtitle">Monthly aggregated summary.</p>
-              <div class="simple-table-wrap">
-                <table id="recMonthlyTable" class="simple-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">year_month</th>
-                      <th scope="col">member_months</th>
-                      <th scope="col">members</th>
-                      <th scope="col">claims</th>
-                      <th scope="col">claim_lines</th>
-                      <th scope="col">paid_amount</th>
-                      <th scope="col">members_with_claims</th>
-                      <th scope="col">pct_members_with_claims</th>
-                    </tr>
-                  </thead>
-                  <tbody id="recMonthlyBody"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card table-card">
-              <p class="section-subtitle">Detail rows at model grain (first 1000 rows).</p>
-              <div class="simple-table-wrap">
-                <table id="recDetailTable" class="simple-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">data_source</th>
-                      <th scope="col">payer</th>
-                      <th scope="col">plan</th>
-                      <th scope="col">year_month</th>
-                      <th scope="col">member_months</th>
-                      <th scope="col">claims</th>
-                      <th scope="col">paid_amount</th>
-                      <th scope="col">pmpm_paid</th>
-                    </tr>
-                  </thead>
-                  <tbody id="recDetailBody"></tbody>
-                </table>
-              </div>
+          <div class="card table-card">
+            <p class="section-subtitle">Monthly aggregated summary.</p>
+            <div class="simple-table-wrap">
+              <table id="recMonthlyTable" class="simple-table">
+                <thead>
+                  <tr>
+                    <th scope="col" data-key="year_month">
+                      <button class="sort-button" type="button">
+                        year_month <span class="sort-indicator">↑</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="member_months">
+                      <button class="sort-button" type="button">
+                        member_months <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="members">
+                      <button class="sort-button" type="button">
+                        members <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="claims">
+                      <button class="sort-button" type="button">
+                        claims <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="claim_lines">
+                      <button class="sort-button" type="button">
+                        claim_lines <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="paid_amount">
+                      <button class="sort-button" type="button">
+                        paid_amount <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="members_with_claims">
+                      <button class="sort-button" type="button">
+                        members_with_claims <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="pct_members_with_claims">
+                      <button class="sort-button" type="button">
+                        pct_members_with_claims <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="recMonthlyBody"></tbody>
+              </table>
             </div>
           </div>
         </section>
@@ -1352,6 +1562,7 @@
 
         const DEFAULT_VALID_THRESHOLD_PCT = 0.95;
         const PERCENT_SUM_TOLERANCE = 0.01;
+        const PERCENT_CONSISTENCY_TOLERANCE = 0.005;
         const CHART_COLORS = Object.freeze({
           valid: "--chart-valid",
           invalid: "--chart-invalid",
@@ -1406,7 +1617,7 @@
         ];
         const RECONCILIATION_TREND_METRICS = [
           { key: "pmpm_paid", label: "PMPM paid", format: "currency" },
-          { key: "paid_amount", label: "Paid amount", format: "currency" },
+          { key: "paid_amount", label: "Paid amount", format: "currency_whole" },
           { key: "member_months", label: "Member months", format: "integer" },
           { key: "members_with_claims", label: "Members with claims", format: "integer" },
           { key: "members", label: "Members", format: "integer" },
@@ -1450,6 +1661,9 @@
           sortDir: "asc",
           filterText: "",
           modelFilter: "__all__",
+          dataSourceFilter: "__all__",
+          payerFilter: "__all__",
+          planFilter: "__all__",
           hasLoadedFile: false,
           missingFields: [],
           detectedHeaders: [],
@@ -1467,7 +1681,12 @@
           rows: [],
           filteredRows: [],
           filters: { run_id: "__all__", data_source: "__all__", payer: "__all__", plan: "__all__" },
+          sortKey: "year_month",
+          sortDir: "asc",
           trendCards: {},
+          dateStartIndex: 0,
+          dateEndIndex: 0,
+          hasDateRangeSelection: false,
         };
 
         const mapState = {
@@ -1494,6 +1713,10 @@
           panelTerminology: document.getElementById("panelTerminology"),
           panelReconciliation: document.getElementById("panelReconciliation"),
           panelMapping: document.getElementById("panelMapping"),
+          termFilterRunId: document.getElementById("termFilterRunId"),
+          termFilterDataSource: document.getElementById("termFilterDataSource"),
+          termFilterPayer: document.getElementById("termFilterPayer"),
+          termFilterPlan: document.getElementById("termFilterPlan"),
           runFilterWrap: document.getElementById("runFilterWrap"),
           runFilterSelect: document.getElementById("runFilterSelect"),
           modelFilterSelect: document.getElementById("modelFilterSelect"),
@@ -1527,17 +1750,25 @@
           detailNotApplicableCount: document.getElementById("detailNotApplicableCount"),
           detailInvalidPct: document.getElementById("detailInvalidPct"),
           detailNullPct: document.getElementById("detailNullPct"),
+          detailApplicableDefinition: document.getElementById("detailApplicableDefinition"),
           detailSourceStatus: document.getElementById("detailSourceStatus"),
           recFilterRunId: document.getElementById("recFilterRunId"),
           recFilterDataSource: document.getElementById("recFilterDataSource"),
           recFilterPayer: document.getElementById("recFilterPayer"),
           recFilterPlan: document.getElementById("recFilterPlan"),
-          recKpiRows: document.getElementById("recKpiRows"),
-          recKpiMemberMonths: document.getElementById("recKpiMemberMonths"),
+          recDateSlider: document.getElementById("recDateSlider"),
+          recDateSelection: document.getElementById("recDateSelection"),
+          recDateStart: document.getElementById("recDateStart"),
+          recDateEnd: document.getElementById("recDateEnd"),
+          recDateStartLabel: document.getElementById("recDateStartLabel"),
+          recDateEndLabel: document.getElementById("recDateEndLabel"),
+          recDateRangeSummary: document.getElementById("recDateRangeSummary"),
+          recKpiAvgPmpm: document.getElementById("recKpiAvgPmpm"),
+          recKpiAvgMemberMonths: document.getElementById("recKpiAvgMemberMonths"),
           recKpiClaims: document.getElementById("recKpiClaims"),
+          recMonthlyHead: document.querySelector("#recMonthlyTable thead"),
           recTrendGrid: document.getElementById("recTrendGrid"),
           recMonthlyBody: document.getElementById("recMonthlyBody"),
-          recDetailBody: document.getElementById("recDetailBody"),
           mapFilterRunId: document.getElementById("mapFilterRunId"),
           mapFilterDataSource: document.getElementById("mapFilterDataSource"),
           mapFilterPayer: document.getElementById("mapFilterPayer"),
@@ -1562,6 +1793,10 @@
           bindLogoFallback();
           initDetailChart();
           initReconciliationTrendCards();
+          populateSelectWithOptions(els.termFilterRunId, ["__all__"], "__all__");
+          populateSelectWithOptions(els.termFilterDataSource, ["__all__"], "__all__");
+          populateSelectWithOptions(els.termFilterPayer, ["__all__"], "__all__");
+          populateSelectWithOptions(els.termFilterPlan, ["__all__"], "__all__");
           populateSelectWithOptions(els.modelFilterSelect, ["__all__"], state.modelFilter);
           initializeReconciliationView();
           initializeMappingView();
@@ -1643,8 +1878,24 @@
               return;
             }
             state.selectedRunId = nextRunId;
-            syncRunIdToUrl(nextRunId);
+            syncRunIdToUrl(nextRunId === "__all__" ? "" : nextRunId);
             applyView();
+          });
+
+          [
+            els.termFilterRunId,
+            els.termFilterDataSource,
+            els.termFilterPayer,
+            els.termFilterPlan,
+          ].forEach((input) => {
+            input.addEventListener("change", () => {
+              state.selectedRunId = els.termFilterRunId.value;
+              state.dataSourceFilter = els.termFilterDataSource.value;
+              state.payerFilter = els.termFilterPayer.value;
+              state.planFilter = els.termFilterPlan.value;
+              syncRunIdToUrl(state.selectedRunId === "__all__" ? "" : state.selectedRunId);
+              applyView();
+            });
           });
 
           els.modelFilterSelect.addEventListener("change", () => {
@@ -1732,6 +1983,42 @@
               recState.filters.plan = els.recFilterPlan.value;
               renderReconciliationView();
             });
+          });
+
+          [els.recDateStart, els.recDateEnd].forEach((input) => {
+            input.addEventListener("input", () => {
+              const startIndex = Number(els.recDateStart.value);
+              const endIndex = Number(els.recDateEnd.value);
+              if (!Number.isFinite(startIndex) || !Number.isFinite(endIndex)) {
+                return;
+              }
+
+              recState.dateStartIndex = Math.min(startIndex, endIndex);
+              recState.dateEndIndex = Math.max(startIndex, endIndex);
+              recState.hasDateRangeSelection = true;
+              renderReconciliationView();
+            });
+          });
+
+          els.recMonthlyHead.addEventListener("click", (event) => {
+            const button = event.target.closest("button.sort-button");
+            if (!button) {
+              return;
+            }
+
+            const th = button.closest("th[data-key]");
+            if (!th) {
+              return;
+            }
+
+            const key = th.dataset.key;
+            if (recState.sortKey === key) {
+              recState.sortDir = recState.sortDir === "asc" ? "desc" : "asc";
+            } else {
+              recState.sortKey = key;
+              recState.sortDir = "asc";
+            }
+            renderReconciliationView();
           });
 
           [
@@ -2080,17 +2367,18 @@
             );
             const values = monthlyRows.map((row) => getReconciliationTrendValue(metric.key, row));
             const finitePoints = values.filter((value) => Number.isFinite(value));
+            const averageValue = computeAverage(finitePoints);
             const latestValue = getLastFiniteValue(values);
             const minValue = finitePoints.length ? Math.min(...finitePoints) : null;
             const maxValue = finitePoints.length ? Math.max(...finitePoints) : null;
             const latestIndex = findLastFiniteIndex(values);
             const latestMonth = latestIndex >= 0 ? labels[latestIndex] : "";
 
-            card.value.textContent = formatTrendValue(metric.format, latestValue);
+            card.value.textContent = `Avg ${formatTrendValue(metric.format, averageValue)}`;
             card.summary.textContent = buildTrendSummaryText({
               metric,
               values,
-              labels,
+              averageValue,
               latestMonth,
               latestValue,
               minValue,
@@ -2106,6 +2394,9 @@
             chart.data.datasets[0].data = values.map((value) =>
               Number.isFinite(value) ? value : null,
             );
+            const yBounds = computeTrendYAxisBounds(values);
+            chart.options.scales.y.min = yBounds ? yBounds.min : undefined;
+            chart.options.scales.y.max = yBounds ? yBounds.max : undefined;
             chart.update();
           });
         }
@@ -2160,9 +2451,17 @@
                   border: { display: false },
                 },
                 y: {
-                  display: false,
+                  display: true,
+                  title: {
+                    display: true,
+                    text: card.metric.label,
+                  },
                   grid: { color: gridColor },
                   border: { display: false },
+                  ticks: {
+                    maxTicksLimit: 4,
+                    callback: (value) => formatTrendAxisTick(card.metric.format, Number(value)),
+                  },
                 },
               },
               plugins: {
@@ -2191,9 +2490,25 @@
           return Number.isFinite(row[metricKey]) ? row[metricKey] : null;
         }
 
+        function formatTrendAxisTick(format, value) {
+          if (!Number.isFinite(value)) {
+            return "";
+          }
+          if (format === "currency_whole") {
+            return formatCompactCurrencyWhole(value);
+          }
+          if (format === "currency") {
+            return formatCompactCurrency(value);
+          }
+          return formatCompactNumber(value);
+        }
+
         function formatTrendValue(format, value) {
           if (!Number.isFinite(value)) {
             return "--";
+          }
+          if (format === "currency_whole") {
+            return formatCurrencyWhole(value);
           }
           if (format === "currency") {
             return formatCurrency(value);
@@ -2204,7 +2519,7 @@
         function buildTrendSummaryText({
           metric,
           values,
-          labels,
+          averageValue,
           latestMonth,
           latestValue,
           minValue,
@@ -2215,22 +2530,36 @@
             return "No monthly values available for current filters.";
           }
 
-          const firstIndex = values.findIndex((value) => Number.isFinite(value));
-          const firstValue = firstIndex >= 0 ? values[firstIndex] : null;
-          const firstMonth = firstIndex >= 0 ? labels[firstIndex] : "";
-          const changeValue =
-            Number.isFinite(firstValue) && Number.isFinite(latestValue)
-              ? latestValue - firstValue
-              : null;
-          const changeText = Number.isFinite(changeValue)
-            ? `${changeValue >= 0 ? "+" : "-"}${formatTrendValue(metric.format, Math.abs(changeValue))}`
-            : "--";
-
           return (
+            `Average: ${formatTrendValue(metric.format, averageValue)}. ` +
             `Latest ${latestMonth || "(unknown month)"}: ${formatTrendValue(metric.format, latestValue)}. ` +
-            `Min ${formatTrendValue(metric.format, minValue)}, max ${formatTrendValue(metric.format, maxValue)}. ` +
-            `Change since ${firstMonth || "(first month)"}: ${changeText}.`
+            `Min ${formatTrendValue(metric.format, minValue)}, max ${formatTrendValue(metric.format, maxValue)}.`
           );
+        }
+
+        function computeTrendYAxisBounds(values) {
+          const finiteValues = values.filter((value) => Number.isFinite(value));
+          if (!finiteValues.length) {
+            return null;
+          }
+
+          const minValue = Math.min(...finiteValues);
+          const maxValue = Math.max(...finiteValues);
+          const hasNegative = finiteValues.some((value) => value < 0);
+
+          // Keep baseline at zero for non-negative metrics so axis labels stay intuitive.
+          if (!hasNegative) {
+            const upperPad = maxValue === 0 ? 1 : maxValue * 0.18;
+            return { min: 0, max: maxValue + upperPad };
+          }
+
+          if (minValue === maxValue) {
+            const pad = Math.abs(minValue) * 0.1 || 1;
+            return { min: minValue - pad, max: maxValue + pad };
+          }
+
+          const pad = (maxValue - minValue) * 0.18;
+          return { min: minValue - pad, max: maxValue + pad };
         }
 
         function findLastFiniteIndex(values) {
@@ -2318,6 +2647,9 @@
           recState.filters.data_source = "__all__";
           recState.filters.payer = "__all__";
           recState.filters.plan = "__all__";
+          recState.dateStartIndex = 0;
+          recState.dateEndIndex = 0;
+          recState.hasDateRangeSelection = false;
           rebuildReconciliationFilters();
           renderReconciliationView();
         }
@@ -2355,39 +2687,10 @@
           recState.filters.plan = els.recFilterPlan.value;
         }
 
-        function renderReconciliationView() {
-          const filteredRows = recState.rows.filter((row) => {
-            if (recState.filters.run_id !== "__all__" && row.run_id !== recState.filters.run_id) {
-              return false;
-            }
-            if (
-              recState.filters.data_source !== "__all__" &&
-              row.data_source !== recState.filters.data_source
-            ) {
-              return false;
-            }
-            if (recState.filters.payer !== "__all__" && row.payer !== recState.filters.payer) {
-              return false;
-            }
-            if (recState.filters.plan !== "__all__" && row.plan !== recState.filters.plan) {
-              return false;
-            }
-            return true;
-          });
-          recState.filteredRows = filteredRows;
-
-          const memberMonths = filteredRows.reduce(
-            (total, row) => total + (row.member_months || 0),
-            0,
-          );
-          const claims = filteredRows.reduce((total, row) => total + (row.claims || 0), 0);
-          els.recKpiRows.textContent = formatInteger(filteredRows.length);
-          els.recKpiMemberMonths.textContent = formatInteger(memberMonths);
-          els.recKpiClaims.textContent = formatInteger(claims);
-
+        function buildReconciliationMonthlyRows(rows) {
           const monthlyMap = new Map();
-          filteredRows.forEach((row) => {
-            const key = row.year_month_int || row.year_month;
+          rows.forEach((row) => {
+            const key = getYearMonthKey(row);
             if (!key) {
               return;
             }
@@ -2410,7 +2713,7 @@
             monthlyMap.set(key, current);
           });
 
-          const monthlyRows = Array.from(monthlyMap.values()).sort((left, right) => {
+          return Array.from(monthlyMap.values()).sort((left, right) => {
             const leftKey = Number.isFinite(left.year_month_int)
               ? left.year_month_int
               : Number.MAX_SAFE_INTEGER;
@@ -2422,17 +2725,203 @@
             }
             return String(left.year_month).localeCompare(String(right.year_month));
           });
+        }
+
+        function getYearMonthKey(row) {
+          if (Number.isFinite(row.year_month_int)) {
+            return `int:${Math.round(row.year_month_int)}`;
+          }
+          const yearMonth = String(row.year_month || "").trim();
+          return yearMonth ? `label:${yearMonth}` : "";
+        }
+
+        function getYearMonthLabel(row) {
+          return row.year_month || formatYearMonth(row.year_month_int) || "(unknown)";
+        }
+
+        function syncReconciliationDateRange(monthlyRows) {
+          if (!monthlyRows.length) {
+            recState.dateStartIndex = 0;
+            recState.dateEndIndex = 0;
+            recState.hasDateRangeSelection = false;
+            els.recDateStart.min = "0";
+            els.recDateStart.max = "0";
+            els.recDateStart.value = "0";
+            els.recDateEnd.min = "0";
+            els.recDateEnd.max = "0";
+            els.recDateEnd.value = "0";
+            els.recDateStart.disabled = true;
+            els.recDateEnd.disabled = true;
+            els.recDateStartLabel.textContent = "--";
+            els.recDateEndLabel.textContent = "--";
+            els.recDateRangeSummary.textContent = "No months available for current filters.";
+            updateReconciliationRangeVisual(0);
+            return { startIndex: 0, endIndex: -1 };
+          }
+
+          const maxIndex = monthlyRows.length - 1;
+          if (!recState.hasDateRangeSelection) {
+            recState.dateStartIndex = 0;
+            recState.dateEndIndex = maxIndex;
+          } else {
+            recState.dateStartIndex = Math.max(0, Math.min(maxIndex, recState.dateStartIndex));
+            recState.dateEndIndex = Math.max(0, Math.min(maxIndex, recState.dateEndIndex));
+            if (recState.dateStartIndex > recState.dateEndIndex) {
+              recState.dateStartIndex = recState.dateEndIndex;
+            }
+          }
+
+          els.recDateStart.disabled = false;
+          els.recDateEnd.disabled = false;
+          els.recDateStart.min = "0";
+          els.recDateStart.max = String(maxIndex);
+          els.recDateStart.value = String(recState.dateStartIndex);
+          els.recDateEnd.min = "0";
+          els.recDateEnd.max = String(maxIndex);
+          els.recDateEnd.value = String(recState.dateEndIndex);
+
+          const startLabel = getYearMonthLabel(monthlyRows[recState.dateStartIndex]);
+          const endLabel = getYearMonthLabel(monthlyRows[recState.dateEndIndex]);
+          const monthCount = recState.dateEndIndex - recState.dateStartIndex + 1;
+          els.recDateStartLabel.textContent = startLabel;
+          els.recDateEndLabel.textContent = endLabel;
+          els.recDateRangeSummary.textContent = `${startLabel} to ${endLabel} (${monthCount} month${monthCount === 1 ? "" : "s"})`;
+          updateReconciliationRangeVisual(maxIndex);
+          return { startIndex: recState.dateStartIndex, endIndex: recState.dateEndIndex };
+        }
+
+        function updateReconciliationRangeVisual(maxIndex) {
+          if (!els.recDateSelection) {
+            return;
+          }
+          if (!Number.isFinite(maxIndex) || maxIndex <= 0) {
+            els.recDateSelection.style.left = "0%";
+            els.recDateSelection.style.width = "100%";
+            return;
+          }
+          const startPct = (recState.dateStartIndex / maxIndex) * 100;
+          const endPct = (recState.dateEndIndex / maxIndex) * 100;
+          els.recDateSelection.style.left = `${startPct}%`;
+          els.recDateSelection.style.width = `${Math.max(0, endPct - startPct)}%`;
+        }
+
+        function sortReconciliationMonthlyRows(rows) {
+          const sorted = [...rows];
+          sorted.sort((left, right) =>
+            compareReconciliationMonthlyRows(left, right, recState.sortKey, recState.sortDir),
+          );
+          return sorted;
+        }
+
+        function compareReconciliationMonthlyRows(left, right, key, direction) {
+          const multiplier = direction === "asc" ? 1 : -1;
+
+          if (key === "year_month") {
+            const leftKey = Number.isFinite(left.year_month_int) ? left.year_month_int : null;
+            const rightKey = Number.isFinite(right.year_month_int) ? right.year_month_int : null;
+            if (Number.isFinite(leftKey) && Number.isFinite(rightKey) && leftKey !== rightKey) {
+              return (leftKey - rightKey) * multiplier;
+            }
+            const leftLabel = getYearMonthLabel(left).toLowerCase();
+            const rightLabel = getYearMonthLabel(right).toLowerCase();
+            return leftLabel.localeCompare(rightLabel) * multiplier;
+          }
+
+          const leftValue = getReconciliationMonthlySortValue(left, key);
+          const rightValue = getReconciliationMonthlySortValue(right, key);
+          const safeLeft = Number.isFinite(leftValue) ? leftValue : Number.NEGATIVE_INFINITY;
+          const safeRight = Number.isFinite(rightValue) ? rightValue : Number.NEGATIVE_INFINITY;
+          return (safeLeft - safeRight) * multiplier;
+        }
+
+        function getReconciliationMonthlySortValue(row, key) {
+          if (key === "pct_members_with_claims") {
+            return row.member_months > 0 ? row.members_with_claims / row.member_months : null;
+          }
+          return Number.isFinite(row[key]) ? row[key] : null;
+        }
+
+        function updateReconciliationSortHeaderState() {
+          const headers = els.recMonthlyHead.querySelectorAll("th[data-key]");
+          headers.forEach((header) => {
+            const key = header.dataset.key;
+            const indicator = header.querySelector(".sort-indicator");
+            const isActive = key === recState.sortKey;
+            let ariaSort = "none";
+
+            if (isActive) {
+              if (recState.sortDir === "asc") {
+                indicator.textContent = "↑";
+                ariaSort = "ascending";
+              } else {
+                indicator.textContent = "↓";
+                ariaSort = "descending";
+              }
+            } else {
+              indicator.textContent = "↕";
+            }
+
+            header.setAttribute("aria-sort", ariaSort);
+          });
+        }
+
+        function renderReconciliationView() {
+          const dimensionFilteredRows = recState.rows.filter((row) => {
+            if (recState.filters.run_id !== "__all__" && row.run_id !== recState.filters.run_id) {
+              return false;
+            }
+            if (
+              recState.filters.data_source !== "__all__" &&
+              row.data_source !== recState.filters.data_source
+            ) {
+              return false;
+            }
+            if (recState.filters.payer !== "__all__" && row.payer !== recState.filters.payer) {
+              return false;
+            }
+            if (recState.filters.plan !== "__all__" && row.plan !== recState.filters.plan) {
+              return false;
+            }
+            return true;
+          });
+          const monthlyRowsAll = buildReconciliationMonthlyRows(dimensionFilteredRows);
+          const range = syncReconciliationDateRange(monthlyRowsAll);
+          const monthlyRows =
+            range.endIndex >= range.startIndex
+              ? monthlyRowsAll.slice(range.startIndex, range.endIndex + 1)
+              : [];
+          const selectedMonthKeys = new Set(monthlyRows.map((row) => getYearMonthKey(row)));
+          const filteredRows = dimensionFilteredRows.filter((row) =>
+            selectedMonthKeys.has(getYearMonthKey(row)),
+          );
+          recState.filteredRows = filteredRows;
+
+          const avgPmpm = computeAverage(
+            monthlyRows
+              .map((row) => getReconciliationTrendValue("pmpm_paid", row))
+              .filter((value) => Number.isFinite(value)),
+          );
+          const avgMemberMonths = computeAverage(
+            monthlyRows.map((row) => row.member_months).filter((value) => Number.isFinite(value)),
+          );
+          const claimsTotal = monthlyRows.reduce((total, row) => total + (row.claims || 0), 0);
+          els.recKpiAvgPmpm.textContent = monthlyRows.length > 0 ? formatCurrency(avgPmpm) : "--";
+          els.recKpiAvgMemberMonths.textContent =
+            monthlyRows.length > 0 ? formatInteger(avgMemberMonths) : "--";
+          els.recKpiClaims.textContent = monthlyRows.length > 0 ? formatInteger(claimsTotal) : "--";
+
           renderReconciliationTrends(monthlyRows);
+          updateReconciliationSortHeaderState();
 
           const monthlyFragment = document.createDocumentFragment();
-          monthlyRows.forEach((row) => {
+          sortReconciliationMonthlyRows(monthlyRows).forEach((row) => {
             const tr = document.createElement("tr");
-            appendTextCell(tr, row.year_month || formatYearMonth(row.year_month_int));
+            appendTextCell(tr, getYearMonthLabel(row));
             appendNumberCell(tr, formatInteger(row.member_months));
             appendNumberCell(tr, formatInteger(row.members));
             appendNumberCell(tr, formatInteger(row.claims));
             appendNumberCell(tr, formatInteger(row.claim_lines));
-            appendNumberCell(tr, formatCurrency(row.paid_amount));
+            appendNumberCell(tr, formatCurrencyWhole(row.paid_amount));
             appendNumberCell(tr, formatInteger(row.members_with_claims));
             const pctMembers =
               row.member_months > 0 ? row.members_with_claims / row.member_months : null;
@@ -2440,41 +2929,6 @@
             monthlyFragment.appendChild(tr);
           });
           els.recMonthlyBody.replaceChildren(monthlyFragment);
-
-          const detailFragment = document.createDocumentFragment();
-          [...filteredRows]
-            .sort((left, right) => {
-              if (left.data_source !== right.data_source) {
-                return left.data_source.localeCompare(right.data_source);
-              }
-              if (left.payer !== right.payer) {
-                return left.payer.localeCompare(right.payer);
-              }
-              if (left.plan !== right.plan) {
-                return left.plan.localeCompare(right.plan);
-              }
-              const leftKey = Number.isFinite(left.year_month_int)
-                ? left.year_month_int
-                : Number.MAX_SAFE_INTEGER;
-              const rightKey = Number.isFinite(right.year_month_int)
-                ? right.year_month_int
-                : Number.MAX_SAFE_INTEGER;
-              return leftKey - rightKey;
-            })
-            .slice(0, 1000)
-            .forEach((row) => {
-              const tr = document.createElement("tr");
-              appendTextCell(tr, row.data_source);
-              appendTextCell(tr, row.payer);
-              appendTextCell(tr, row.plan);
-              appendTextCell(tr, row.year_month || formatYearMonth(row.year_month_int));
-              appendNumberCell(tr, formatInteger(row.member_months));
-              appendNumberCell(tr, formatInteger(row.claims));
-              appendNumberCell(tr, formatCurrency(row.paid_amount));
-              appendNumberCell(tr, formatCurrency(row.pmpm_paid));
-              detailFragment.appendChild(tr);
-            });
-          els.recDetailBody.replaceChildren(detailFragment);
         }
 
         function processMappingCsv(text) {
@@ -2792,11 +3246,15 @@
             state.runScopedRows = [];
             state.filteredRows = [];
             state.runOptions = [];
-            state.selectedRunId = "";
+            state.selectedRunId = "__all__";
+            state.dataSourceFilter = "__all__";
+            state.payerFilter = "__all__";
+            state.planFilter = "__all__";
             state.missingFields = [];
             showGenericError("CSV appears to be empty or missing data rows.");
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
             renderRunFilter();
+            rebuildTerminologyDimensionFilters();
             renderTable([]);
             renderDetailPanel(null);
             return;
@@ -2810,9 +3268,13 @@
             state.runScopedRows = [];
             state.filteredRows = [];
             state.runOptions = [];
-            state.selectedRunId = "";
+            state.selectedRunId = "__all__";
+            state.dataSourceFilter = "__all__";
+            state.payerFilter = "__all__";
+            state.planFilter = "__all__";
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
             renderRunFilter();
+            rebuildTerminologyDimensionFilters();
             renderMissingFieldsError(parsed.missingFields, parsed.detectedHeaders);
             renderTable([]);
             renderDetailPanel(null);
@@ -2856,14 +3318,19 @@
               valid_rows_pct: parsePercent(row.valid_rows_pct),
               invalid_rows_pct: parsePercent(row.invalid_rows_pct),
               valid_rows_applicable_pct: parsePercent(row.valid_rows_applicable_pct),
+              applicability_scope: getTerminologyApplicabilityScope(row),
             });
           }
 
           state.rows = computeDerivedMetrics(rowData);
           state.runOptions = computeRunOptions(state.rows);
           state.selectedRunId = resolveInitialRunId(state.runOptions);
-          syncRunIdToUrl(state.selectedRunId);
+          state.dataSourceFilter = "__all__";
+          state.payerFilter = "__all__";
+          state.planFilter = "__all__";
+          syncRunIdToUrl(state.selectedRunId === "__all__" ? "" : state.selectedRunId);
           renderRunFilter();
+          rebuildTerminologyDimensionFilters();
           state.selectedRowId = null;
           applyView();
         }
@@ -3086,6 +3553,27 @@
           return mapped;
         }
 
+        function getTerminologyApplicabilityScope(row) {
+          return firstNonBlank([
+            row.applicability_scope,
+            row.applicable_scope,
+            row.applicability_description,
+            row.applicable_rows_definition,
+            row.applicable_rows_description,
+            row.rule_scope,
+          ]);
+        }
+
+        function firstNonBlank(values) {
+          for (const value of values) {
+            const text = String(value || "").trim();
+            if (text) {
+              return text;
+            }
+          }
+          return "";
+        }
+
         function computeDerivedMetrics(rows) {
           return rows.map((row) => {
             const totalRows = row.total_rows;
@@ -3096,37 +3584,47 @@
             const notApplicableCount = row.not_applicable_rows;
 
             const hasTotalCounts = Number.isFinite(totalRows) && totalRows > 0;
-            const hasApplicableCounts = Number.isFinite(applicableRows) && applicableRows > 0;
+            const mismatchNotes = [];
 
-            const validPctApplicable = Number.isFinite(row.valid_rows_applicable_pct)
-              ? row.valid_rows_applicable_pct
-              : hasApplicableCounts
-                ? validCount / applicableRows
-                : null;
+            const validPctApplicable = resolveCountConsistentPercent({
+              sourcePercent: row.valid_rows_applicable_pct,
+              numerator: validCount,
+              denominator: applicableRows,
+              fieldName: "valid_rows_applicable_pct",
+              notes: mismatchNotes,
+            });
 
-            let validPctTotal = Number.isFinite(row.valid_rows_pct)
-              ? row.valid_rows_pct
-              : hasTotalCounts
-                ? validCount / totalRows
-                : null;
+            let validPctTotal = resolveCountConsistentPercent({
+              sourcePercent: row.valid_rows_pct,
+              numerator: validCount,
+              denominator: totalRows,
+              fieldName: "valid_rows_pct",
+              notes: mismatchNotes,
+            });
 
-            let invalidPct = Number.isFinite(row.invalid_rows_pct)
-              ? row.invalid_rows_pct
-              : hasTotalCounts
-                ? invalidCount / totalRows
-                : null;
+            let invalidPct = resolveCountConsistentPercent({
+              sourcePercent: row.invalid_rows_pct,
+              numerator: invalidCount,
+              denominator: totalRows,
+              fieldName: "invalid_rows_pct",
+              notes: mismatchNotes,
+            });
 
-            let nullPct = Number.isFinite(row.null_rows_pct)
-              ? row.null_rows_pct
-              : hasTotalCounts
-                ? nullCount / totalRows
-                : null;
+            let nullPct = resolveCountConsistentPercent({
+              sourcePercent: row.null_rows_pct,
+              numerator: nullCount,
+              denominator: totalRows,
+              fieldName: "null_rows_pct",
+              notes: mismatchNotes,
+            });
 
-            let notApplicablePct = Number.isFinite(row.not_applicable_rows_pct)
-              ? row.not_applicable_rows_pct
-              : hasTotalCounts
-                ? notApplicableCount / totalRows
-                : null;
+            let notApplicablePct = resolveCountConsistentPercent({
+              sourcePercent: row.not_applicable_rows_pct,
+              numerator: notApplicableCount,
+              denominator: totalRows,
+              fieldName: "not_applicable_rows_pct",
+              notes: mismatchNotes,
+            });
 
             const hasDistributionPercents =
               Number.isFinite(validPctTotal) &&
@@ -3146,6 +3644,9 @@
               invalidPct = invalidCount / totalRows;
               nullPct = nullCount / totalRows;
               notApplicablePct = notApplicableCount / totalRows;
+              mismatchNotes.push(
+                "Distribution percentages exceeded 100% and were recalculated from counts.",
+              );
             }
 
             const threshold = DEFAULT_VALID_THRESHOLD_PCT;
@@ -3177,9 +3678,36 @@
               threshold,
               margin_pct_points: marginPctPoints,
               status,
-              source_status: "",
+              source_status: mismatchNotes.join(" "),
             };
           });
+        }
+
+        function resolveCountConsistentPercent({
+          sourcePercent,
+          numerator,
+          denominator,
+          fieldName,
+          notes,
+        }) {
+          const computedPercent =
+            Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0
+              ? numerator / denominator
+              : null;
+
+          if (!Number.isFinite(sourcePercent)) {
+            return computedPercent;
+          }
+
+          if (
+            Number.isFinite(computedPercent) &&
+            Math.abs(sourcePercent - computedPercent) > PERCENT_CONSISTENCY_TOLERANCE
+          ) {
+            notes.push(`${fieldName} did not match count-derived values.`);
+            return computedPercent;
+          }
+
+          return sourcePercent;
         }
 
         function formatMetricLabel(modelName, fieldName) {
@@ -3236,7 +3764,7 @@
 
         function resolveInitialRunId(runOptions) {
           if (!runOptions.length) {
-            return "";
+            return "__all__";
           }
 
           const runIdFromUrl = getRunIdFromUrl();
@@ -3244,25 +3772,7 @@
             return runIdFromUrl;
           }
 
-          return resolveLatestRunId(runOptions);
-        }
-
-        function resolveLatestRunId(runOptions) {
-          const withTimestamp = runOptions.filter((option) =>
-            Number.isFinite(option.latestRunTsMs),
-          );
-          if (!withTimestamp.length) {
-            return runOptions
-              .map((option) => option.runId)
-              .sort((left, right) => String(right).localeCompare(String(left)))[0];
-          }
-
-          const maxTimestamp = Math.max(...withTimestamp.map((option) => option.latestRunTsMs));
-          const tiedRunIds = withTimestamp
-            .filter((option) => option.latestRunTsMs === maxTimestamp)
-            .map((option) => option.runId)
-            .sort((left, right) => String(right).localeCompare(String(left)));
-          return tiedRunIds[0];
+          return "__all__";
         }
 
         function getRunIdFromUrl() {
@@ -3283,21 +3793,107 @@
 
         function getRunScopedRows() {
           if (
+            state.selectedRunId !== "__all__" &&
             state.runOptions.length > 0 &&
             !state.runOptions.some((option) => option.runId === state.selectedRunId)
           ) {
-            state.selectedRunId = resolveLatestRunId(state.runOptions);
-            syncRunIdToUrl(state.selectedRunId);
+            state.selectedRunId = "__all__";
+            syncRunIdToUrl("");
           }
 
-          if (!state.selectedRunId) {
-            return [...state.rows];
-          }
-          return state.rows.filter((row) => row.run_id === state.selectedRunId);
+          const runScopedRows =
+            state.selectedRunId && state.selectedRunId !== "__all__"
+              ? state.rows.filter((row) => row.run_id === state.selectedRunId)
+              : [...state.rows];
+
+          return runScopedRows.filter((row) => {
+            if (
+              state.dataSourceFilter !== "__all__" &&
+              row.data_source !== state.dataSourceFilter
+            ) {
+              return false;
+            }
+            if (state.payerFilter !== "__all__" && row.payer !== state.payerFilter) {
+              return false;
+            }
+            if (state.planFilter !== "__all__" && row.plan !== state.planFilter) {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        function getTerminologyRowsForFilterOptions(excludeFilterKey) {
+          return state.rows.filter((row) => {
+            if (
+              excludeFilterKey !== "run_id" &&
+              state.selectedRunId !== "__all__" &&
+              row.run_id !== state.selectedRunId
+            ) {
+              return false;
+            }
+            if (
+              excludeFilterKey !== "data_source" &&
+              state.dataSourceFilter !== "__all__" &&
+              row.data_source !== state.dataSourceFilter
+            ) {
+              return false;
+            }
+            if (
+              excludeFilterKey !== "payer" &&
+              state.payerFilter !== "__all__" &&
+              row.payer !== state.payerFilter
+            ) {
+              return false;
+            }
+            if (
+              excludeFilterKey !== "plan" &&
+              state.planFilter !== "__all__" &&
+              row.plan !== state.planFilter
+            ) {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        function rebuildTerminologyDimensionFilters() {
+          const runIds = uniqueSorted(
+            getTerminologyRowsForFilterOptions("run_id").map((row) => row.run_id),
+          );
+          const dataSources = uniqueSorted(
+            getTerminologyRowsForFilterOptions("data_source").map((row) => row.data_source),
+          );
+          const payers = uniqueSorted(
+            getTerminologyRowsForFilterOptions("payer").map((row) => row.payer),
+          );
+          const plans = uniqueSorted(
+            getTerminologyRowsForFilterOptions("plan").map((row) => row.plan),
+          );
+
+          populateSelectWithOptions(
+            els.termFilterRunId,
+            ["__all__", ...runIds],
+            state.selectedRunId,
+          );
+
+          populateSelectWithOptions(
+            els.termFilterDataSource,
+            ["__all__", ...dataSources],
+            state.dataSourceFilter,
+          );
+          populateSelectWithOptions(els.termFilterPayer, ["__all__", ...payers], state.payerFilter);
+          populateSelectWithOptions(els.termFilterPlan, ["__all__", ...plans], state.planFilter);
+
+          state.selectedRunId = els.termFilterRunId.value;
+          state.dataSourceFilter = els.termFilterDataSource.value;
+          state.payerFilter = els.termFilterPayer.value;
+          state.planFilter = els.termFilterPlan.value;
         }
 
         function applyView() {
           renderRunFilter();
+          rebuildTerminologyDimensionFilters();
           state.runScopedRows = getRunScopedRows();
           rebuildTerminologyModelFilter(state.runScopedRows);
           const filtered = state.runScopedRows.filter((row) => {
@@ -3325,16 +3921,14 @@
           }
 
           state.selectedRowId = rowId;
-          renderTable(state.filteredRows, options.focus ? rowId : null);
+          renderTable(state.filteredRows, options.focus ? rowId : null, {
+            preserveScroll: !options.focus,
+          });
           renderDetailPanel(getSelectedRow());
         }
 
         function calculateKpis(rows) {
-          const denominators = rows
-            .map((row) => row.denominator)
-            .filter((value) => Number.isFinite(value) && value > 0);
-
-          const totalRows = denominators.length ? Math.max(...denominators) : null;
+          const totalRows = rows.length;
 
           let nullCountSum = 0;
           let invalidCountSum = 0;
@@ -3378,32 +3972,24 @@
 
         function renderRunFilter() {
           const options = state.runOptions;
-          const shouldShow = options.length > 1 && state.missingFields.length === 0;
-          els.runFilterWrap.hidden = !shouldShow;
-          els.runFilterSelect.disabled = !shouldShow;
+          els.runFilterWrap.hidden = true;
+          els.runFilterSelect.disabled = true;
 
           if (!options.length) {
             els.runFilterSelect.replaceChildren();
             return;
           }
 
+          const runIdOptions = ["__all__", ...options.map((option) => option.runId)];
           const fragment = document.createDocumentFragment();
-          options.forEach((option) => {
+          runIdOptions.forEach((runId) => {
             const item = document.createElement("option");
-            item.value = option.runId;
-            item.textContent = option.runId;
+            item.value = runId;
+            item.textContent = runId === "__all__" ? "All" : runId;
             fragment.appendChild(item);
           });
           els.runFilterSelect.replaceChildren(fragment);
-
-          if (
-            state.selectedRunId &&
-            options.some((option) => option.runId === state.selectedRunId)
-          ) {
-            els.runFilterSelect.value = state.selectedRunId;
-          } else {
-            els.runFilterSelect.value = options[0].runId;
-          }
+          els.runFilterSelect.value = state.selectedRunId;
         }
 
         function rebuildTerminologyModelFilter(rows) {
@@ -3416,7 +4002,9 @@
           state.modelFilter = els.modelFilterSelect.value;
         }
 
-        function renderTable(rows, focusRowId = null) {
+        function renderTable(rows, focusRowId = null, options = {}) {
+          const preserveScroll = options.preserveScroll === true;
+          const previousScrollTop = preserveScroll ? els.tableContainer.scrollTop : 0;
           const noDataLoaded = !state.hasLoadedFile;
           const blockedBySchema = state.missingFields.length > 0;
           const noRows = rows.length === 0;
@@ -3450,6 +4038,7 @@
             return;
           }
 
+          const metricCounts = buildMetricCounts(rows);
           const fragment = document.createDocumentFragment();
           rows.forEach((row) => {
             const tr = document.createElement("tr");
@@ -3461,13 +4050,17 @@
               tr.classList.add("selected");
             }
 
-            appendMetricCell(tr, row.metric);
+            appendMetricCell(tr, row, metricCounts);
             appendValidPctCell(tr, row);
             appendStatusCell(tr, row.status);
             fragment.appendChild(tr);
           });
 
           els.tableBody.replaceChildren(fragment);
+
+          if (preserveScroll && !Number.isFinite(focusRowId)) {
+            els.tableContainer.scrollTop = previousScrollTop;
+          }
 
           if (Number.isFinite(focusRowId)) {
             const focusRow = els.tableBody.querySelector(`tr[data-row-id="${focusRowId}"]`);
@@ -3477,10 +4070,28 @@
           }
         }
 
-        function appendMetricCell(tr, metric) {
+        function buildMetricCounts(rows) {
+          const counts = new Map();
+          rows.forEach((row) => {
+            const key = row.metric;
+            counts.set(key, (counts.get(key) || 0) + 1);
+          });
+          return counts;
+        }
+
+        function appendMetricCell(tr, row, metricCounts) {
           const td = document.createElement("td");
           td.className = "metric-cell";
-          td.textContent = metric;
+          td.textContent = row.metric;
+          const duplicateCount = metricCounts.get(row.metric) || 1;
+          if (duplicateCount > 1) {
+            const badge = document.createElement("span");
+            badge.className = "metric-badge";
+            badge.textContent = `x${duplicateCount}`;
+            badge.title =
+              "Multiple CSV rows share this metric label in the current selection (often different plans, payers, or data sources).";
+            td.appendChild(badge);
+          }
           tr.appendChild(td);
         }
 
@@ -3605,6 +4216,7 @@
           els.detailNotApplicableCount.textContent = formatInteger(row.not_applicable_count);
           els.detailInvalidPct.textContent = formatPercent(row.invalid_pct);
           els.detailNullPct.textContent = formatPercent(row.null_pct);
+          els.detailApplicableDefinition.textContent = getApplicableRowsDescription(row);
 
           if (row.source_status) {
             els.detailSourceStatus.hidden = false;
@@ -3725,6 +4337,51 @@
             margin >= 0 ? "over" : "under"
           } threshold`;
           return `Valid %: ${validText}. Threshold: ${thresholdText}. Status: ${status} (${distanceText}).`;
+        }
+
+        function getApplicableRowsDescription(row) {
+          const explicitScope = String(row.applicability_scope || "").trim();
+          if (explicitScope) {
+            return `Applicable rows definition: ${explicitScope}`;
+          }
+
+          const inferredScope = inferTerminologyApplicabilityScope(row);
+          if (inferredScope) {
+            return `Applicable rows definition: ${inferredScope} (inferred from model/field).`;
+          }
+
+          return "Applicable rows are rows where this terminology check applies. Rows outside the rule scope are counted as not applicable and excluded from valid % (applicable).";
+        }
+
+        function inferTerminologyApplicabilityScope(row) {
+          const modelName = String(row.model_name || "").toLowerCase();
+          const fieldName = String(row.field_name || "").toLowerCase();
+          const terminologyTable = String(row.terminology_table || "").toLowerCase();
+
+          if (terminologyTable.includes("drg")) {
+            return "Inpatient claims only.";
+          }
+          if (fieldName.includes("revenue_code") || fieldName.includes("bill_type")) {
+            return "Institutional claims only.";
+          }
+          if (
+            fieldName.includes("cpt") ||
+            fieldName.includes("hcpcs") ||
+            fieldName.includes("modifier")
+          ) {
+            return "Professional and institutional claim lines where these procedure fields are populated.";
+          }
+          if (fieldName.includes("diagnosis_code")) {
+            return "Medical claims where diagnosis coding is expected (professional and institutional).";
+          }
+          if (modelName.includes("eligibility")) {
+            return "All eligibility rows.";
+          }
+          if (modelName.includes("pharmacy")) {
+            return "Pharmacy claims only.";
+          }
+
+          return "";
         }
 
         function renderMissingFieldsError(missingFields, detectedHeaders) {
@@ -3930,8 +4587,52 @@
           return Math.max(0, Math.min(100, value));
         }
 
+        function computeAverage(values) {
+          const validValues = values.filter((value) => Number.isFinite(value));
+          if (!validValues.length) {
+            return null;
+          }
+          const total = validValues.reduce((sum, value) => sum + value, 0);
+          return total / validValues.length;
+        }
+
         function formatInteger(value) {
           return Number.isFinite(value) ? Math.round(value).toLocaleString() : "--";
+        }
+
+        function formatCompactNumber(value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          return Number(value).toLocaleString(undefined, {
+            notation: "compact",
+            maximumFractionDigits: 1,
+          });
+        }
+
+        function formatCompactCurrency(value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          return Number(value).toLocaleString(undefined, {
+            style: "currency",
+            currency: "USD",
+            notation: "compact",
+            maximumFractionDigits: 1,
+          });
+        }
+
+        function formatCompactCurrencyWhole(value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          return Number(value).toLocaleString(undefined, {
+            style: "currency",
+            currency: "USD",
+            notation: "compact",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          });
         }
 
         function formatPercent(value) {
@@ -3947,6 +4648,18 @@
             currency: "USD",
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
+          });
+        }
+
+        function formatCurrencyWhole(value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          return Number(value).toLocaleString(undefined, {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
           });
         }
 

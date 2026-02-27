@@ -26,11 +26,30 @@ eligibility as (
         birth_date,
         death_date,
         social_security_number,
+        replace(social_security_number, '-', '') as social_security_number_digits,
         address,
         city,
         state,
         zip_code,
+        replace(zip_code, '-', '') as zip_code_digits,
         phone,
+        replace(
+            replace(
+                replace(
+                    replace(
+                        replace(phone, '-', ''),
+                        '(',
+                        ''
+                    ),
+                    ')',
+                    ''
+                ),
+                ' ',
+                ''
+            ),
+            '.',
+            ''
+        ) as phone_digits,
         email
     from {{ ref('input_layer__eligibility') }}
 
@@ -464,13 +483,13 @@ field_observations as (
             when e.social_security_number is null or e.social_security_number = '' then 'null'
             when (
                 len(e.social_security_number) = 9
-                and translate(e.social_security_number, '0123456789', '') = ''
+                and patindex('%[^0-9]%', e.social_security_number) = 0
             ) or (
                 len(e.social_security_number) = 11
                 and substring(e.social_security_number, 4, 1) = '-'
                 and substring(e.social_security_number, 7, 1) = '-'
-                and len(replace(e.social_security_number, '-', '')) = 9
-                and translate(replace(e.social_security_number, '-', ''), '0123456789', '') = ''
+                and len(e.social_security_number_digits) = 9
+                and patindex('%[^0-9]%', e.social_security_number_digits) = 0
             )
                 then 'valid'
             else 'invalid'
@@ -542,12 +561,12 @@ field_observations as (
             when e.zip_code is null or e.zip_code = '' then 'null'
             when (
                 len(e.zip_code) in (5, 9)
-                and translate(e.zip_code, '0123456789', '') = ''
+                and patindex('%[^0-9]%', e.zip_code) = 0
             ) or (
                 len(e.zip_code) = 10
                 and substring(e.zip_code, 6, 1) = '-'
-                and len(replace(e.zip_code, '-', '')) = 9
-                and translate(replace(e.zip_code, '-', ''), '0123456789', '') = ''
+                and len(e.zip_code_digits) = 9
+                and patindex('%[^0-9]%', e.zip_code_digits) = 0
             )
                 then 'valid'
             else 'invalid'
@@ -566,87 +585,12 @@ field_observations as (
         '10 digits (or formatted equivalent), or 11 digits starting with 1' as terminology_field,
         case
             when e.phone is null or e.phone = '' then 'null'
-            when translate(
-                replace(
-                    replace(
-                        replace(
-                            replace(
-                                replace(e.phone, '-', ''),
-                                '(',
-                                ''
-                            ),
-                            ')',
-                            ''
-                        ),
-                        ' ',
-                        ''
-                    ),
-                    '.',
-                    ''
-                ),
-                '0123456789',
-                ''
-            ) = ''
+            when patindex('%[^0-9]%', e.phone_digits) = 0
                 and (
-                    len(
-                        replace(
-                            replace(
-                                replace(
-                                    replace(
-                                        replace(e.phone, '-', ''),
-                                        '(',
-                                        ''
-                                    ),
-                                    ')',
-                                    ''
-                                ),
-                                ' ',
-                                ''
-                            ),
-                            '.',
-                            ''
-                        )
-                    ) = 10
+                    len(e.phone_digits) = 10
                     or (
-                        len(
-                            replace(
-                                replace(
-                                    replace(
-                                        replace(
-                                            replace(e.phone, '-', ''),
-                                            '(',
-                                            ''
-                                        ),
-                                        ')',
-                                        ''
-                                    ),
-                                    ' ',
-                                    ''
-                                ),
-                                '.',
-                                ''
-                            )
-                        ) = 11
-                        and left(
-                            replace(
-                                replace(
-                                    replace(
-                                        replace(
-                                            replace(e.phone, '-', ''),
-                                            '(',
-                                            ''
-                                        ),
-                                        ')',
-                                        ''
-                                    ),
-                                    ' ',
-                                    ''
-                                ),
-                                '.',
-                                ''
-                            ),
-                            1
-                        ) = '1'
+                        len(e.phone_digits) = 11
+                        and left(e.phone_digits, 1) = '1'
                     )
                 )
                 then 'valid'

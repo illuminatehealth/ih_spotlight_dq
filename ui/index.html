@@ -176,24 +176,6 @@
         gap: 10px;
       }
 
-      .header-toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-pill);
-        background: var(--color-surface-soft);
-        color: var(--muted);
-        font-size: var(--text-sm);
-        white-space: nowrap;
-      }
-
-      .header-toggle input {
-        margin: 0;
-        accent-color: var(--accent);
-      }
-
       .button {
         display: inline-flex;
         align-items: center;
@@ -363,6 +345,67 @@
         margin: 6px 0 0;
         font-size: clamp(1.4rem, 2.6vw, 2rem);
         font-weight: 800;
+      }
+
+      .trend-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .trend-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .trend-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface-soft);
+        padding: 10px;
+      }
+
+      .trend-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+
+      .trend-title {
+        margin: 0;
+        font-size: var(--text-sm);
+        color: var(--muted);
+      }
+
+      .trend-value {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .trend-canvas-wrap {
+        position: relative;
+        height: 82px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+        padding: 6px;
+      }
+
+      .trend-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .trend-summary {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: var(--text-xs);
       }
 
       .content-grid {
@@ -823,6 +866,10 @@
           grid-template-columns: 1fr;
         }
 
+        .trend-grid {
+          grid-template-columns: 1fr;
+        }
+
         .content-grid {
           grid-template-columns: 1fr;
         }
@@ -853,11 +900,7 @@
         <div class="controls">
           <label for="csvInput" class="button">Choose CSV</label>
           <input id="csvInput" type="file" accept=".csv,text/csv" class="sr-only" />
-          <p class="helper-text">or drag &amp; drop (with or without headers)</p>
-          <label class="header-toggle" for="csvHasHeadersToggle">
-            <input id="csvHasHeadersToggle" type="checkbox" checked />
-            CSV has headers
-          </label>
+          <p class="helper-text">or drag, drop, or paste (Ctrl/Cmd+V)</p>
         </div>
       </header>
 
@@ -957,8 +1000,7 @@
               </p>
 
               <div id="emptyState" class="empty-state">
-                Load a CSV (with or without headers) using Choose CSV or drag it into the drop
-                zone to view results.
+                Load a CSV with Choose CSV or drag it into the drop zone to view results.
               </div>
 
               <div id="tableContainer" class="table-container" hidden>
@@ -1147,6 +1189,13 @@
               <p id="recKpiClaims" class="kpi-value">--</p>
             </article>
           </section>
+
+          <div class="card table-card">
+            <p class="section-subtitle">
+              Monthly trends across current filters (exact values summarized under each chart).
+            </p>
+            <ul id="recTrendGrid" class="trend-grid trend-list"></ul>
+          </div>
 
           <div class="dual-table-grid">
             <div class="card table-card">
@@ -1355,6 +1404,14 @@
           "members_with_claims",
           "pmpm_paid",
         ];
+        const RECONCILIATION_TREND_METRICS = [
+          { key: "pmpm_paid", label: "PMPM paid", format: "currency" },
+          { key: "paid_amount", label: "Paid amount", format: "currency" },
+          { key: "member_months", label: "Member months", format: "integer" },
+          { key: "members_with_claims", label: "Members with claims", format: "integer" },
+          { key: "members", label: "Members", format: "integer" },
+          { key: "claims", label: "Claims", format: "integer" },
+        ];
         const MAPPING_REQUIRED_FIELDS = [
           "run_id",
           "run_ts",
@@ -1374,53 +1431,6 @@
           "null_rows_pct",
           "non_null_rows_pct",
         ];
-        const TERMINOLOGY_POSITIONAL_FIELDS = [
-          "run_id",
-          "run_ts",
-          "data_source",
-          "payer",
-          "plan",
-          "model_name",
-          "field_name",
-          "terminology_table",
-          "terminology_field",
-          "total_rows",
-          "applicable_rows",
-          "not_applicable_rows",
-          "null_rows",
-          "non_null_rows",
-          "valid_rows",
-          "invalid_rows",
-          "total_rows_pct",
-          "applicable_rows_pct",
-          "not_applicable_rows_pct",
-          "null_rows_pct",
-          "non_null_rows_pct",
-          "valid_rows_pct",
-          "invalid_rows_pct",
-          "valid_rows_applicable_pct",
-        ];
-        const RECONCILIATION_POSITIONAL_FIELDS = [
-          "run_id",
-          "run_ts",
-          "data_source",
-          "payer",
-          "plan",
-          "year_month_int",
-          "year_month",
-          "member_months",
-          "members",
-          "claims",
-          "claim_lines",
-          "paid_amount",
-          "members_with_claims",
-          "pct_members_with_claims",
-          "claims_per_1000",
-          "pmpm_paid",
-          "avg_paid_per_claim",
-          "tuva_last_run",
-        ];
-        const MAPPING_POSITIONAL_FIELDS = [...MAPPING_REQUIRED_FIELDS];
 
         const COLUMN_TYPES = {
           metric: "text",
@@ -1445,13 +1455,7 @@
           detectedHeaders: [],
           detailChart: null,
           hasShownChartLoadError: false,
-          csvHasHeaders: true,
           loadedFileNameByView: {
-            [VIEWS.terminology]: "",
-            [VIEWS.reconciliation]: "",
-            [VIEWS.mapping]: "",
-          },
-          loadedFileTextByView: {
             [VIEWS.terminology]: "",
             [VIEWS.reconciliation]: "",
             [VIEWS.mapping]: "",
@@ -1463,6 +1467,7 @@
           rows: [],
           filteredRows: [],
           filters: { run_id: "__all__", data_source: "__all__", payer: "__all__", plan: "__all__" },
+          trendCards: {},
         };
 
         const mapState = {
@@ -1483,7 +1488,6 @@
           logoImage: document.getElementById("logoImage"),
           logoFallback: document.getElementById("logoFallback"),
           csvInput: document.getElementById("csvInput"),
-          csvHasHeadersToggle: document.getElementById("csvHasHeadersToggle"),
           dropZone: document.getElementById("dropZone"),
           errorBanner: document.getElementById("errorBanner"),
           tabButtons: document.querySelectorAll(".tab-button"),
@@ -1531,6 +1535,7 @@
           recKpiRows: document.getElementById("recKpiRows"),
           recKpiMemberMonths: document.getElementById("recKpiMemberMonths"),
           recKpiClaims: document.getElementById("recKpiClaims"),
+          recTrendGrid: document.getElementById("recTrendGrid"),
           recMonthlyBody: document.getElementById("recMonthlyBody"),
           recDetailBody: document.getElementById("recDetailBody"),
           mapFilterRunId: document.getElementById("mapFilterRunId"),
@@ -1556,7 +1561,7 @@
           bindEvents();
           bindLogoFallback();
           initDetailChart();
-          els.csvHasHeadersToggle.checked = state.csvHasHeaders;
+          initReconciliationTrendCards();
           populateSelectWithOptions(els.modelFilterSelect, ["__all__"], state.modelFilter);
           initializeReconciliationView();
           initializeMappingView();
@@ -1580,11 +1585,7 @@
             if (file) {
               handleFile(file);
             }
-          });
-
-          els.csvHasHeadersToggle.addEventListener("change", () => {
-            state.csvHasHeaders = Boolean(els.csvHasHeadersToggle.checked);
-            reprocessActiveView();
+            event.target.value = "";
           });
 
           els.dropZone.addEventListener("click", () => {
@@ -1613,6 +1614,22 @@
             if (file) {
               handleFile(file);
             }
+          });
+
+          document.addEventListener("paste", (event) => {
+            if (isEditableTarget(event.target)) {
+              return;
+            }
+
+            const text = event.clipboardData?.getData("text/plain") || "";
+            if (!looksLikeDelimitedText(text)) {
+              return;
+            }
+
+            event.preventDefault();
+            state.loadedFileNameByView[state.activeView] = "Pasted CSV text";
+            updateDropZonePrompt();
+            handleCsvText(text);
           });
 
           els.tableFilter.addEventListener("input", () => {
@@ -1903,16 +1920,36 @@
           event.stopPropagation();
         }
 
+        function isEditableTarget(target) {
+          if (!(target instanceof HTMLElement)) {
+            return false;
+          }
+          if (target.isContentEditable) {
+            return true;
+          }
+          const tagName = target.tagName.toLowerCase();
+          return tagName === "input" || tagName === "textarea" || tagName === "select";
+        }
+
+        function looksLikeDelimitedText(text) {
+          if (typeof text !== "string") {
+            return false;
+          }
+          const trimmed = text.trim();
+          if (!trimmed) {
+            return false;
+          }
+          return trimmed.includes(",") || trimmed.includes("\t");
+        }
+
         function handleFile(file) {
-          const targetView = state.activeView;
-          state.loadedFileNameByView[targetView] = file.name;
+          state.loadedFileNameByView[state.activeView] = file.name;
           updateDropZonePrompt();
 
           const reader = new FileReader();
           reader.onload = () => {
             const text = String(reader.result || "");
-            state.loadedFileTextByView[targetView] = text;
-            processTextForView(targetView, text, { markLoaded: true });
+            handleCsvText(text);
           };
           reader.onerror = () => {
             showGenericError("Unable to read file. Please choose a UTF-8 CSV file.");
@@ -1920,33 +1957,19 @@
           reader.readAsText(file, "UTF-8");
         }
 
-        function processTextForView(viewName, text, { markLoaded = false } = {}) {
-          if (viewName === VIEWS.terminology) {
-            if (markLoaded) {
-              state.hasLoadedFile = true;
-            }
+        function handleCsvText(text) {
+          if (state.activeView === VIEWS.terminology) {
+            state.hasLoadedFile = true;
             processCsv(text);
             return;
           }
-          if (viewName === VIEWS.reconciliation) {
-            if (markLoaded) {
-              recState.hasLoadedFile = true;
-            }
+          if (state.activeView === VIEWS.reconciliation) {
+            recState.hasLoadedFile = true;
             processReconciliationCsv(text);
             return;
           }
-          if (markLoaded) {
-            mapState.hasLoadedFile = true;
-          }
+          mapState.hasLoadedFile = true;
           processMappingCsv(text);
-        }
-
-        function reprocessActiveView() {
-          const text = state.loadedFileTextByView[state.activeView];
-          if (!text) {
-            return;
-          }
-          processTextForView(state.activeView, text);
         }
 
         function updateActiveView(viewName) {
@@ -1977,10 +2000,10 @@
                 : "Input Layer DQ";
           const fileName = state.loadedFileNameByView[state.activeView];
           if (fileName) {
-            els.dropZone.textContent = `Loaded for ${viewLabel}: ${fileName}. Drop or choose another CSV to replace it.`;
+            els.dropZone.textContent = `Loaded for ${viewLabel}: ${fileName}. Drop, choose, or paste another CSV to replace it.`;
             return;
           }
-          els.dropZone.textContent = `Drop a CSV for ${viewLabel}, or click Choose CSV.`;
+          els.dropZone.textContent = `Drop, choose, or paste CSV text for ${viewLabel}.`;
         }
 
         function initializeReconciliationView() {
@@ -1993,6 +2016,235 @@
           populateSelectWithOptions(els.recFilterPayer, ["__all__"], recState.filters.payer);
           populateSelectWithOptions(els.recFilterPlan, ["__all__"], recState.filters.plan);
           renderReconciliationView();
+        }
+
+        function initReconciliationTrendCards() {
+          const grid = els.recTrendGrid;
+          if (!grid) {
+            return;
+          }
+
+          recState.trendCards = {};
+          const fragment = document.createDocumentFragment();
+          RECONCILIATION_TREND_METRICS.forEach((metric) => {
+            const card = document.createElement("li");
+            card.className = "trend-card";
+
+            const header = document.createElement("div");
+            header.className = "trend-header";
+            const title = document.createElement("h3");
+            title.className = "trend-title";
+            title.textContent = metric.label;
+            const value = document.createElement("p");
+            value.className = "trend-value";
+            value.textContent = "--";
+            header.appendChild(title);
+            header.appendChild(value);
+
+            const canvasWrap = document.createElement("div");
+            canvasWrap.className = "trend-canvas-wrap";
+            const canvas = document.createElement("canvas");
+            canvas.className = "trend-canvas";
+            canvas.role = "img";
+            canvas.setAttribute(
+              "aria-label",
+              `${metric.label} monthly line chart. Exact values are listed in the summary text below.`,
+            );
+            canvas.textContent =
+              "Monthly trend line visualization. Use the visible summary text for exact numeric values.";
+            canvasWrap.appendChild(canvas);
+
+            const summary = document.createElement("p");
+            summary.className = "trend-summary";
+            summary.textContent = "Load reconciliation data to view monthly trend details.";
+
+            card.appendChild(header);
+            card.appendChild(canvasWrap);
+            card.appendChild(summary);
+            fragment.appendChild(card);
+
+            recState.trendCards[metric.key] = { metric, value, summary, canvas, chart: null };
+          });
+          grid.replaceChildren(fragment);
+        }
+
+        function renderReconciliationTrends(monthlyRows) {
+          RECONCILIATION_TREND_METRICS.forEach((metric) => {
+            const card = recState.trendCards[metric.key];
+            if (!card) {
+              return;
+            }
+
+            const labels = monthlyRows.map(
+              (row) => row.year_month || formatYearMonth(row.year_month_int),
+            );
+            const values = monthlyRows.map((row) => getReconciliationTrendValue(metric.key, row));
+            const finitePoints = values.filter((value) => Number.isFinite(value));
+            const latestValue = getLastFiniteValue(values);
+            const minValue = finitePoints.length ? Math.min(...finitePoints) : null;
+            const maxValue = finitePoints.length ? Math.max(...finitePoints) : null;
+            const latestIndex = findLastFiniteIndex(values);
+            const latestMonth = latestIndex >= 0 ? labels[latestIndex] : "";
+
+            card.value.textContent = formatTrendValue(metric.format, latestValue);
+            card.summary.textContent = buildTrendSummaryText({
+              metric,
+              values,
+              labels,
+              latestMonth,
+              latestValue,
+              minValue,
+              maxValue,
+            });
+
+            const chart = ensureTrendChart(card);
+            if (!chart) {
+              return;
+            }
+
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = values.map((value) =>
+              Number.isFinite(value) ? value : null,
+            );
+            chart.update();
+          });
+        }
+
+        function ensureTrendChart(card) {
+          if (card.chart) {
+            return card.chart;
+          }
+          if (typeof window.Chart !== "function") {
+            return null;
+          }
+
+          const context = card.canvas.getContext("2d");
+          if (!context) {
+            return null;
+          }
+
+          const lineColor = getCssColorToken("--color-accent") || getCssColorToken("--chart-valid");
+          const pointColor =
+            getCssColorToken("--color-accent-strong") || getCssColorToken("--chart-threshold");
+          const gridColor = getCssColorToken("--chart-grid");
+
+          card.chart = new window.Chart(card.canvas, {
+            type: "line",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: card.metric.label,
+                  data: [],
+                  borderColor: lineColor,
+                  backgroundColor: lineColor,
+                  pointBackgroundColor: pointColor,
+                  pointBorderColor: pointColor,
+                  pointRadius: 2,
+                  pointHoverRadius: 4,
+                  pointHitRadius: 8,
+                  borderWidth: 2,
+                  tension: 0.25,
+                  spanGaps: true,
+                },
+              ],
+            },
+            options: {
+              animation: false,
+              maintainAspectRatio: false,
+              responsive: true,
+              scales: {
+                x: {
+                  display: false,
+                  grid: { display: false },
+                  border: { display: false },
+                },
+                y: {
+                  display: false,
+                  grid: { color: gridColor },
+                  border: { display: false },
+                },
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      const value = context.parsed.y;
+                      return `${card.metric.label}: ${formatTrendValue(card.metric.format, value)}`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+          return card.chart;
+        }
+
+        function getReconciliationTrendValue(metricKey, row) {
+          if (metricKey === "pmpm_paid") {
+            if (!Number.isFinite(row.member_months) || row.member_months <= 0) {
+              return null;
+            }
+            return row.paid_amount / row.member_months;
+          }
+          return Number.isFinite(row[metricKey]) ? row[metricKey] : null;
+        }
+
+        function formatTrendValue(format, value) {
+          if (!Number.isFinite(value)) {
+            return "--";
+          }
+          if (format === "currency") {
+            return formatCurrency(value);
+          }
+          return formatInteger(value);
+        }
+
+        function buildTrendSummaryText({
+          metric,
+          values,
+          labels,
+          latestMonth,
+          latestValue,
+          minValue,
+          maxValue,
+        }) {
+          const validCount = values.filter((value) => Number.isFinite(value)).length;
+          if (!validCount) {
+            return "No monthly values available for current filters.";
+          }
+
+          const firstIndex = values.findIndex((value) => Number.isFinite(value));
+          const firstValue = firstIndex >= 0 ? values[firstIndex] : null;
+          const firstMonth = firstIndex >= 0 ? labels[firstIndex] : "";
+          const changeValue =
+            Number.isFinite(firstValue) && Number.isFinite(latestValue)
+              ? latestValue - firstValue
+              : null;
+          const changeText = Number.isFinite(changeValue)
+            ? `${changeValue >= 0 ? "+" : "-"}${formatTrendValue(metric.format, Math.abs(changeValue))}`
+            : "--";
+
+          return (
+            `Latest ${latestMonth || "(unknown month)"}: ${formatTrendValue(metric.format, latestValue)}. ` +
+            `Min ${formatTrendValue(metric.format, minValue)}, max ${formatTrendValue(metric.format, maxValue)}. ` +
+            `Change since ${firstMonth || "(first month)"}: ${changeText}.`
+          );
+        }
+
+        function findLastFiniteIndex(values) {
+          for (let index = values.length - 1; index >= 0; index -= 1) {
+            if (Number.isFinite(values[index])) {
+              return index;
+            }
+          }
+          return -1;
+        }
+
+        function getLastFiniteValue(values) {
+          const index = findLastFiniteIndex(values);
+          return index >= 0 ? values[index] : null;
         }
 
         function initializeMappingView() {
@@ -2010,8 +2262,8 @@
         }
 
         function processReconciliationCsv(text) {
-          const parsed = parseCSV(text);
-          if (parsed.length < 1) {
+          const parsed = parseCsvForRequiredFields(text, RECONCILIATION_REQUIRED_FIELDS);
+          if (parsed.dataRows.length < 1) {
             recState.rows = [];
             recState.filteredRows = [];
             renderReconciliationView();
@@ -2019,42 +2271,25 @@
             return;
           }
 
-          const csvHeaders = resolveCsvHeaders(
-            parsed,
-            RECONCILIATION_REQUIRED_FIELDS,
-            RECONCILIATION_POSITIONAL_FIELDS,
-            state.csvHasHeaders,
-          );
-          const normalizedHeaders = csvHeaders.normalizedHeaders;
-          const missingFields = csvHeaders.missingFields;
-
-          if (missingFields.length > 0) {
+          if (parsed.missingFields.length > 0) {
             recState.rows = [];
             recState.filteredRows = [];
             renderReconciliationView();
             showGenericError(
-              `Missing required reconciliation fields: ${missingFields.join(", ")}. Detected headers: ${csvHeaders.detectedHeaders.join(", ") || "(none)"}. If your CSV has no headers, keep the default export column order.`,
+              `Missing required reconciliation fields: ${parsed.missingFields.join(", ")}. Detected headers: ${parsed.detectedHeaders.join(", ") || "(none)"}.`,
             );
-            return;
-          }
-
-          if (parsed.length <= csvHeaders.dataStartRow) {
-            recState.rows = [];
-            recState.filteredRows = [];
-            renderReconciliationView();
-            showGenericError("Reconciliation CSV appears to be empty or missing data rows.");
             return;
           }
 
           hideErrorBanner();
           const rows = [];
-          for (let rowIndex = csvHeaders.dataStartRow; rowIndex < parsed.length; rowIndex += 1) {
-            const cells = parsed[rowIndex];
+          for (let rowIndex = 0; rowIndex < parsed.dataRows.length; rowIndex += 1) {
+            const cells = parsed.dataRows[rowIndex];
             if (cells.every((cell) => String(cell || "").trim() === "")) {
               continue;
             }
 
-            const row = mapRowToHeaders(cells, normalizedHeaders);
+            const row = mapRowToHeaders(cells, parsed.normalizedHeaders);
             const yearMonthInt = parseYearMonthInt(row.year_month_int, row.year_month);
             const yearMonth = normalizeYearMonthLabel(row.year_month, yearMonthInt);
             rows.push({
@@ -2187,6 +2422,7 @@
             }
             return String(left.year_month).localeCompare(String(right.year_month));
           });
+          renderReconciliationTrends(monthlyRows);
 
           const monthlyFragment = document.createDocumentFragment();
           monthlyRows.forEach((row) => {
@@ -2242,8 +2478,8 @@
         }
 
         function processMappingCsv(text) {
-          const parsed = parseCSV(text);
-          if (parsed.length < 1) {
+          const parsed = parseCsvForRequiredFields(text, MAPPING_REQUIRED_FIELDS);
+          if (parsed.dataRows.length < 1) {
             mapState.rows = [];
             mapState.filteredRows = [];
             renderMappingView();
@@ -2253,44 +2489,25 @@
             return;
           }
 
-          const csvHeaders = resolveCsvHeaders(
-            parsed,
-            MAPPING_REQUIRED_FIELDS,
-            MAPPING_POSITIONAL_FIELDS,
-            state.csvHasHeaders,
-          );
-          const normalizedHeaders = csvHeaders.normalizedHeaders;
-          const missingFields = csvHeaders.missingFields;
-
-          if (missingFields.length > 0) {
+          if (parsed.missingFields.length > 0) {
             mapState.rows = [];
             mapState.filteredRows = [];
             renderMappingView();
             showGenericError(
-              `Missing required mapping fields: ${missingFields.join(", ")}. Detected headers: ${csvHeaders.detectedHeaders.join(", ") || "(none)"}. If your CSV has no headers, keep the default export column order.`,
-            );
-            return;
-          }
-
-          if (parsed.length <= csvHeaders.dataStartRow) {
-            mapState.rows = [];
-            mapState.filteredRows = [];
-            renderMappingView();
-            showGenericError(
-              "Input layer field summary CSV appears to be empty or missing data rows.",
+              `Missing required mapping fields: ${parsed.missingFields.join(", ")}. Detected headers: ${parsed.detectedHeaders.join(", ") || "(none)"}.`,
             );
             return;
           }
 
           hideErrorBanner();
           const rows = [];
-          for (let rowIndex = csvHeaders.dataStartRow; rowIndex < parsed.length; rowIndex += 1) {
-            const cells = parsed[rowIndex];
+          for (let rowIndex = 0; rowIndex < parsed.dataRows.length; rowIndex += 1) {
+            const cells = parsed.dataRows[rowIndex];
             if (cells.every((cell) => String(cell || "").trim() === "")) {
               continue;
             }
 
-            const row = mapRowToHeaders(cells, normalizedHeaders);
+            const row = mapRowToHeaders(cells, parsed.normalizedHeaders);
             rows.push({
               run_id: (row.run_id || "").trim(),
               run_ts: (row.run_ts || "").trim(),
@@ -2569,8 +2786,8 @@
         }
 
         function processCsv(text) {
-          const parsed = parseCSV(text);
-          if (parsed.length < 1) {
+          const parsed = parseCsvForRequiredFields(text, TERMINOLOGY_REQUIRED_FIELDS);
+          if (parsed.dataRows.length < 1) {
             state.rows = [];
             state.runScopedRows = [];
             state.filteredRows = [];
@@ -2585,19 +2802,10 @@
             return;
           }
 
-          const csvHeaders = resolveCsvHeaders(
-            parsed,
-            TERMINOLOGY_REQUIRED_FIELDS,
-            TERMINOLOGY_POSITIONAL_FIELDS,
-            state.csvHasHeaders,
-          );
-          const normalizedHeaders = csvHeaders.normalizedHeaders;
-          state.detectedHeaders = csvHeaders.detectedHeaders;
+          state.detectedHeaders = parsed.detectedHeaders;
+          state.missingFields = parsed.missingFields;
 
-          const missingFields = csvHeaders.missingFields;
-          state.missingFields = missingFields;
-
-          if (missingFields.length > 0) {
+          if (parsed.missingFields.length > 0) {
             state.rows = [];
             state.runScopedRows = [];
             state.filteredRows = [];
@@ -2605,22 +2813,7 @@
             state.selectedRunId = "";
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
             renderRunFilter();
-            renderMissingFieldsError(missingFields, csvHeaders.detectedHeaders);
-            renderTable([]);
-            renderDetailPanel(null);
-            return;
-          }
-
-          if (parsed.length <= csvHeaders.dataStartRow) {
-            state.rows = [];
-            state.runScopedRows = [];
-            state.filteredRows = [];
-            state.runOptions = [];
-            state.selectedRunId = "";
-            state.missingFields = [];
-            showGenericError("CSV appears to be empty or missing data rows.");
-            renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
-            renderRunFilter();
+            renderMissingFieldsError(parsed.missingFields, parsed.detectedHeaders);
             renderTable([]);
             renderDetailPanel(null);
             return;
@@ -2629,13 +2822,13 @@
           hideErrorBanner();
 
           const rowData = [];
-          for (let rowIndex = csvHeaders.dataStartRow; rowIndex < parsed.length; rowIndex += 1) {
-            const cells = parsed[rowIndex];
+          for (let rowIndex = 0; rowIndex < parsed.dataRows.length; rowIndex += 1) {
+            const cells = parsed.dataRows[rowIndex];
             if (cells.every((cell) => String(cell || "").trim() === "")) {
               continue;
             }
 
-            const row = mapRowToHeaders(cells, normalizedHeaders);
+            const row = mapRowToHeaders(cells, parsed.normalizedHeaders);
             rowData.push({
               id: rowData.length + 1,
               run_id: (row.run_id || "").trim(),
@@ -2676,54 +2869,143 @@
         }
 
         function normalizeHeaders(headers) {
-          return headers.map((header) =>
-            String(header || "")
-              .trim()
-              .toLowerCase()
-              .replace(/\s+/g, "_"),
-          );
+          return headers.map((header) => normalizeHeaderValue(header));
         }
 
-        function resolveCsvHeaders(
-          parsedRows,
-          requiredFields,
-          positionalFields,
-          csvHasHeaders,
-        ) {
-          const firstRow = Array.isArray(parsedRows[0]) ? parsedRows[0] : [];
-          const rawFirstRow = firstRow.map((cell) => String(cell || ""));
-          const normalizedFirstRow = normalizeHeaders(rawFirstRow);
-          const firstRowHeaderSet = new Set(normalizedFirstRow);
-          const missingFromHeaderRow = requiredFields.filter(
-            (field) => !firstRowHeaderSet.has(field),
-          );
+        function normalizeHeaderValue(value) {
+          return String(value || "")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "_");
+        }
 
-          if (csvHasHeaders) {
+        function parseCsvForRequiredFields(text, requiredFields) {
+          const parsedRows = parseCSV(text);
+          if (!parsedRows.length) {
             return {
-              normalizedHeaders: normalizedFirstRow,
-              dataStartRow: 1,
-              missingFields: missingFromHeaderRow,
-              detectedHeaders: normalizedFirstRow,
+              normalizedHeaders: [],
+              detectedHeaders: [],
+              dataRows: [],
+              missingFields: [...requiredFields],
             };
           }
 
-          const normalizedPositionalFields = normalizeHeaders(positionalFields);
-          const missingFromPositionalRow = requiredFields.filter((field) => {
-            const columnIndex = normalizedPositionalFields.indexOf(field);
-            return columnIndex < 0 || columnIndex >= firstRow.length;
-          });
+          const rawHeaders = parsedRows[0].map((header) => String(header || ""));
+          const normalizedHeaders = normalizeHeaders(rawHeaders);
+          const headerSet = new Set(normalizedHeaders);
+          const missingFields = requiredFields.filter((field) => !headerSet.has(field));
+          if (!missingFields.length) {
+            return {
+              normalizedHeaders,
+              detectedHeaders: normalizedHeaders,
+              dataRows: parsedRows.slice(1),
+              missingFields: [],
+            };
+          }
+
+          const inferredHeaders = inferHeaderlessHeaders(parsedRows, requiredFields, headerSet);
+          if (inferredHeaders) {
+            return {
+              normalizedHeaders: inferredHeaders,
+              detectedHeaders: normalizedHeaders,
+              dataRows: parsedRows,
+              missingFields: [],
+            };
+          }
+
           return {
-            normalizedHeaders: normalizedPositionalFields,
-            dataStartRow: 0,
-            missingFields: missingFromPositionalRow,
-            detectedHeaders: normalizedPositionalFields.slice(
-              0,
-              Math.min(firstRow.length, normalizedPositionalFields.length),
-            ),
+            normalizedHeaders,
+            detectedHeaders: normalizedHeaders,
+            dataRows: parsedRows.slice(1),
+            missingFields,
           };
         }
 
+        function inferHeaderlessHeaders(parsedRows, requiredFields, headerSet) {
+          if (!parsedRows.length) {
+            return null;
+          }
+
+          const firstRow = parsedRows[0];
+          if (!Array.isArray(firstRow) || firstRow.length < requiredFields.length) {
+            return null;
+          }
+
+          const firstRowNormalized = normalizeHeaders(firstRow);
+          const requiredFieldSet = new Set(requiredFields);
+          let rowHeaderMatches = 0;
+          firstRowNormalized.forEach((value) => {
+            if (requiredFieldSet.has(value)) {
+              rowHeaderMatches += 1;
+            }
+          });
+
+          let detectedHeaderMatches = 0;
+          requiredFields.forEach((field) => {
+            if (headerSet.has(field)) {
+              detectedHeaderMatches += 1;
+            }
+          });
+
+          if (detectedHeaderMatches > 1 || rowHeaderMatches > 1) {
+            return null;
+          }
+
+          const inferredHeaders = [...requiredFields];
+          for (let index = requiredFields.length; index < firstRow.length; index += 1) {
+            inferredHeaders.push(`extra_column_${index + 1}`);
+          }
+          return inferredHeaders;
+        }
+
         function parseCSV(text) {
+          const delimiter = detectDelimiter(text);
+          return parseDelimitedRows(text, delimiter);
+        }
+
+        function detectDelimiter(text) {
+          if (typeof text !== "string" || !text.trim()) {
+            return ",";
+          }
+
+          const sampleLines = text
+            .slice(0, 12000)
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0)
+            .slice(0, 8);
+
+          let commaCount = 0;
+          let tabCount = 0;
+          sampleLines.forEach((line) => {
+            commaCount += countDelimiterOutsideQuotes(line, ",");
+            tabCount += countDelimiterOutsideQuotes(line, "\t");
+          });
+
+          return tabCount > commaCount ? "\t" : ",";
+        }
+
+        function countDelimiterOutsideQuotes(text, delimiter) {
+          let count = 0;
+          let inQuotes = false;
+          for (let index = 0; index < text.length; index += 1) {
+            const char = text[index];
+            if (char === '"') {
+              if (inQuotes && text[index + 1] === '"') {
+                index += 1;
+                continue;
+              }
+              inQuotes = !inQuotes;
+              continue;
+            }
+            if (!inQuotes && char === delimiter) {
+              count += 1;
+            }
+          }
+          return count;
+        }
+
+        function parseDelimitedRows(text, delimiter) {
           const rows = [];
           let row = [];
           let cell = "";
@@ -2755,7 +3037,7 @@
               continue;
             }
 
-            if (char === ",") {
+            if (char === delimiter) {
               row.push(cell);
               cell = "";
               index += 1;
@@ -3451,7 +3733,7 @@
           const message =
             `Missing required terminology fields: ${missingList}. ` +
             `Detected headers: ${detected}. ` +
-            "Add required columns and reload the CSV. If your CSV has no headers, keep the default export column order.";
+            "Add required columns and reload the CSV.";
           showGenericError(message);
         }
 

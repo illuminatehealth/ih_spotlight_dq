@@ -43,9 +43,9 @@ models:
         tests:
           - not_null
       - name: terminology_table
-        description: Referenced terminology model name.
+        description: Referenced terminology/reference model name, or `validation_rule` for rule-based checks.
       - name: terminology_field
-        description: Referenced terminology column used for validation.
+        description: Referenced validation field or rule descriptor used for validation.
       - name: total_rows
         description: Total number of rows evaluated for the grain.
       - name: applicable_rows

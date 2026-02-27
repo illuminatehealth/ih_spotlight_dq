@@ -18,9 +18,41 @@ eligibility as (
         data_source,
         payer,
         {{ the_tuva_project.quote_column('plan') }} as plan_name,
+        gender,
         race,
-        dual_status_code
+        dual_status_code,
+        original_reason_entitlement_code,
+        medicare_status_code,
+        birth_date,
+        death_date,
+        social_security_number,
+        address,
+        city,
+        state,
+        zip_code,
+        phone,
+        email
     from {{ ref('input_layer__eligibility') }}
+
+),
+
+state_reference as (
+
+    select distinct
+        ansi_fips_state_abbreviation as state_value
+    from {{ ref('reference_data__ansi_fips_state') }}
+
+    union
+
+    select distinct
+        ansi_fips_state_name as state_value
+    from {{ ref('reference_data__ansi_fips_state') }}
+
+    union
+
+    select distinct
+        ansi_fips_state_code as state_value
+    from {{ ref('reference_data__ansi_fips_state') }}
 
 ),
 
@@ -33,8 +65,17 @@ medical_claim as (
         claim_type,
         drg_code_type,
         drg_code,
+        claim_start_date,
+        claim_end_date,
+        claim_line_start_date,
+        claim_line_end_date,
+        admission_date,
+        discharge_date,
+        paid_date,
+        service_unit_quantity,
         revenue_center_code,
         hcpcs_code,
+        hcpcs_modifier_1,
         diagnosis_code_1,
         diagnosis_code_2,
         diagnosis_code_3,
@@ -59,7 +100,14 @@ pharmacy_claim as (
         data_source,
         payer,
         {{ the_tuva_project.quote_column('plan') }} as plan_name,
-        ndc_code
+        prescribing_provider_npi,
+        dispensing_provider_npi,
+        dispensing_date,
+        ndc_code,
+        quantity,
+        days_supply,
+        refills,
+        paid_date
     from {{ ref('input_layer__pharmacy_claim') }}
 
 ),
@@ -89,6 +137,189 @@ field_observations as (
     left join {{ ref('terminology__apr_drg') }} as apr
         on m.drg_code = apr.apr_drg_code
         and m.drg_code_type = 'apr-drg'
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'claim_type' as field_name,
+        'validation_rule' as terminology_table,
+        'professional|institutional' as terminology_field,
+        case
+            when m.claim_type is null or m.claim_type = '' then 'null'
+            when m.claim_type in ('professional', 'institutional') then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'claim_start_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.claim_start_date is null then 'null'
+            when m.claim_start_date > cast('1970-01-01' as date)
+                and m.claim_start_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'claim_end_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.claim_end_date is null then 'null'
+            when m.claim_end_date > cast('1970-01-01' as date)
+                and m.claim_end_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'claim_line_start_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.claim_line_start_date is null then 'null'
+            when m.claim_line_start_date > cast('1970-01-01' as date)
+                and m.claim_line_start_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'claim_line_end_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.claim_line_end_date is null then 'null'
+            when m.claim_line_end_date > cast('1970-01-01' as date)
+                and m.claim_line_end_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'admission_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.admission_date is null then 'null'
+            when m.admission_date > cast('1970-01-01' as date)
+                and m.admission_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'discharge_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.discharge_date is null then 'null'
+            when m.discharge_date > cast('1970-01-01' as date)
+                and m.discharge_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'service_unit_quantity' as field_name,
+        'validation_rule' as terminology_table,
+        '> 0 and non_null' as terminology_field,
+        case
+            when m.service_unit_quantity is null then 'null'
+            when m.service_unit_quantity > 0 then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'hcpcs_modifier_1' as field_name,
+        'validation_rule' as terminology_table,
+        'non_null' as terminology_field,
+        case
+            when m.hcpcs_modifier_1 is null then 'null'
+            else 'valid'
+        end as mapping_status
+    from medical_claim as m
+
+    union all
+
+    select
+        m.data_source,
+        m.payer,
+        m.plan_name,
+        'input_layer__medical_claim' as model_name,
+        'paid_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when m.paid_date is null then 'null'
+            when m.paid_date > cast('1970-01-01' as date)
+                and m.paid_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from medical_claim as m
 
     union all
 
@@ -127,6 +358,318 @@ field_observations as (
     from eligibility as e
     left join {{ ref('terminology__medicare_dual_eligibility') }} as t
         on e.dual_status_code = t.dual_status_code
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'gender' as field_name,
+        'validation_rule' as terminology_table,
+        'male|female|unknown' as terminology_field,
+        case
+            when e.gender is null or e.gender = '' then 'null'
+            when e.gender in ('male', 'female', 'unknown') then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'original_reason_entitlement_code' as field_name,
+        'validation_rule' as terminology_table,
+        '0|1|2|3' as terminology_field,
+        case
+            when e.original_reason_entitlement_code is null or e.original_reason_entitlement_code = ''
+                then 'null'
+            when e.original_reason_entitlement_code in ('0', '1', '2', '3') then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'medicare_status_code' as field_name,
+        'validation_rule' as terminology_table,
+        '00|10|11|20|21|31|40' as terminology_field,
+        case
+            when e.medicare_status_code is null or e.medicare_status_code = '' then 'null'
+            when e.medicare_status_code in ('00', '10', '11', '20', '21', '31', '40')
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'birth_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1900-01-01 and < current_date' as terminology_field,
+        case
+            when e.birth_date is null then 'null'
+            when e.birth_date > cast('1900-01-01' as date)
+                and e.birth_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'death_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1900-01-01 and < current_date' as terminology_field,
+        case
+            when e.death_date is null then 'null'
+            when e.death_date > cast('1900-01-01' as date)
+                and e.death_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'social_security_number' as field_name,
+        'validation_rule' as terminology_table,
+        '9 digits or ###-##-####' as terminology_field,
+        case
+            when e.social_security_number is null or e.social_security_number = '' then 'null'
+            when (
+                len(e.social_security_number) = 9
+                and translate(e.social_security_number, '0123456789', '') = ''
+            ) or (
+                len(e.social_security_number) = 11
+                and substring(e.social_security_number, 4, 1) = '-'
+                and substring(e.social_security_number, 7, 1) = '-'
+                and len(replace(e.social_security_number, '-', '')) = 9
+                and translate(replace(e.social_security_number, '-', ''), '0123456789', '') = ''
+            )
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'address' as field_name,
+        'validation_rule' as terminology_table,
+        'non_null and non_blank and != ''NULL''' as terminology_field,
+        case
+            when e.address is null or e.address = '' or e.address = 'NULL' then 'null'
+            else 'valid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'city' as field_name,
+        'validation_rule' as terminology_table,
+        'non_null and non_blank and != ''NULL''' as terminology_field,
+        case
+            when e.city is null or e.city = '' or e.city = 'NULL' then 'null'
+            else 'valid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'state' as field_name,
+        'reference_data__ansi_fips_state' as terminology_table,
+        'ansi_fips_state_abbreviation|ansi_fips_state_name|ansi_fips_state_code' as terminology_field,
+        case
+            when e.state is null or e.state = '' or e.state = 'NULL' then 'null'
+            when sr.state_value is not null then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+    left join state_reference as sr
+        on e.state = sr.state_value
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'zip_code' as field_name,
+        'validation_rule' as terminology_table,
+        '5 digits or 9-digit zip (with or without hyphen)' as terminology_field,
+        case
+            when e.zip_code is null or e.zip_code = '' then 'null'
+            when (
+                len(e.zip_code) in (5, 9)
+                and translate(e.zip_code, '0123456789', '') = ''
+            ) or (
+                len(e.zip_code) = 10
+                and substring(e.zip_code, 6, 1) = '-'
+                and len(replace(e.zip_code, '-', '')) = 9
+                and translate(replace(e.zip_code, '-', ''), '0123456789', '') = ''
+            )
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'phone' as field_name,
+        'validation_rule' as terminology_table,
+        '10 digits (or formatted equivalent), or 11 digits starting with 1' as terminology_field,
+        case
+            when e.phone is null or e.phone = '' then 'null'
+            when translate(
+                replace(
+                    replace(
+                        replace(
+                            replace(
+                                replace(e.phone, '-', ''),
+                                '(',
+                                ''
+                            ),
+                            ')',
+                            ''
+                        ),
+                        ' ',
+                        ''
+                    ),
+                    '.',
+                    ''
+                ),
+                '0123456789',
+                ''
+            ) = ''
+                and (
+                    len(
+                        replace(
+                            replace(
+                                replace(
+                                    replace(
+                                        replace(e.phone, '-', ''),
+                                        '(',
+                                        ''
+                                    ),
+                                    ')',
+                                    ''
+                                ),
+                                ' ',
+                                ''
+                            ),
+                            '.',
+                            ''
+                        )
+                    ) = 10
+                    or (
+                        len(
+                            replace(
+                                replace(
+                                    replace(
+                                        replace(
+                                            replace(e.phone, '-', ''),
+                                            '(',
+                                            ''
+                                        ),
+                                        ')',
+                                        ''
+                                    ),
+                                    ' ',
+                                    ''
+                                ),
+                                '.',
+                                ''
+                            )
+                        ) = 11
+                        and left(
+                            replace(
+                                replace(
+                                    replace(
+                                        replace(
+                                            replace(e.phone, '-', ''),
+                                            '(',
+                                            ''
+                                        ),
+                                        ')',
+                                        ''
+                                    ),
+                                    ' ',
+                                    ''
+                                ),
+                                '.',
+                                ''
+                            ),
+                            1
+                        ) = '1'
+                    )
+                )
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
+
+    union all
+
+    select
+        e.data_source,
+        e.payer,
+        e.plan_name,
+        'input_layer__eligibility' as model_name,
+        'email' as field_name,
+        'validation_rule' as terminology_table,
+        'non_null and contains @' as terminology_field,
+        case
+            when e.email is null or e.email = '' then 'null'
+            when e.email like '%@%' then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from eligibility as e
 
     union all
 
@@ -459,6 +1002,133 @@ field_observations as (
     from pharmacy_claim as p
     left join {{ ref('terminology__ndc') }} as t
         on p.ndc_code = t.ndc
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'prescribing_provider_npi' as field_name,
+        'terminology__provider' as terminology_table,
+        'npi' as terminology_field,
+        case
+            when nullif(p.prescribing_provider_npi, '') is null then 'null'
+            when t.npi is not null then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
+    left join {{ ref('terminology__provider') }} as t
+        on p.prescribing_provider_npi = t.npi
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'dispensing_provider_npi' as field_name,
+        'terminology__provider' as terminology_table,
+        'npi' as terminology_field,
+        case
+            when nullif(p.dispensing_provider_npi, '') is null then 'null'
+            when t.npi is not null then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
+    left join {{ ref('terminology__provider') }} as t
+        on p.dispensing_provider_npi = t.npi
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'dispensing_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when p.dispensing_date is null then 'null'
+            when p.dispensing_date > cast('1970-01-01' as date)
+                and p.dispensing_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'quantity' as field_name,
+        'validation_rule' as terminology_table,
+        '> 0' as terminology_field,
+        case
+            when p.quantity is null then 'null'
+            when p.quantity > 0 then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'days_supply' as field_name,
+        'validation_rule' as terminology_table,
+        '> 0' as terminology_field,
+        case
+            when p.days_supply is null then 'null'
+            when p.days_supply > 0 then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'refills' as field_name,
+        'validation_rule' as terminology_table,
+        '> 0' as terminology_field,
+        case
+            when p.refills is null then 'null'
+            when p.refills > 0 then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
+
+    union all
+
+    select
+        p.data_source,
+        p.payer,
+        p.plan_name,
+        'input_layer__pharmacy_claim' as model_name,
+        'paid_date' as field_name,
+        'validation_rule' as terminology_table,
+        '>1970-01-01 and < current_date' as terminology_field,
+        case
+            when p.paid_date is null then 'null'
+            when p.paid_date > cast('1970-01-01' as date)
+                and p.paid_date < cast({{ dbt.current_timestamp() }} as date)
+                then 'valid'
+            else 'invalid'
+        end as mapping_status
+    from pharmacy_claim as p
 
 ),
 

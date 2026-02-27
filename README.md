@@ -41,9 +41,31 @@ All outputs are PHI-safe aggregate summaries.
 ### Fields evaluated by DQ checks
 
 - Eligibility fields:
+  - `gender` (valid: `male`, `female`, `unknown`)
   - `race`
   - `dual_status_code`
+  - `original_reason_entitlement_code` (valid: `0`, `1`, `2`, `3`)
+  - `medicare_status_code` (valid: `00`, `10`, `11`, `20`, `21`, `31`, `40`)
+  - `birth_date` (valid date range: `> 1900-01-01` and `< current_date`)
+  - `death_date` (valid date range: `> 1900-01-01` and `< current_date`)
+  - `social_security_number` (valid: 9 digits or formatted `###-##-####`)
+  - `address` (non-null, non-blank, not literal `NULL`)
+  - `city` (non-null, non-blank, not literal `NULL`)
+  - `state` (validated against ANSI/FIPS state reference values)
+  - `zip_code` (valid: 5-digit or 9-digit zip, with or without hyphen)
+  - `phone` (valid: 10 digits, or 11 digits starting with `1`)
+  - `email` (non-null and contains `@`)
 - Medical claim fields:
+  - `claim_type` (valid: `professional` or `institutional`)
+  - `claim_start_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `claim_end_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `claim_line_start_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `claim_line_end_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `admission_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `discharge_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `paid_date` (valid date range: `> 1970-01-01` and `< current_date`)
+  - `service_unit_quantity` (valid: `> 0` and non-null)
+  - `hcpcs_modifier_1` (non-null, non-blank, not literal `NULL`)
   - `drg_code` (validated using `drg_code_type` against MS-DRG or APR-DRG sets)
   - `revenue_center_code`
   - `hcpcs_code`
@@ -62,7 +84,14 @@ All outputs are PHI-safe aggregate summaries.
   - `billing_npi`
   - `facility_npi`
 - Pharmacy claim fields:
+  - `prescribing_provider_npi` (validated against `terminology__provider.npi`)
+  - `dispensing_provider_npi` (validated against `terminology__provider.npi`)
+  - `dispensing_date` (valid date range: `> 1970-01-01` and `< current_date`)
   - `ndc_code`
+  - `quantity` (valid: `> 0`)
+  - `days_supply` (valid: `> 0`)
+  - `refills` (valid: `> 0`)
+  - `paid_date` (valid date range: `> 1970-01-01` and `< current_date`)
 
 ### DQ history models
 
@@ -89,6 +118,7 @@ This package expects Tuva-style upstream refs to already exist in the downstream
   - `input_layer__pharmacy_claim`
 - Reference:
   - `reference_data__calendar`
+  - `reference_data__ansi_fips_state`
 - Terminology (used by `dq_results__terminology_field_summary`):
   - `terminology__race`
   - `terminology__medicare_dual_eligibility`

@@ -7,105 +7,98 @@
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <style>
       :root {
-        /* Token Reference
-           Typography: font stack, body scale, and compact utility sizes.
-           Surfaces: page, card, elevated card, selected row.
-           Borders/Shadows/Radii: modern but restrained data-density defaults.
-           Semantics: info/success/warning/danger with accessible text-on-tint.
-           Charts: colorblind-safer palette + separator/threshold tokens.
-        */
-        --font: system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
-        --font-sans: var(--font);
-        --text-body: 1rem;
-        --text-xs: 0.78rem;
-        --text-sm: 0.88rem;
-        --text-md: 0.94rem;
-        --line-height-body: 1.5;
-        --line-height-tight: 1.2;
-        --radius-sm: 8px;
-        --radius-md: 12px;
-        --radius-lg: 16px;
+        --color-accent: var(--color-accent-500);
+        --color-accent-100: #dbe8ff;
+        --color-accent-300: #8cb0fa;
+        --color-accent-500: #2f6df4;
+        --color-accent-700: #1e4fd8;
+        --color-accent-900: #173b9f;
+        --color-accent-strong: var(--color-accent-700);
+        --color-accent-subtle: var(--color-accent-100);
+        --color-bg: #f6f8fc;
+        --color-border: #dde4f0;
+        --color-border-strong: #98a2b3;
+        --color-chart-invalid: var(--color-chart-negative-strong);
+        --color-chart-negative-light: #fdba74;
+        --color-chart-negative-strong: #c2410c;
+        --color-chart-neutral: #94a3b8;
+        --color-chart-null: var(--color-chart-neutral);
+        --color-chart-positive-light: #5eead4;
+        --color-chart-positive-strong: #0f766e;
+        --color-chart-valid: var(--color-chart-positive-strong);
+        --color-danger: var(--color-danger-500);
+        --color-danger-100: #fee2e2;
+        --color-danger-500: #ef4444;
+        --color-danger-700: #b91c1c;
+        --color-danger-strong: var(--color-danger-700);
+        --color-danger-subtle: var(--color-danger-100);
+        --color-focus-ring: #2563eb;
+        --color-glow: #f5c451;
+        --color-glow-subtle: #fff7e8;
+        --color-info: var(--color-info-500);
+        --color-info-100: #dbeafe;
+        --color-info-500: #3b82f6;
+        --color-info-700: #1d4ed8;
+        --color-info-strong: var(--color-info-700);
+        --color-info-subtle: var(--color-info-100);
+        --color-muted: #4a5568;
+        --color-shadow-soft: #10182814;
+        --color-shadow-strong: #1018281f;
+        --color-success: var(--color-success-500);
+        --color-success-100: #d1fae5;
+        --color-success-500: #10b981;
+        --color-success-700: #047857;
+        --color-success-strong: var(--color-success-700);
+        --color-success-subtle: var(--color-success-100);
+        --color-surface: #ffffff;
+        --color-surface-elevated: #f8faff;
+        --color-surface-illuminated: #fffcf5;
+        --color-surface-muted: #eef2ff;
+        --color-text: #101828;
+        --color-text-disabled: #98a2b3;
+        --color-text-subtle: #667085;
+        --color-warning: var(--color-warning-500);
+        --color-warning-100: #fef3c7;
+        --color-warning-500: #f59e0b;
+        --color-warning-700: #b45309;
+        --color-warning-strong: var(--color-warning-700);
+        --color-warning-subtle: var(--color-warning-100);
+        --duration-fast: 120ms;
+        --duration-normal: 220ms;
+        --duration-slow: 360ms;
+        --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+        --focus-offset: 2px;
+        --focus-ring: 0 0 0 2px #2f6df4;
+        --font-family-sans:
+          system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
+        --leading-body: 1.65;
+        --leading-display: 1.1;
+        --radius-lg: 1.25rem;
+        --radius-md: 0.875rem;
         --radius-pill: 999px;
-        --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 20px rgb(16 24 40 / 5%);
-        --shadow-md: 0 12px 28px rgb(16 24 40 / 8%);
-        --shadow-text-contrast: 0 1px 1px rgb(16 24 40 / 22%);
-        --color-brand-primary: #2f6df4;
-        --color-brand-primary-strong: #1e4fd8;
-        --color-brand-secondary: #0d7f4d;
-        --surface-page: #f6f8fc;
-        --surface-card: #fff;
-        --surface-card-soft: #f8fbff;
-        --surface-accent: #eef2ff;
-        --surface-selected: #e6eeff;
-        --surface-overlay: rgb(255 255 255 / 84%);
-        --border-hairline: #d5deec;
-        --border-soft: #e6edf7;
-        --text-primary: #101828;
-        --text-secondary: #344054;
-        --text-subtle: #475467;
-        --text-on-accent: #fff;
-        --focus-ring-color: var(--color-brand-primary);
-        --focus-ring-shadow: 0 0 0 3px rgb(47 109 244 / 28%);
-        --color-info: var(--color-brand-primary);
-        --color-info-soft: rgb(47 109 244 / 14%);
-        --color-success: var(--color-brand-secondary);
-        --color-success-ink: #075c38;
-        --color-success-soft: rgb(13 127 77 / 14%);
-        --color-success-border: rgb(13 127 77 / 26%);
-        --color-warning: #9a6700;
-        --color-warning-ink: #7a5200;
-        --color-warning-soft: rgb(154 103 0 / 14%);
-        --color-warning-border: rgb(154 103 0 / 26%);
-        --color-danger: #c0362c;
-        --color-danger-ink: #8c2922;
-        --color-danger-soft: rgb(192 54 44 / 16%);
-        --color-danger-border: rgb(192 54 44 / 26%);
-        --color-null: #8fa2c1;
-        --chart-valid: var(--color-brand-primary);
-        --chart-invalid: #b86f00;
-        --chart-null: var(--color-null);
-        --chart-grid: rgb(16 24 40 / 16%);
-        --chart-separator: var(--surface-card);
-        --chart-threshold: #344054;
-        --chart-threshold-soft: rgb(52 64 84 / 12%);
-        --chart-bullet-track: #dbe4f2;
-        --chart-bullet-measure: var(--color-brand-primary);
-        --chart-bullet-bad: var(--chart-invalid);
-        --chart-bullet-threshold: var(--chart-threshold);
-        --chart-not-applicable: #9aa8bf;
-        --color-error-bg: #fff4f4;
-        --color-error-border: #f5c7c7;
-        --color-error-text: #8c2922;
-        --color-bg: var(--surface-page);
-        --color-surface: var(--surface-card);
-        --color-surface-muted: var(--surface-accent);
-        --color-border: var(--border-hairline);
-        --color-border-soft: var(--border-soft);
-        --color-text: var(--text-primary);
-        --color-muted: var(--text-secondary);
-        --color-accent: var(--color-brand-primary);
-        --color-accent-strong: var(--color-brand-primary-strong);
-        --color-on-accent: var(--text-on-accent);
-        --color-surface-soft: var(--surface-card-soft);
-        --color-surface-selected: var(--surface-selected);
-        --color-accent-soft: rgb(47 109 244 / 24%);
-        --color-threshold: var(--chart-threshold);
-        --color-threshold-soft: var(--chart-threshold-soft);
-        --color-danger-tint: rgb(192 54 44 / 12%);
-        --color-warning-tint: var(--color-warning-soft);
-        --color-grid: var(--chart-grid);
-        --bg: var(--color-bg);
-        --card: var(--color-surface);
-        --text: var(--color-text);
-        --muted: var(--color-muted);
-        --border: var(--color-border);
-        --accent: var(--color-accent);
-        --danger: var(--color-danger);
-        --success: var(--color-success);
-        --warning: var(--color-warning);
-        --shadow: var(--shadow-md);
-        --shadow-soft: var(--shadow-sm);
-        --radius: var(--radius-md);
+        --shadow-lg: 0 20px 45px #1018281a;
+        --shadow-md: 0 10px 30px #10182814;
+        --shadow-sm: 0 1px 2px #10182814;
+        --space-2xs: 0.25rem;
+        --space-card: 1.5rem;
+        --space-lg: 1.5rem;
+        --space-md: 1rem;
+        --space-section: clamp(4.5rem, 7vw, 6rem);
+        --space-sm: 0.75rem;
+        --space-xl: 2rem;
+        --space-xs: 0.5rem;
+        --text-body: 1rem;
+        --text-display: clamp(2rem, 3.5vw + 1rem, 3.6rem);
+        --text-h1: clamp(1.875rem, 2.3vw + 1rem, 2.75rem);
+        --text-h2: clamp(1.5rem, 1vw + 1.2rem, 2rem);
+        --text-lg: 1.125rem;
+        --text-sm: 0.875rem;
+        --text-xl: 1.25rem;
+        --text-xs: 0.75rem;
+        --z-dropdown: 1000;
+        --z-modal: 1200;
+        --z-sticky: 1100;
+        --z-toast: 1300;
       }
 
       * {
@@ -114,66 +107,101 @@
 
       body {
         margin: 0;
-        font-family: var(--font);
-        color: var(--text);
+        font-family: var(--font-family-sans);
+        color: var(--color-text);
         font-size: var(--text-body);
-        line-height: var(--line-height-body);
+        line-height: var(--leading-body);
         background: radial-gradient(
           120% 140% at 0% 0%,
-          var(--color-surface-muted) 0%,
-          var(--color-bg) 48%,
+          var(--color-surface-muted) 30%,
+          var(--color-surface-elevated) 62%,
           var(--color-bg) 100%
         );
       }
 
       .page-shell {
+        position: relative;
         max-width: 1220px;
         margin: 0 auto;
         padding: clamp(16px, 2vw, 24px);
+      }
+
+      .page-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.45;
+        background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+
+      .page-shell > * {
+        position: relative;
       }
 
       .header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-bottom: 16px;
+        gap: clamp(14px, 2vw, 24px);
+        flex-wrap: nowrap;
+        margin-bottom: 18px;
+        padding: clamp(14px, 2vw, 20px);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: linear-gradient(
+          160deg,
+          var(--color-surface-illuminated) 0%,
+          var(--color-surface) 38%,
+          var(--color-surface-elevated) 100%
+        );
+        box-shadow: var(--shadow-sm);
       }
 
       .brand {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: clamp(12px, 1.4vw, 18px);
+        min-width: 0;
+        flex: 1 1 auto;
       }
 
       .logo-wrap {
         display: inline-flex;
         align-items: center;
-        min-height: 28px;
+        min-height: clamp(44px, 4.4vw, 60px);
+        flex: 0 0 auto;
       }
 
       .logo {
-        height: 28px;
+        height: clamp(44px, 4.4vw, 60px);
         width: auto;
       }
 
       .logo-fallback {
         font-weight: 700;
         letter-spacing: 0.01em;
+        font-size: var(--text-lg);
       }
 
       .title {
+        align-self: flex-end;
         margin: 0;
-        font-size: clamp(1.3rem, 1.8vw + 0.8rem, 1.9rem);
+        font-size: clamp(1.28rem, 1.2vw + 0.94rem, 1.7rem);
         letter-spacing: -0.01em;
-        line-height: var(--line-height-tight);
+        line-height: var(--leading-display);
+        color: var(--color-text);
+        white-space: nowrap;
       }
 
       .controls {
         display: flex;
         align-items: center;
+        align-self: flex-end;
         gap: 10px;
+        flex: 0 0 auto;
+        justify-content: flex-end;
       }
 
       .button {
@@ -183,14 +211,14 @@
         border: 1px solid transparent;
         border-radius: var(--radius-pill);
         padding: 10px 18px;
-        color: var(--color-on-accent);
-        background: var(--accent);
+        color: var(--color-surface);
+        background: var(--color-accent);
         font-size: var(--text-sm);
         font-weight: 700;
-        line-height: var(--line-height-tight);
+        line-height: var(--leading-display);
         cursor: pointer;
         text-decoration: none;
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow-sm);
         transition:
           background-color 120ms ease,
           box-shadow 120ms ease,
@@ -199,40 +227,54 @@
 
       .button:hover {
         background: var(--color-accent-strong);
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-md);
         transform: translateY(-1px);
       }
 
       .helper-text {
         margin: 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: var(--text-sm);
       }
 
       .tab-strip {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        flex-wrap: nowrap;
+        gap: 4px;
         margin: 0 0 12px;
+        border-radius: var(--radius-md);
+        padding: 4px;
+        background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-surface) 12%);
       }
 
       .tab-button {
-        border: 1px solid var(--color-border);
-        background: var(--color-surface-soft);
-        color: var(--text);
-        border-radius: var(--radius-pill);
-        padding: 8px 14px;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        color: var(--color-text-subtle);
+        border-radius: var(--radius-md);
+        padding: 10px 16px;
         font: inherit;
         font-size: var(--text-sm);
         font-weight: 700;
-        line-height: var(--line-height-tight);
+        line-height: var(--leading-display);
         cursor: pointer;
+        transition:
+          background-color var(--duration-fast) var(--ease-standard),
+          color var(--duration-fast) var(--ease-standard),
+          border-color var(--duration-fast) var(--ease-standard);
+      }
+
+      .tab-button:hover {
+        color: var(--color-text);
+        background: var(--color-surface);
       }
 
       .tab-button[aria-selected="true"] {
-        background: var(--accent);
-        color: var(--color-on-accent);
-        border-color: var(--accent);
+        background: var(--color-surface);
+        border-bottom: 2px solid var(--color-accent);
+        color: var(--color-accent);
+        box-shadow: var(--shadow-sm);
       }
 
       .view-panel[hidden] {
@@ -246,8 +288,16 @@
 
       .section-subtitle {
         margin: 0 0 10px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: var(--text-sm);
+      }
+
+      .section-subtitle code {
+        background: var(--color-surface-muted);
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.85em;
       }
 
       .filter-grid {
@@ -276,17 +326,17 @@
 
       .filter-label {
         font-size: var(--text-sm);
-        color: var(--muted);
+        color: var(--color-muted);
       }
 
       .filter-select {
         width: 100%;
         min-width: 0;
         max-width: 100%;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
         padding: 8px 10px;
-        color: var(--text);
+        color: var(--color-text);
         background: var(--color-surface);
         font: inherit;
       }
@@ -305,35 +355,40 @@
       }
 
       .simple-table-wrap {
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
         background: var(--color-surface);
         overflow: auto;
         max-height: 380px;
       }
 
-      .drop-zone {
-        display: block;
-        width: 100%;
-        border: 1px dashed var(--color-border);
-        border-radius: var(--radius);
-        background: var(--color-surface-soft);
-        color: var(--muted);
-        padding: 14px 16px;
-        margin-bottom: 18px;
-        text-align: left;
-        font: inherit;
-        line-height: var(--line-height-tight);
-        cursor: pointer;
-        transition:
-          border-color 120ms ease,
-          background-color 120ms ease;
+      .page-drop-overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: clamp(14px, 2vw, 24px);
+        border: 2px dashed var(--color-accent-300);
+        background: var(--color-surface-muted);
+        pointer-events: none;
+        z-index: var(--z-modal);
       }
 
-      .drop-zone.drag-over {
-        border-color: var(--accent);
-        background: var(--color-surface-muted);
-        color: var(--text);
+      .page-drop-overlay[hidden] {
+        display: none;
+      }
+
+      .page-drop-overlay-label {
+        margin: 0;
+        padding: 10px 14px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-pill);
+        background: var(--color-surface);
+        color: var(--color-text);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        line-height: var(--leading-display);
+        box-shadow: var(--shadow-sm);
       }
 
       .kpi-grid {
@@ -344,23 +399,37 @@
       }
 
       .kpi-card {
-        background: var(--card);
+        background: var(--color-surface);
         border: 1px solid var(--color-border);
-        border-radius: var(--radius);
+        border-left: 3px solid var(--color-accent);
+        border-radius: var(--radius-md);
         padding: 16px;
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow-sm);
       }
 
       .kpi-label {
         margin: 0;
         font-size: var(--text-sm);
-        color: var(--muted);
+        color: var(--color-muted);
       }
 
       .kpi-value {
         margin: 6px 0 0;
-        font-size: clamp(1.4rem, 2.6vw, 2rem);
+        font-size: clamp(1.55rem, 2.9vw, 2.2rem);
         font-weight: 800;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .status-summary-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0 0 16px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 10px 14px;
+        box-shadow: var(--shadow-sm);
       }
 
       .trend-grid {
@@ -376,15 +445,15 @@
       }
 
       .trend-card {
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        background: var(--color-surface-soft);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background: var(--color-surface-elevated);
         padding: 10px;
       }
 
       .trend-header {
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 6px;
@@ -393,23 +462,59 @@
       .trend-title {
         margin: 0;
         font-size: var(--text-sm);
-        color: var(--muted);
+        color: var(--color-muted);
       }
 
-      .trend-value {
+      .trend-header-meta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .trend-average {
         margin: 0;
         font-size: 1.05rem;
         font-weight: 700;
         font-variant-numeric: tabular-nums;
       }
 
+      .trend-delta-badge {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid transparent;
+        border-radius: var(--radius-pill);
+        padding: 2px 7px;
+        font-size: var(--text-xs);
+        font-weight: 700;
+        line-height: var(--leading-display);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .trend-delta-badge.is-positive {
+        color: var(--color-success-700);
+        background: var(--color-success-subtle);
+        border-color: var(--color-success-500);
+      }
+
+      .trend-delta-badge.is-negative {
+        color: var(--color-danger-700);
+        background: var(--color-danger-subtle);
+        border-color: var(--color-danger-500);
+      }
+
+      .trend-delta-badge.is-neutral {
+        color: var(--color-text-subtle);
+        background: var(--color-surface-elevated);
+        border-color: var(--color-border);
+      }
+
       .trend-canvas-wrap {
         position: relative;
-        height: 124px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        height: 148px;
+        border-radius: var(--radius-md);
         background: var(--color-surface);
-        padding: 6px;
+        padding: 6px 6px 20px;
       }
 
       .trend-canvas {
@@ -418,9 +523,27 @@
         height: 100%;
       }
 
+      .trend-edge-label {
+        position: absolute;
+        bottom: 5px;
+        font-size: var(--text-xs);
+        color: var(--color-text-subtle);
+        line-height: var(--leading-display);
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+      }
+
+      .trend-edge-label.is-start {
+        left: 8px;
+      }
+
+      .trend-edge-label.is-end {
+        right: 8px;
+      }
+
       .trend-summary {
         margin: 8px 0 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: var(--text-xs);
       }
 
@@ -435,7 +558,7 @@
         justify-content: space-between;
         gap: 8px;
         font-size: var(--text-xs);
-        color: var(--muted);
+        color: var(--color-muted);
       }
 
       .range-boundary {
@@ -445,7 +568,7 @@
       }
 
       .range-boundary strong {
-        color: var(--text);
+        color: var(--color-text);
       }
 
       .dual-slider {
@@ -461,14 +584,14 @@
         right: 0;
         height: 6px;
         border-radius: var(--radius-pill);
-        background: var(--chart-bullet-track);
+        background: var(--color-border);
       }
 
       .dual-slider-selection {
         position: absolute;
         height: 6px;
         border-radius: var(--radius-pill);
-        background: var(--accent);
+        background: var(--color-accent);
         left: 0%;
         width: 100%;
       }
@@ -500,9 +623,9 @@
         height: 16px;
         margin-top: -5px;
         border-radius: 50%;
-        border: 2px solid var(--accent);
+        border: 2px solid var(--color-accent);
         background: var(--color-surface);
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow-sm);
         pointer-events: auto;
         cursor: pointer;
       }
@@ -511,9 +634,9 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        border: 2px solid var(--accent);
+        border: 2px solid var(--color-accent);
         background: var(--color-surface);
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow-sm);
         pointer-events: auto;
         cursor: pointer;
       }
@@ -529,7 +652,7 @@
       .range-summary {
         margin: 0;
         font-size: var(--text-xs);
-        color: var(--muted);
+        color: var(--color-muted);
       }
 
       .content-grid {
@@ -539,10 +662,10 @@
       }
 
       .card {
-        background: var(--card);
+        background: var(--color-surface);
         border: 1px solid var(--color-border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-soft);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
       }
 
       .table-card {
@@ -573,39 +696,43 @@
 
       .filter-input {
         width: min(360px, 70vw);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
         padding: 8px 10px;
-        color: var(--text);
+        color: var(--color-text);
         background: var(--color-surface);
         font: inherit;
       }
 
       .run-select {
         max-width: min(420px, 78vw);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
         padding: 8px 10px;
-        color: var(--text);
+        color: var(--color-text);
         background: var(--color-surface);
         font: inherit;
       }
 
       .count-text {
         margin: 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: var(--text-sm);
       }
 
       .table-note {
+        background: var(--color-info-subtle);
+        border-left: 3px solid var(--color-info-500);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding: 8px 12px;
         margin: 0 0 10px;
-        color: var(--muted);
+        color: var(--color-text-subtle);
         font-size: var(--text-xs);
       }
 
       .table-container {
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
         background: var(--color-surface);
         overflow: auto;
         max-height: 560px;
@@ -619,8 +746,8 @@
       th,
       td {
         padding: 10px;
-        border-bottom: 1px solid var(--color-border-soft);
-        font-size: var(--text-md);
+        border-bottom: 1px solid var(--color-border);
+        font-size: var(--text-body);
         white-space: nowrap;
       }
 
@@ -628,7 +755,7 @@
         position: sticky;
         top: 0;
         z-index: 1;
-        background: var(--color-surface-soft);
+        background: var(--color-surface-elevated);
         font-size: var(--text-sm);
       }
 
@@ -650,7 +777,7 @@
       .simple-table th,
       .simple-table td {
         padding: 9px 10px;
-        border-bottom: 1px solid var(--color-border-soft);
+        border-bottom: 1px solid var(--color-border);
         font-size: var(--text-sm);
         white-space: nowrap;
       }
@@ -659,13 +786,37 @@
         position: sticky;
         top: 0;
         z-index: 1;
-        background: var(--color-surface-soft);
+        background: var(--color-surface-elevated);
         text-align: left;
       }
 
       .simple-table td.number {
         text-align: right;
         font-variant-numeric: tabular-nums;
+      }
+
+      .view-panel[aria-labelledby="tabMapping"].panel-stack {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .view-panel[aria-labelledby="tabMapping"] > * {
+        min-width: 0;
+      }
+
+      .view-panel[aria-labelledby="tabMapping"] .dual-table-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .view-panel[aria-labelledby="tabMapping"] .table-card,
+      .view-panel[aria-labelledby="tabMapping"] .dual-table-grid > .table-card,
+      .view-panel[aria-labelledby="tabMapping"] .simple-table-wrap {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .view-panel[aria-labelledby="tabMapping"] .simple-table {
+        min-width: 100%;
+        width: max-content;
       }
 
       .sort-button {
@@ -688,8 +839,18 @@
       }
 
       .sort-indicator {
-        color: var(--muted);
-        font-size: var(--text-xs);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 10px;
+        height: 10px;
+        color: var(--color-muted);
+      }
+
+      .sort-indicator svg {
+        display: block;
+        width: 10px;
+        height: 10px;
       }
 
       tbody tr {
@@ -697,11 +858,11 @@
       }
 
       tbody tr:hover {
-        background: var(--color-surface-soft);
+        background: var(--color-surface-muted);
       }
 
       tbody tr.selected {
-        background: var(--color-surface-selected);
+        background: var(--color-accent-subtle);
       }
 
       .metric-cell {
@@ -717,8 +878,8 @@
         padding: 1px 6px;
         border-radius: var(--radius-pill);
         border: 1px solid var(--color-border);
-        background: var(--color-surface-soft);
-        color: var(--muted);
+        background: var(--color-surface-elevated);
+        color: var(--color-muted);
         font-size: var(--text-xs);
         font-weight: 700;
         vertical-align: middle;
@@ -733,7 +894,7 @@
         height: 24px;
         border: 1px solid var(--color-border);
         border-radius: var(--radius-pill);
-        background: var(--chart-bullet-track);
+        background: var(--color-border);
         overflow: hidden;
       }
 
@@ -742,11 +903,11 @@
         top: 0;
         left: 0;
         bottom: 0;
-        background: var(--chart-bullet-measure);
+        background: var(--color-chart-valid);
       }
 
       .valid-meter-fill.fail {
-        background: var(--chart-bullet-bad);
+        background: var(--color-chart-invalid);
       }
 
       .valid-meter-threshold {
@@ -754,7 +915,7 @@
         top: 0;
         bottom: 0;
         width: 2px;
-        background: var(--chart-bullet-threshold);
+        background: var(--color-muted);
       }
 
       .valid-meter-label {
@@ -762,13 +923,13 @@
         top: 50%;
         right: 8px;
         transform: translateY(-50%);
-        color: var(--text);
-        background: var(--surface-overlay);
+        color: var(--color-text);
+        background: var(--color-surface);
         border-radius: var(--radius-pill);
         padding: 1px 6px;
         font-size: var(--text-xs);
         font-weight: 700;
-        text-shadow: var(--shadow-text-contrast);
+        text-shadow: var(--shadow-sm);
         font-variant-numeric: tabular-nums;
       }
 
@@ -781,7 +942,8 @@
         padding: 3px 8px;
         font-size: var(--text-xs);
         font-weight: 700;
-        letter-spacing: 0.01em;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
       }
 
       .status-pill::before {
@@ -793,65 +955,90 @@
       }
 
       .status-pass {
-        color: var(--color-success-ink);
-        background: var(--color-success-soft);
-        border-color: var(--color-success-border);
+        color: var(--color-success-700);
+        background: var(--color-success-subtle);
+        border-color: var(--color-success-500);
       }
 
       .status-fail {
-        color: var(--color-danger-ink);
-        background: var(--color-danger-tint);
-        border-color: var(--color-danger-border);
+        color: var(--color-danger-700);
+        background: var(--color-danger-subtle);
+        border-color: var(--color-danger-500);
       }
 
       .status-unknown {
-        color: var(--color-warning-ink);
-        background: var(--color-warning-tint);
-        border-color: var(--color-warning-border);
+        color: var(--color-warning-700);
+        background: var(--color-warning-subtle);
+        border-color: var(--color-warning-500);
       }
 
       .chart-card {
         padding: 16px;
+        border-left: 3px solid transparent;
+      }
+
+      .chart-card.status-accent-pass {
+        border-left-color: var(--color-success-500);
+      }
+
+      .chart-card.status-accent-fail {
+        border-left-color: var(--color-danger-500);
+      }
+
+      .chart-card.status-accent-unknown {
+        border-left-color: var(--color-warning-500);
       }
 
       .chart-title {
         margin: 0;
         font-size: 1rem;
-        line-height: var(--line-height-tight);
+        line-height: var(--leading-display);
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+        opacity: 1;
+        transition: opacity 150ms ease;
+      }
+
+      .chart-title.is-placeholder {
+        opacity: 0.72;
       }
 
       .rule-text {
         margin: 6px 0 12px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: var(--text-xs);
       }
 
       .detail-content {
+        gap: 0;
+      }
+
+      .detail-content:not([hidden]) {
         display: grid;
-        gap: 12px;
       }
 
       .detail-block {
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 10px;
-        background: var(--color-surface-soft);
+        padding: 14px 0;
+      }
+
+      .detail-block + .detail-block {
+        border-top: 1px solid var(--color-border);
       }
 
       .detail-heading {
         margin: 0 0 8px;
-        font-size: var(--text-xs);
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--color-muted);
       }
 
       .chart-canvas-wrap {
         position: relative;
         width: 100%;
-        height: 86px;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border);
+        height: 152px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-border);
         background: var(--color-surface);
         padding: 8px;
       }
@@ -863,13 +1050,35 @@
       }
 
       .decision-summary {
-        margin: 10px 0 0;
-        color: var(--muted);
+        margin: 0 0 10px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--color-border);
+        padding: 4px 10px;
+        color: var(--color-warning-700);
+        background: var(--color-warning-subtle);
         font-size: var(--text-sm);
+        font-weight: 700;
+        line-height: var(--leading-display);
       }
 
-      .decision-summary strong {
-        color: var(--text);
+      .decision-summary.is-pass {
+        color: var(--color-success-700);
+        background: var(--color-success-subtle);
+        border-color: var(--color-success-500);
+      }
+
+      .decision-summary.is-fail {
+        color: var(--color-danger-700);
+        background: var(--color-danger-subtle);
+        border-color: var(--color-danger-500);
+      }
+
+      .decision-summary.is-unknown {
+        color: var(--color-warning-700);
+        background: var(--color-warning-subtle);
+        border-color: var(--color-warning-500);
       }
 
       .legend {
@@ -906,36 +1115,38 @@
       }
 
       .swatch-valid {
-        background: var(--chart-valid);
+        background: var(--color-chart-valid);
       }
 
       .swatch-invalid {
-        background: var(--chart-invalid);
+        background: var(--color-chart-invalid);
       }
 
       .swatch-null {
-        background: var(--chart-null);
-      }
-
-      .swatch-not-applicable {
-        background: var(--chart-not-applicable);
+        background: var(--color-chart-null);
       }
 
       .detail-grid {
         margin: 0;
         display: grid;
-        gap: 6px;
+        gap: 8px;
       }
 
-      .detail-row {
+      .detail-pair {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: 12px;
       }
 
+      .detail-grid.two-column {
+        grid-template-columns: 1fr 1fr;
+        column-gap: 16px;
+      }
+
       .detail-grid dt {
-        color: var(--muted);
+        margin: 0;
+        color: var(--color-muted);
         font-size: var(--text-sm);
       }
 
@@ -948,25 +1159,53 @@
 
       .detail-source {
         margin-top: 8px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: var(--text-xs);
       }
 
+      .detail-empty {
+        justify-items: center;
+        gap: 8px;
+        padding: 22px 20px;
+      }
+
+      .detail-empty:not([hidden]) {
+        display: grid;
+      }
+
+      .detail-empty-icon {
+        width: 28px;
+        height: 28px;
+        color: var(--color-muted);
+      }
+
+      .detail-empty-heading {
+        margin: 0;
+        font-size: var(--text-sm);
+        color: var(--color-text);
+      }
+
+      .detail-empty-subline {
+        margin: 0;
+        font-size: var(--text-xs);
+        color: var(--color-muted);
+      }
+
       .error-banner {
-        border-radius: var(--radius);
+        border-radius: var(--radius-md);
         padding: 12px 14px;
         margin-bottom: 14px;
-        background: var(--color-error-bg);
-        border: 1px solid var(--color-error-border);
-        color: var(--color-error-text);
+        background: var(--color-danger-subtle);
+        border: 1px solid var(--color-danger-500);
+        color: var(--color-danger-700);
       }
 
       .empty-state {
-        border: 1px dashed var(--border);
-        border-radius: var(--radius-sm);
-        color: var(--muted);
+        border: 1px dashed var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-muted);
         padding: 20px;
-        background: var(--color-surface-soft);
+        background: var(--color-surface-elevated);
         text-align: center;
       }
 
@@ -983,9 +1222,9 @@
       }
 
       :focus-visible {
-        outline: 2px solid var(--focus-ring-color);
+        outline: 2px solid var(--color-focus-ring);
         outline-offset: 2px;
-        box-shadow: var(--focus-ring-shadow);
+        box-shadow: var(--focus-ring);
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -1000,6 +1239,24 @@
       }
 
       @media (width <= 940px) {
+        .header {
+          flex-wrap: wrap;
+          align-items: flex-start;
+        }
+
+        .brand {
+          flex: 1 1 100%;
+        }
+
+        .title {
+          white-space: normal;
+        }
+
+        .controls {
+          flex: 1 1 100%;
+          align-self: stretch;
+        }
+
         .kpi-grid {
           grid-template-columns: 1fr;
         }
@@ -1016,6 +1273,31 @@
         .filter-grid.three,
         .filter-grid.five {
           grid-template-columns: 1fr;
+        }
+      }
+
+      @media (width <= 640px) {
+        .tab-strip {
+          overflow: auto;
+          white-space: nowrap;
+        }
+
+        .tab-button {
+          flex: 0 0 auto;
+          min-height: 44px;
+        }
+
+        .brand {
+          gap: 10px;
+        }
+
+        .controls {
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+
+        .helper-text {
+          width: 100%;
         }
       }
     </style>
@@ -1038,15 +1320,10 @@
         <div class="controls">
           <label for="csvInput" class="button">Choose CSV</label>
           <input id="csvInput" type="file" accept=".csv,text/csv" class="sr-only" />
-          <p class="helper-text">or drag, drop, or paste (Ctrl/Cmd+V)</p>
         </div>
       </header>
 
       <main id="mainContent">
-        <button id="dropZone" class="drop-zone" type="button">
-          Drop a CSV file here, or click Choose CSV.
-        </button>
-
         <div id="errorBanner" class="error-banner" role="alert" hidden></div>
         <div class="tab-strip" role="tablist" aria-label="Data quality dashboards">
           <button
@@ -1057,6 +1334,7 @@
             data-view="terminology"
             aria-controls="panelTerminology"
             aria-selected="true"
+            tabindex="0"
           >
             Terminology DQ
           </button>
@@ -1068,6 +1346,7 @@
             data-view="reconciliation"
             aria-controls="panelReconciliation"
             aria-selected="false"
+            tabindex="-1"
           >
             Reconciliation Summary
           </button>
@@ -1079,32 +1358,43 @@
             data-view="mapping"
             aria-controls="panelMapping"
             aria-selected="false"
+            tabindex="-1"
           >
             Input Layer DQ
           </button>
         </div>
 
-        <section id="panelTerminology" class="view-panel" aria-label="Terminology view">
+        <section
+          id="panelTerminology"
+          class="view-panel panel-stack"
+          role="tabpanel"
+          aria-labelledby="tabTerminology"
+          aria-label="Terminology view"
+        >
           <div class="card table-card">
             <p class="section-subtitle">
               Load CSV exported from <code>spotlight.dq_results__terminology_field_summary</code>.
             </p>
             <div class="filter-grid rec-filter-grid">
               <div class="filter-box">
-                <label class="filter-label" for="termFilterRunId">run_id</label>
+                <label class="filter-label" for="termFilterRunId">Run</label>
                 <select id="termFilterRunId" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="termFilterDataSource">data_source</label>
+                <label class="filter-label" for="termFilterDataSource">Data Source</label>
                 <select id="termFilterDataSource" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="termFilterPayer">payer</label>
+                <label class="filter-label" for="termFilterPayer">Payer</label>
                 <select id="termFilterPayer" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="termFilterPlan">plan</label>
+                <label class="filter-label" for="termFilterPlan">Plan</label>
                 <select id="termFilterPlan" class="filter-select"></select>
+              </div>
+              <div class="filter-box">
+                <label class="filter-label" for="modelFilterSelect">Model</label>
+                <select id="modelFilterSelect" class="filter-select"></select>
               </div>
             </div>
           </div>
@@ -1124,25 +1414,21 @@
             </article>
           </section>
 
+          <div
+            class="status-summary-bar"
+            role="group"
+            aria-live="polite"
+            aria-label="Status summary counts"
+          >
+            <span id="statusSummaryPass" class="status-pill status-pass">-- Pass</span>
+            <span id="statusSummaryFail" class="status-pill status-fail">-- Fail</span>
+            <span id="statusSummaryUnknown" class="status-pill status-unknown">-- Unknown</span>
+          </div>
+
           <section class="content-grid" aria-label="Detailed results">
             <div class="card table-card">
               <div class="table-toolbar">
                 <div class="toolbar-controls">
-                  <div id="runFilterWrap" class="filter-wrap" hidden>
-                    <label for="runFilterSelect">Run</label>
-                    <select
-                      id="runFilterSelect"
-                      class="run-select"
-                      aria-describedby="runFilterHint"
-                    ></select>
-                    <span id="runFilterHint" class="sr-only">
-                      Select a run_id to filter table rows, KPI summaries, and detail panel data.
-                    </span>
-                  </div>
-                  <div class="filter-wrap">
-                    <label for="modelFilterSelect">Model</label>
-                    <select id="modelFilterSelect" class="run-select"></select>
-                  </div>
                   <div class="filter-wrap">
                     <label for="tableFilter">Filter metric</label>
                     <input
@@ -1162,9 +1448,7 @@
                 badge indicates multiple CSV rows share the same visible metric label.
               </p>
 
-              <div id="emptyState" class="empty-state">
-                Load a CSV with Choose CSV or drag it into the drop zone to view results.
-              </div>
+              <div id="emptyState" class="empty-state">Load a CSV file to populate the table.</div>
 
               <div id="tableContainer" class="table-container" hidden>
                 <table id="resultsTable">
@@ -1172,17 +1456,50 @@
                     <tr>
                       <th scope="col" data-key="metric">
                         <button class="sort-button" type="button">
-                          metric <span class="sort-indicator">↕</span>
+                          metric
+                          <span class="sort-indicator"
+                            ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                              <path
+                                d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.35"
+                              /></svg
+                          ></span>
                         </button>
                       </th>
                       <th scope="col" data-key="valid_pct">
                         <button class="sort-button" type="button">
-                          valid % (applicable) <span class="sort-indicator">↕</span>
+                          valid % (applicable)
+                          <span class="sort-indicator"
+                            ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                              <path
+                                d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.35"
+                              /></svg
+                          ></span>
                         </button>
                       </th>
                       <th scope="col" data-key="status">
                         <button class="sort-button" type="button">
-                          status <span class="sort-indicator">↕</span>
+                          status
+                          <span class="sort-indicator"
+                            ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                              <path
+                                d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.35"
+                              /></svg
+                          ></span>
                         </button>
                       </th>
                     </tr>
@@ -1201,21 +1518,39 @@
               <p id="detailRule" class="rule-text">
                 Status rule: valid % must be greater than or equal to threshold.
               </p>
-              <div id="detailEmpty" class="empty-state">Select a row to view details.</div>
+              <div id="detailEmpty" class="empty-state detail-empty">
+                <svg
+                  class="detail-empty-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
+                  <path d="M3 20.5h18" stroke-linecap="round"></path>
+                  <rect x="5" y="11" width="3.4" height="6.5" rx="1"></rect>
+                  <rect x="10.3" y="8.5" width="3.4" height="9" rx="1"></rect>
+                  <rect x="15.6" y="5.5" width="3.4" height="12" rx="1"></rect>
+                </svg>
+                <h3 class="detail-empty-heading">Select a metric to inspect</h3>
+                <p class="detail-empty-subline">
+                  Click any row in the table to see its full breakdown.
+                </p>
+              </div>
 
               <div id="detailContent" class="detail-content" hidden>
                 <div class="detail-block">
                   <h3 class="detail-heading">Validity vs threshold</h3>
-                  <dl class="detail-grid">
-                    <div class="detail-row">
-                      <dt>Valid % (applicable)</dt>
-                      <dd id="detailValidPct">--</dd>
+                  <dl class="detail-grid two-column">
+                    <div class="detail-pair">
+                      <dt>Valid %</dt>
+                      <dd id="detailValidityPct">--</dd>
                     </div>
-                    <div class="detail-row">
-                      <dt>Threshold (min valid %)</dt>
+                    <div class="detail-pair">
+                      <dt>Threshold</dt>
                       <dd id="detailThreshold">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Margin</dt>
                       <dd id="detailMargin">--</dd>
                     </div>
@@ -1224,21 +1559,20 @@
 
                 <div class="detail-block">
                   <h3 class="detail-heading">Distribution</h3>
+                  <p id="detailDecision" class="decision-summary is-unknown">
+                    Valid -- · UNKNOWN · threshold unavailable
+                  </p>
                   <div class="chart-canvas-wrap">
                     <canvas
                       id="distributionChart"
                       class="chart-canvas"
                       role="img"
-                      aria-label="100 percent stacked bar chart showing valid, invalid, null, and not applicable percentages with a threshold marker"
+                      aria-label="100 percent stacked bar chart showing valid, invalid, and null percentages with a threshold marker"
                     >
-                      Selected metric distribution chart with valid, invalid, null, and not
-                      applicable segments. Use the summary and legend text below for exact
-                      percentages and row counts.
+                      Selected metric distribution chart with valid, invalid, and null segments. Use
+                      the summary and legend text below for exact percentages and row counts.
                     </canvas>
                   </div>
-                  <p id="detailDecision" class="decision-summary">
-                    Valid % threshold comparison appears after selecting a metric.
-                  </p>
                   <ul class="legend">
                     <li class="legend-item">
                       <span class="legend-start"
@@ -1248,7 +1582,7 @@
                     </li>
                     <li class="legend-item">
                       <span class="legend-start"
-                        ><span class="swatch swatch-invalid"></span>Invalid (orange)</span
+                        ><span class="swatch swatch-invalid"></span>Invalid</span
                       >
                       <strong id="legendInvalid" class="legend-value">--</strong>
                     </li>
@@ -1256,47 +1590,41 @@
                       <span class="legend-start"><span class="swatch swatch-null"></span>Null</span>
                       <strong id="legendNull" class="legend-value">--</strong>
                     </li>
-                    <li class="legend-item">
-                      <span class="legend-start"
-                        ><span class="swatch swatch-not-applicable"></span>Not applicable</span
-                      >
-                      <strong id="legendNotApplicable" class="legend-value">--</strong>
-                    </li>
                   </ul>
                 </div>
 
                 <div class="detail-block">
                   <h3 class="detail-heading">Counts</h3>
-                  <dl class="detail-grid">
-                    <div class="detail-row">
+                  <dl class="detail-grid two-column">
+                    <div class="detail-pair">
                       <dt>Total rows</dt>
                       <dd id="detailTotalRows">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Applicable rows</dt>
                       <dd id="detailApplicableRows">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Valid rows</dt>
                       <dd id="detailValidCount">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Invalid rows</dt>
                       <dd id="detailInvalidCount">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Null rows</dt>
                       <dd id="detailNullCount">--</dd>
                     </div>
-                    <div class="detail-row">
-                      <dt>Not applicable rows</dt>
+                    <div class="detail-pair">
+                      <dt>N/A rows</dt>
                       <dd id="detailNotApplicableCount">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Invalid %</dt>
                       <dd id="detailInvalidPct">--</dd>
                     </div>
-                    <div class="detail-row">
+                    <div class="detail-pair">
                       <dt>Null %</dt>
                       <dd id="detailNullPct">--</dd>
                     </div>
@@ -1315,6 +1643,8 @@
         <section
           id="panelReconciliation"
           class="view-panel panel-stack"
+          role="tabpanel"
+          aria-labelledby="tabReconciliation"
           aria-label="Reconciliation summary view"
           hidden
         >
@@ -1324,19 +1654,19 @@
             </p>
             <div class="filter-grid rec-filter-grid">
               <div class="filter-box">
-                <label class="filter-label" for="recFilterRunId">run_id</label>
+                <label class="filter-label" for="recFilterRunId">Run</label>
                 <select id="recFilterRunId" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="recFilterDataSource">data_source</label>
+                <label class="filter-label" for="recFilterDataSource">Data Source</label>
                 <select id="recFilterDataSource" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="recFilterPayer">payer</label>
+                <label class="filter-label" for="recFilterPayer">Payer</label>
                 <select id="recFilterPayer" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="recFilterPlan">plan</label>
+                <label class="filter-label" for="recFilterPlan">Plan</label>
                 <select id="recFilterPlan" class="filter-select"></select>
               </div>
               <div class="filter-box filter-box-span">
@@ -1406,42 +1736,130 @@
                   <tr>
                     <th scope="col" data-key="year_month">
                       <button class="sort-button" type="button">
-                        year_month <span class="sort-indicator">↑</span>
+                        year_month
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 6.5L5 3.5L7.5 6.5"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="member_months">
                       <button class="sort-button" type="button">
-                        member_months <span class="sort-indicator">↕</span>
+                        member_months
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="members">
                       <button class="sort-button" type="button">
-                        members <span class="sort-indicator">↕</span>
+                        members
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="claims">
                       <button class="sort-button" type="button">
-                        claims <span class="sort-indicator">↕</span>
+                        claims
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="claim_lines">
                       <button class="sort-button" type="button">
-                        claim_lines <span class="sort-indicator">↕</span>
+                        claim_lines
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="paid_amount">
                       <button class="sort-button" type="button">
-                        paid_amount <span class="sort-indicator">↕</span>
+                        paid_amount
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="members_with_claims">
                       <button class="sort-button" type="button">
-                        members_with_claims <span class="sort-indicator">↕</span>
+                        members_with_claims
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                     <th scope="col" data-key="pct_members_with_claims">
                       <button class="sort-button" type="button">
-                        pct_members_with_claims <span class="sort-indicator">↕</span>
+                        pct_members_with_claims
+                        <span class="sort-indicator"
+                          ><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                            <path
+                              d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.35"
+                            /></svg
+                        ></span>
                       </button>
                     </th>
                   </tr>
@@ -1455,6 +1873,8 @@
         <section
           id="panelMapping"
           class="view-panel panel-stack"
+          role="tabpanel"
+          aria-labelledby="tabMapping"
           aria-label="Input layer field summary view"
           hidden
         >
@@ -1464,27 +1884,27 @@
             </p>
             <div class="filter-grid five">
               <div class="filter-box">
-                <label class="filter-label" for="mapFilterRunId">run_id</label>
+                <label class="filter-label" for="mapFilterRunId">Run</label>
                 <select id="mapFilterRunId" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="mapFilterDataSource">data_source</label>
+                <label class="filter-label" for="mapFilterDataSource">Data Source</label>
                 <select id="mapFilterDataSource" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="mapFilterPayer">payer</label>
+                <label class="filter-label" for="mapFilterPayer">Payer</label>
                 <select id="mapFilterPayer" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="mapFilterPlan">plan</label>
+                <label class="filter-label" for="mapFilterPlan">Plan</label>
                 <select id="mapFilterPlan" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="mapFilterModel">model_name</label>
+                <label class="filter-label" for="mapFilterModel">Model</label>
                 <select id="mapFilterModel" class="filter-select"></select>
               </div>
               <div class="filter-box">
-                <label class="filter-label" for="mapFilterField">field_name</label>
+                <label class="filter-label" for="mapFilterField">Field</label>
                 <select id="mapFilterField" class="filter-select"></select>
               </div>
             </div>
@@ -1554,6 +1974,9 @@
         </section>
       </main>
     </div>
+    <div id="pageDropOverlay" class="page-drop-overlay" aria-hidden="true" hidden>
+      <p class="page-drop-overlay-label">Drop CSV to load it into the current view</p>
+    </div>
 
     <script src="vendor/chart.js/chart.umd.js"></script>
     <script>
@@ -1564,13 +1987,12 @@
         const PERCENT_SUM_TOLERANCE = 0.01;
         const PERCENT_CONSISTENCY_TOLERANCE = 0.005;
         const CHART_COLORS = Object.freeze({
-          valid: "--chart-valid",
-          invalid: "--chart-invalid",
-          null: "--chart-null",
-          notApplicable: "--chart-not-applicable",
-          threshold: "--chart-threshold",
-          grid: "--chart-grid",
-          separator: "--chart-separator",
+          valid: "--color-chart-valid",
+          invalid: "--color-chart-invalid",
+          null: "--color-chart-null",
+          threshold: "--color-muted",
+          grid: "--color-border",
+          separator: "--color-surface",
         });
         const TERMINOLOGY_REQUIRED_FIELDS = [
           "run_id",
@@ -1648,6 +2070,11 @@
           valid_pct: "number",
           status: "status",
         };
+        const SORT_ICONS = Object.freeze({
+          none: '<svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2.5 4.25L5 1.75L7.5 4.25M2.5 5.75L5 8.25L7.5 5.75" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/></svg>',
+          asc: '<svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2.5 6.5L5 3.5L7.5 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/></svg>',
+          desc: '<svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2.5 3.5L5 6.5L7.5 3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/></svg>',
+        });
 
         const state = {
           activeView: VIEWS.terminology,
@@ -1669,11 +2096,7 @@
           detectedHeaders: [],
           detailChart: null,
           hasShownChartLoadError: false,
-          loadedFileNameByView: {
-            [VIEWS.terminology]: "",
-            [VIEWS.reconciliation]: "",
-            [VIEWS.mapping]: "",
-          },
+          pageDragDepth: 0,
         };
 
         const recState = {
@@ -1707,7 +2130,7 @@
           logoImage: document.getElementById("logoImage"),
           logoFallback: document.getElementById("logoFallback"),
           csvInput: document.getElementById("csvInput"),
-          dropZone: document.getElementById("dropZone"),
+          pageDropOverlay: document.getElementById("pageDropOverlay"),
           errorBanner: document.getElementById("errorBanner"),
           tabButtons: document.querySelectorAll(".tab-button"),
           panelTerminology: document.getElementById("panelTerminology"),
@@ -1717,8 +2140,6 @@
           termFilterDataSource: document.getElementById("termFilterDataSource"),
           termFilterPayer: document.getElementById("termFilterPayer"),
           termFilterPlan: document.getElementById("termFilterPlan"),
-          runFilterWrap: document.getElementById("runFilterWrap"),
-          runFilterSelect: document.getElementById("runFilterSelect"),
           modelFilterSelect: document.getElementById("modelFilterSelect"),
           tableFilter: document.getElementById("tableFilter"),
           rowCountText: document.getElementById("rowCountText"),
@@ -1729,6 +2150,10 @@
           kpiTotalRows: document.getElementById("kpiTotalRows"),
           kpiNullPct: document.getElementById("kpiNullPct"),
           kpiInvalidPct: document.getElementById("kpiInvalidPct"),
+          statusSummaryPass: document.getElementById("statusSummaryPass"),
+          statusSummaryFail: document.getElementById("statusSummaryFail"),
+          statusSummaryUnknown: document.getElementById("statusSummaryUnknown"),
+          detailCard: document.querySelector(".chart-card"),
           chartTitle: document.getElementById("chartTitle"),
           detailRule: document.getElementById("detailRule"),
           detailEmpty: document.getElementById("detailEmpty"),
@@ -1738,8 +2163,7 @@
           legendValid: document.getElementById("legendValid"),
           legendInvalid: document.getElementById("legendInvalid"),
           legendNull: document.getElementById("legendNull"),
-          legendNotApplicable: document.getElementById("legendNotApplicable"),
-          detailValidPct: document.getElementById("detailValidPct"),
+          detailValidityPct: document.getElementById("detailValidityPct"),
           detailThreshold: document.getElementById("detailThreshold"),
           detailMargin: document.getElementById("detailMargin"),
           detailTotalRows: document.getElementById("detailTotalRows"),
@@ -1788,6 +2212,59 @@
           return getComputedStyle(document.documentElement).getPropertyValue(tokenName).trim();
         }
 
+        function resolveCssColorTokenValue(tokenName, fallbackTokenName = "") {
+          const probe = document.createElement("span");
+          probe.style.color = `var(${tokenName})`;
+          if (!probe.style.color && fallbackTokenName) {
+            probe.style.color = `var(${fallbackTokenName})`;
+          }
+          document.body.appendChild(probe);
+          const resolved = getComputedStyle(probe).color;
+          probe.remove();
+
+          if (resolved) {
+            return resolved;
+          }
+
+          const direct = getCssColorToken(tokenName);
+          if (direct) {
+            return direct;
+          }
+          return fallbackTokenName ? getCssColorToken(fallbackTokenName) : "";
+        }
+
+        function colorWithAlpha(color, alpha) {
+          const safeAlpha = Math.max(0, Math.min(1, Number(alpha)));
+          const rgbMatch =
+            /^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*[0-9.]+)?\s*\)$/i.exec(
+              String(color || "").trim(),
+            );
+          if (rgbMatch) {
+            const red = Number(rgbMatch[1]);
+            const green = Number(rgbMatch[2]);
+            const blue = Number(rgbMatch[3]);
+            const rgbaFunction = "rgb" + "a";
+            return `${rgbaFunction}(${red}, ${green}, ${blue}, ${safeAlpha})`;
+          }
+
+          const hexMatch = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(color || "").trim());
+          if (hexMatch) {
+            const hex = hexMatch[1];
+            const [red, green, blue] =
+              hex.length === 3
+                ? hex.split("").map((channel) => Number.parseInt(channel + channel, 16))
+                : [
+                    Number.parseInt(hex.slice(0, 2), 16),
+                    Number.parseInt(hex.slice(2, 4), 16),
+                    Number.parseInt(hex.slice(4, 6), 16),
+                  ];
+            const rgbaFunction = "rgb" + "a";
+            return `${rgbaFunction}(${red}, ${green}, ${blue}, ${safeAlpha})`;
+          }
+
+          return String(color || "");
+        }
+
         function init() {
           bindEvents();
           bindLogoFallback();
@@ -1802,10 +2279,9 @@
           initializeMappingView();
           updateActiveView(VIEWS.terminology);
           renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
-          renderRunFilter();
+          renderTerminologyStatusSummary();
           renderTable([]);
           renderDetailPanel(null);
-          updateDropZonePrompt();
         }
 
         function bindEvents() {
@@ -1813,6 +2289,7 @@
             button.addEventListener("click", () => {
               updateActiveView(button.dataset.view);
             });
+            button.addEventListener("keydown", handleTabKeydown);
           });
 
           els.csvInput.addEventListener("change", (event) => {
@@ -1823,32 +2300,8 @@
             event.target.value = "";
           });
 
-          els.dropZone.addEventListener("click", () => {
-            els.csvInput.click();
-          });
-
           ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-            els.dropZone.addEventListener(eventName, preventDefault);
-            document.body.addEventListener(eventName, preventDefault);
-          });
-
-          ["dragenter", "dragover"].forEach((eventName) => {
-            els.dropZone.addEventListener(eventName, () => {
-              els.dropZone.classList.add("drag-over");
-            });
-          });
-
-          ["dragleave", "drop"].forEach((eventName) => {
-            els.dropZone.addEventListener(eventName, () => {
-              els.dropZone.classList.remove("drag-over");
-            });
-          });
-
-          els.dropZone.addEventListener("drop", (event) => {
-            const [file] = event.dataTransfer?.files || [];
-            if (file) {
-              handleFile(file);
-            }
+            document.addEventListener(eventName, handleDocumentFileDragEvent);
           });
 
           document.addEventListener("paste", (event) => {
@@ -1862,23 +2315,11 @@
             }
 
             event.preventDefault();
-            state.loadedFileNameByView[state.activeView] = "Pasted CSV text";
-            updateDropZonePrompt();
             handleCsvText(text);
           });
 
           els.tableFilter.addEventListener("input", () => {
             state.filterText = els.tableFilter.value.trim().toLowerCase();
-            applyView();
-          });
-
-          els.runFilterSelect.addEventListener("change", () => {
-            const nextRunId = els.runFilterSelect.value;
-            if (!nextRunId || nextRunId === state.selectedRunId) {
-              return;
-            }
-            state.selectedRunId = nextRunId;
-            syncRunIdToUrl(nextRunId === "__all__" ? "" : nextRunId);
             applyView();
           });
 
@@ -2064,8 +2505,70 @@
             return;
           }
 
+          function getDetailChartBarBounds(chart) {
+            const chartArea = chart.chartArea;
+            if (!chartArea) {
+              return null;
+            }
+
+            for (let index = 0; index < chart.data.datasets.length; index += 1) {
+              const barElement = chart.getDatasetMeta(index)?.data?.[0];
+              if (
+                !barElement ||
+                !Number.isFinite(barElement.y) ||
+                !Number.isFinite(barElement.height) ||
+                barElement.height <= 0
+              ) {
+                continue;
+              }
+
+              const top = Math.max(chartArea.top, barElement.y - barElement.height / 2);
+              const bottom = Math.min(chartArea.bottom, barElement.y + barElement.height / 2);
+              if (bottom > top) {
+                return { top, bottom };
+              }
+            }
+
+            return {
+              top: chartArea.top,
+              bottom: chartArea.bottom,
+            };
+          }
+
           const thresholdLinePlugin = {
             id: "thresholdLineMarker",
+            beforeDatasetsDraw(chart, _args, pluginOptions) {
+              const threshold = pluginOptions?.threshold;
+              if (!Number.isFinite(threshold)) {
+                return;
+              }
+
+              const { ctx, chartArea, scales } = chart;
+              const xScale = scales.x;
+              const barBounds = getDetailChartBarBounds(chart);
+              if (!xScale || !chartArea || !barBounds) {
+                return;
+              }
+
+              const xPixel = Math.max(
+                chartArea.left,
+                Math.min(chartArea.right, xScale.getPixelForValue(threshold)),
+              );
+              if (xPixel <= chartArea.left) {
+                return;
+              }
+
+              ctx.save();
+              ctx.fillStyle = getCssColorToken(CHART_COLORS.valid);
+              ctx.globalAlpha = 0.14;
+              ctx.fillRect(
+                chartArea.left,
+                barBounds.top,
+                xPixel - chartArea.left,
+                barBounds.bottom - barBounds.top,
+              );
+              ctx.restore();
+            },
             afterDatasetsDraw(chart, _args, pluginOptions) {
               const threshold = pluginOptions?.threshold;
               if (!Number.isFinite(threshold)) {
@@ -2074,30 +2577,51 @@
 
               const { ctx, chartArea, scales } = chart;
               const xScale = scales.x;
-              if (!xScale || !chartArea) {
+              const barBounds = getDetailChartBarBounds(chart);
+              if (!xScale || !chartArea || !barBounds) {
                 return;
               }
 
-              const xPixel = xScale.getPixelForValue(threshold);
-              if (xPixel < chartArea.left || xPixel > chartArea.right) {
-                return;
-              }
+              const xPixel = Math.max(
+                chartArea.left,
+                Math.min(chartArea.right, xScale.getPixelForValue(threshold)),
+              );
+              const statusVariant = normalizeDecisionStatus(pluginOptions?.status);
+              const colors = getDecisionStatusColors(statusVariant);
+              const thresholdLabel = `▲ ${threshold.toFixed(1)}%`;
 
               ctx.save();
               ctx.strokeStyle = getCssColorToken(CHART_COLORS.threshold);
               ctx.lineWidth = 2;
-              ctx.setLineDash([4, 4]);
+              ctx.setLineDash([5, 4]);
               ctx.beginPath();
-              ctx.moveTo(xPixel, chartArea.top + 4);
-              ctx.lineTo(xPixel, chartArea.bottom - 4);
+              ctx.moveTo(xPixel, barBounds.top);
+              ctx.lineTo(xPixel, barBounds.bottom);
               ctx.stroke();
-              ctx.fillStyle = getCssColorToken(CHART_COLORS.threshold);
-              ctx.beginPath();
-              ctx.moveTo(xPixel, chartArea.top + 4);
-              ctx.lineTo(xPixel - 4, chartArea.top + 10);
-              ctx.lineTo(xPixel + 4, chartArea.top + 10);
-              ctx.closePath();
+
+              const fontFamily = getCssColorToken("--font-family-sans") || "system-ui, sans-serif";
+              ctx.font = `700 11px ${fontFamily}`;
+              ctx.textAlign = "left";
+              ctx.textBaseline = "middle";
+              const horizontalPadding = 8;
+              const pillHeight = 20;
+              const pillWidth = ctx.measureText(thresholdLabel).width + horizontalPadding * 2;
+              const minPillX = chartArea.left;
+              const maxPillX = chartArea.right - pillWidth;
+              const pillX = Math.max(minPillX, Math.min(maxPillX, xPixel - pillWidth / 2));
+              const maxPillY = chart.height - pillHeight - 2;
+              const pillY = Math.min(maxPillY, Math.max(chartArea.top + 2, barBounds.bottom + 8));
+
+              drawRoundedRect(ctx, pillX, pillY, pillWidth, pillHeight, pillHeight / 2);
+              ctx.fillStyle = colors.background;
               ctx.fill();
+              ctx.strokeStyle = colors.border;
+              ctx.lineWidth = 1;
+              ctx.setLineDash([]);
+              ctx.stroke();
+
+              ctx.fillStyle = colors.text;
+              ctx.fillText(thresholdLabel, pillX + horizontalPadding, pillY + pillHeight / 2);
               ctx.restore();
             },
           };
@@ -2111,7 +2635,6 @@
             valid: getCssColorToken(CHART_COLORS.valid),
             invalid: getCssColorToken(CHART_COLORS.invalid),
             null: getCssColorToken(CHART_COLORS.null),
-            notApplicable: getCssColorToken(CHART_COLORS.notApplicable),
             grid: getCssColorToken(CHART_COLORS.grid),
             separator: getCssColorToken(CHART_COLORS.separator),
           };
@@ -2126,40 +2649,30 @@
                   data: [0],
                   backgroundColor: chartColorPalette.valid,
                   borderColor: chartColorPalette.separator,
-                  borderRadius: 8,
-                  borderWidth: 2,
+                  borderRadius: 0,
+                  borderWidth: 1,
                   borderSkipped: false,
-                  barThickness: 24,
+                  barThickness: 34,
                 },
                 {
                   label: "Invalid %",
                   data: [0],
                   backgroundColor: chartColorPalette.invalid,
                   borderColor: chartColorPalette.separator,
-                  borderRadius: 8,
-                  borderWidth: 2,
+                  borderRadius: 0,
+                  borderWidth: 1,
                   borderSkipped: false,
-                  barThickness: 24,
+                  barThickness: 34,
                 },
                 {
                   label: "Null %",
                   data: [0],
                   backgroundColor: chartColorPalette.null,
                   borderColor: chartColorPalette.separator,
-                  borderRadius: 8,
-                  borderWidth: 2,
+                  borderRadius: 0,
+                  borderWidth: 1,
                   borderSkipped: false,
-                  barThickness: 24,
-                },
-                {
-                  label: "Not applicable %",
-                  data: [0],
-                  backgroundColor: chartColorPalette.notApplicable,
-                  borderColor: chartColorPalette.separator,
-                  borderRadius: 8,
-                  borderWidth: 2,
-                  borderSkipped: false,
-                  barThickness: 24,
+                  barThickness: 34,
                 },
               ],
             },
@@ -2168,16 +2681,28 @@
               maintainAspectRatio: false,
               responsive: true,
               indexAxis: "y",
+              layout: {
+                padding: {
+                  top: 8,
+                  right: 2,
+                  bottom: 26,
+                  left: 2,
+                },
+              },
               scales: {
                 x: {
+                  display: false,
                   min: 0,
                   max: 100,
                   stacked: true,
-                  grid: { color: chartColorPalette.grid },
-                  ticks: {
-                    stepSize: 10,
-                    callback: (value) => `${value}%`,
+                  grid: {
+                    display: false,
+                    drawTicks: false,
                   },
+                  ticks: {
+                    display: false,
+                  },
+                  border: { display: false },
                 },
                 y: {
                   stacked: true,
@@ -2195,7 +2720,7 @@
                     },
                   },
                 },
-                thresholdLineMarker: { threshold: null },
+                thresholdLineMarker: { threshold: null, status: "Unknown" },
               },
             },
             plugins: [thresholdLinePlugin],
@@ -2205,6 +2730,97 @@
         function preventDefault(event) {
           event.preventDefault();
           event.stopPropagation();
+        }
+
+        function isFileDragEvent(event) {
+          const dataTransfer = event.dataTransfer;
+          if (!dataTransfer) {
+            return false;
+          }
+
+          if (dataTransfer.files?.length > 0) {
+            return true;
+          }
+
+          if (dataTransfer.items?.length > 0) {
+            return Array.from(dataTransfer.items).some((item) => item.kind === "file");
+          }
+
+          const knownFileTypeMarkers = new Set([
+            "files",
+            "application/x-moz-file",
+            "public.file-url",
+          ]);
+          const normalizedTypes = Array.from(dataTransfer.types || []).map((typeValue) =>
+            String(typeValue).toLowerCase(),
+          );
+          return normalizedTypes.some((typeValue) => knownFileTypeMarkers.has(typeValue));
+        }
+
+        function getFirstDroppedFile(event) {
+          const files = event.dataTransfer?.files;
+          if (files?.length) {
+            return files[0];
+          }
+
+          const fileItem = Array.from(event.dataTransfer?.items || []).find(
+            (item) => item.kind === "file",
+          );
+          if (!fileItem || typeof fileItem.getAsFile !== "function") {
+            return null;
+          }
+          return fileItem.getAsFile();
+        }
+
+        function setPageDropOverlayVisible(isVisible) {
+          if (!els.pageDropOverlay) {
+            return;
+          }
+          els.pageDropOverlay.hidden = !isVisible;
+          els.pageDropOverlay.setAttribute("aria-hidden", String(!isVisible));
+        }
+
+        function handleDocumentFileDragEvent(event) {
+          const hasFilePayload = isFileDragEvent(event);
+          if (!hasFilePayload) {
+            if (event.type === "drop") {
+              state.pageDragDepth = 0;
+              setPageDropOverlayVisible(false);
+            }
+            return;
+          }
+
+          preventDefault(event);
+
+          if (event.type === "dragenter") {
+            state.pageDragDepth += 1;
+            setPageDropOverlayVisible(true);
+            return;
+          }
+
+          if (event.type === "dragover") {
+            if (event.dataTransfer) {
+              event.dataTransfer.dropEffect = "copy";
+            }
+            setPageDropOverlayVisible(true);
+            return;
+          }
+
+          if (event.type === "dragleave") {
+            state.pageDragDepth = Math.max(0, state.pageDragDepth - 1);
+            if (state.pageDragDepth === 0) {
+              setPageDropOverlayVisible(false);
+            }
+            return;
+          }
+
+          state.pageDragDepth = 0;
+          setPageDropOverlayVisible(false);
+
+          const file = getFirstDroppedFile(event);
+          if (file) {
+            handleFile(file);
+          }
         }
 
         function isEditableTarget(target) {
@@ -2230,9 +2846,6 @@
         }
 
         function handleFile(file) {
-          state.loadedFileNameByView[state.activeView] = file.name;
-          updateDropZonePrompt();
-
           const reader = new FileReader();
           reader.onload = () => {
             const text = String(reader.result || "");
@@ -2259,7 +2872,51 @@
           processMappingCsv(text);
         }
 
-        function updateActiveView(viewName) {
+        function getTabButtons() {
+          return Array.from(els.tabButtons);
+        }
+
+        function getActiveTabIndex(tabButtons) {
+          const activeIndex = tabButtons.findIndex(
+            (button) => button.dataset.view === state.activeView,
+          );
+          return activeIndex === -1 ? 0 : activeIndex;
+        }
+
+        function syncTabRovingTabIndex(activeView) {
+          els.tabButtons.forEach((button) => {
+            button.tabIndex = button.dataset.view === activeView ? 0 : -1;
+          });
+        }
+
+        function handleTabKeydown(event) {
+          const tabButtons = getTabButtons();
+          if (!tabButtons.length) {
+            return;
+          }
+
+          const activeIndex = getActiveTabIndex(tabButtons);
+          let nextIndex = activeIndex;
+
+          if (event.key === "ArrowRight") {
+            nextIndex = activeIndex === tabButtons.length - 1 ? 0 : activeIndex + 1;
+          } else if (event.key === "ArrowLeft") {
+            nextIndex = activeIndex === 0 ? tabButtons.length - 1 : activeIndex - 1;
+          } else if (event.key === "Home") {
+            nextIndex = 0;
+          } else if (event.key === "End") {
+            nextIndex = tabButtons.length - 1;
+          } else {
+            return;
+          }
+
+          event.preventDefault();
+          const nextView = tabButtons[nextIndex].dataset.view;
+          updateActiveView(nextView, { focusTab: true });
+        }
+
+        function updateActiveView(viewName, options = {}) {
+          const focusTab = options.focusTab === true;
           if (!Object.values(VIEWS).includes(viewName)) {
             return;
           }
@@ -2270,27 +2927,17 @@
             const isActive = button.dataset.view === viewName;
             button.setAttribute("aria-selected", String(isActive));
           });
+          syncTabRovingTabIndex(viewName);
+
+          if (focusTab) {
+            const activeButton = getTabButtons().find((button) => button.dataset.view === viewName);
+            activeButton?.focus();
+          }
 
           els.panelTerminology.hidden = viewName !== VIEWS.terminology;
           els.panelReconciliation.hidden = viewName !== VIEWS.reconciliation;
           els.panelMapping.hidden = viewName !== VIEWS.mapping;
           hideErrorBanner();
-          updateDropZonePrompt();
-        }
-
-        function updateDropZonePrompt() {
-          const viewLabel =
-            state.activeView === VIEWS.terminology
-              ? "Terminology DQ"
-              : state.activeView === VIEWS.reconciliation
-                ? "Reconciliation Summary"
-                : "Input Layer DQ";
-          const fileName = state.loadedFileNameByView[state.activeView];
-          if (fileName) {
-            els.dropZone.textContent = `Loaded for ${viewLabel}: ${fileName}. Drop, choose, or paste another CSV to replace it.`;
-            return;
-          }
-          els.dropZone.textContent = `Drop, choose, or paste CSV text for ${viewLabel}.`;
         }
 
         function initializeReconciliationView() {
@@ -2322,11 +2969,19 @@
             const title = document.createElement("h3");
             title.className = "trend-title";
             title.textContent = metric.label;
-            const value = document.createElement("p");
-            value.className = "trend-value";
-            value.textContent = "--";
+            const headerMeta = document.createElement("div");
+            headerMeta.className = "trend-header-meta";
+            const average = document.createElement("p");
+            average.className = "trend-average";
+            average.textContent = "Avg --";
+            const delta = document.createElement("span");
+            delta.className = "trend-delta-badge is-neutral";
+            delta.textContent = "--";
+            delta.setAttribute("aria-label", `${metric.label} month-over-month delta unavailable.`);
             header.appendChild(title);
-            header.appendChild(value);
+            headerMeta.appendChild(average);
+            headerMeta.appendChild(delta);
+            header.appendChild(headerMeta);
 
             const canvasWrap = document.createElement("div");
             canvasWrap.className = "trend-canvas-wrap";
@@ -2340,6 +2995,14 @@
             canvas.textContent =
               "Monthly trend line visualization. Use the visible summary text for exact numeric values.";
             canvasWrap.appendChild(canvas);
+            const startLabel = document.createElement("span");
+            startLabel.className = "trend-edge-label is-start";
+            startLabel.hidden = true;
+            const endLabel = document.createElement("span");
+            endLabel.className = "trend-edge-label is-end";
+            endLabel.hidden = true;
+            canvasWrap.appendChild(startLabel);
+            canvasWrap.appendChild(endLabel);
 
             const summary = document.createElement("p");
             summary.className = "trend-summary";
@@ -2350,7 +3013,17 @@
             card.appendChild(summary);
             fragment.appendChild(card);
 
-            recState.trendCards[metric.key] = { metric, value, summary, canvas, chart: null };
+            recState.trendCards[metric.key] = {
+              metric,
+              average,
+              delta,
+              startLabel,
+              endLabel,
+              canvasWrap,
+              summary,
+              canvas,
+              chart: null,
+            };
           });
           grid.replaceChildren(fragment);
         }
@@ -2368,18 +3041,19 @@
             const values = monthlyRows.map((row) => getReconciliationTrendValue(metric.key, row));
             const finitePoints = values.filter((value) => Number.isFinite(value));
             const averageValue = computeAverage(finitePoints);
-            const latestValue = getLastFiniteValue(values);
             const minValue = finitePoints.length ? Math.min(...finitePoints) : null;
             const maxValue = finitePoints.length ? Math.max(...finitePoints) : null;
             const latestIndex = findLastFiniteIndex(values);
-            const latestMonth = latestIndex >= 0 ? labels[latestIndex] : "";
+            const latestValue = latestIndex >= 0 ? values[latestIndex] : null;
+            const priorValue = latestIndex > 0 ? values[latestIndex - 1] : null;
+            const deltaPercent = computeTrendDeltaPercent(latestValue, priorValue);
 
-            card.value.textContent = `Avg ${formatTrendValue(metric.format, averageValue)}`;
+            card.average.textContent = `Avg ${formatTrendValue(metric.format, averageValue)}`;
+            updateTrendDeltaBadge(card, deltaPercent);
+            updateTrendEdgeLabels(card, labels, finitePoints.length > 0);
             card.summary.textContent = buildTrendSummaryText({
               metric,
               values,
-              averageValue,
-              latestMonth,
               latestValue,
               minValue,
               maxValue,
@@ -2394,9 +3068,6 @@
             chart.data.datasets[0].data = values.map((value) =>
               Number.isFinite(value) ? value : null,
             );
-            const yBounds = computeTrendYAxisBounds(values);
-            chart.options.scales.y.min = yBounds ? yBounds.min : undefined;
-            chart.options.scales.y.max = yBounds ? yBounds.max : undefined;
             chart.update();
           });
         }
@@ -2414,10 +3085,8 @@
             return null;
           }
 
-          const lineColor = getCssColorToken("--color-accent") || getCssColorToken("--chart-valid");
-          const pointColor =
-            getCssColorToken("--color-accent-strong") || getCssColorToken("--chart-threshold");
-          const gridColor = getCssColorToken("--chart-grid");
+          const lineColor = resolveCssColorTokenValue("--color-accent", "--color-chart-valid");
+          const pointColor = resolveCssColorTokenValue("--color-accent-strong", "--color-muted");
 
           card.chart = new window.Chart(card.canvas, {
             type: "line",
@@ -2428,7 +3097,22 @@
                   label: card.metric.label,
                   data: [],
                   borderColor: lineColor,
-                  backgroundColor: lineColor,
+                  backgroundColor: (scriptableContext) => {
+                    const chart = scriptableContext.chart;
+                    const chartArea = chart.chartArea;
+                    if (!chartArea) {
+                      return colorWithAlpha(lineColor, 0.2);
+                    }
+                    const gradient = chart.ctx.createLinearGradient(
+                      0,
+                      chartArea.top,
+                      0,
+                      chartArea.bottom,
+                    );
+                    gradient.addColorStop(0, colorWithAlpha(lineColor, 0.2));
+                    gradient.addColorStop(1, colorWithAlpha(lineColor, 0));
+                    return gradient;
+                  },
                   pointBackgroundColor: pointColor,
                   pointBorderColor: pointColor,
                   pointRadius: 2,
@@ -2436,6 +3120,7 @@
                   pointHitRadius: 8,
                   borderWidth: 2,
                   tension: 0.25,
+                  fill: true,
                   spanGaps: true,
                 },
               ],
@@ -2451,17 +3136,10 @@
                   border: { display: false },
                 },
                 y: {
-                  display: true,
-                  title: {
-                    display: true,
-                    text: card.metric.label,
-                  },
-                  grid: { color: gridColor },
+                  display: false,
                   border: { display: false },
-                  ticks: {
-                    maxTicksLimit: 4,
-                    callback: (value) => formatTrendAxisTick(card.metric.format, Number(value)),
-                  },
+                  grid: { display: false },
+                  ticks: { display: false },
                 },
               },
               plugins: {
@@ -2490,19 +3168,6 @@
           return Number.isFinite(row[metricKey]) ? row[metricKey] : null;
         }
 
-        function formatTrendAxisTick(format, value) {
-          if (!Number.isFinite(value)) {
-            return "";
-          }
-          if (format === "currency_whole") {
-            return formatCompactCurrencyWhole(value);
-          }
-          if (format === "currency") {
-            return formatCompactCurrency(value);
-          }
-          return formatCompactNumber(value);
-        }
-
         function formatTrendValue(format, value) {
           if (!Number.isFinite(value)) {
             return "--";
@@ -2516,50 +3181,71 @@
           return formatInteger(value);
         }
 
-        function buildTrendSummaryText({
-          metric,
-          values,
-          averageValue,
-          latestMonth,
-          latestValue,
-          minValue,
-          maxValue,
-        }) {
+        function computeTrendDeltaPercent(latestValue, priorValue) {
+          if (!Number.isFinite(latestValue) || !Number.isFinite(priorValue) || priorValue === 0) {
+            return null;
+          }
+          return ((latestValue - priorValue) / priorValue) * 100;
+        }
+
+        function updateTrendDeltaBadge(card, deltaPercent) {
+          const badge = card.delta;
+          badge.classList.remove("is-positive", "is-negative", "is-neutral");
+          if (!Number.isFinite(deltaPercent)) {
+            badge.textContent = "--";
+            badge.classList.add("is-neutral");
+            badge.setAttribute(
+              "aria-label",
+              `${card.metric.label} month-over-month delta unavailable.`,
+            );
+            return;
+          }
+
+          const signPrefix = deltaPercent > 0 ? "+" : "";
+          badge.textContent = `${signPrefix}${deltaPercent.toFixed(1)}%`;
+          if (deltaPercent > 0) {
+            badge.classList.add("is-positive");
+          } else if (deltaPercent < 0) {
+            badge.classList.add("is-negative");
+          } else {
+            badge.classList.add("is-neutral");
+          }
+          badge.setAttribute(
+            "aria-label",
+            `${card.metric.label} month-over-month delta ${badge.textContent}.`,
+          );
+        }
+
+        function updateTrendEdgeLabels(card, labels, hasFiniteValues) {
+          const startLabel = card.startLabel;
+          const endLabel = card.endLabel;
+          if (!hasFiniteValues || !labels.length) {
+            startLabel.hidden = true;
+            endLabel.hidden = true;
+            startLabel.textContent = "";
+            endLabel.textContent = "";
+            return;
+          }
+
+          const startMonth = labels[0] || "(unknown)";
+          const endMonth = labels[labels.length - 1] || "(unknown)";
+          startLabel.textContent = startMonth;
+          startLabel.hidden = false;
+          endLabel.textContent = endMonth;
+          endLabel.hidden = labels.length < 2;
+        }
+
+        function buildTrendSummaryText({ metric, values, latestValue, minValue, maxValue }) {
           const validCount = values.filter((value) => Number.isFinite(value)).length;
           if (!validCount) {
             return "No monthly values available for current filters.";
           }
 
           return (
-            `Average: ${formatTrendValue(metric.format, averageValue)}. ` +
-            `Latest ${latestMonth || "(unknown month)"}: ${formatTrendValue(metric.format, latestValue)}. ` +
-            `Min ${formatTrendValue(metric.format, minValue)}, max ${formatTrendValue(metric.format, maxValue)}.`
+            `Latest: ${formatTrendValue(metric.format, latestValue)} \u00b7 ` +
+            `Min: ${formatTrendValue(metric.format, minValue)} \u00b7 ` +
+            `Max: ${formatTrendValue(metric.format, maxValue)}`
           );
-        }
-
-        function computeTrendYAxisBounds(values) {
-          const finiteValues = values.filter((value) => Number.isFinite(value));
-          if (!finiteValues.length) {
-            return null;
-          }
-
-          const minValue = Math.min(...finiteValues);
-          const maxValue = Math.max(...finiteValues);
-          const hasNegative = finiteValues.some((value) => value < 0);
-
-          // Keep baseline at zero for non-negative metrics so axis labels stay intuitive.
-          if (!hasNegative) {
-            const upperPad = maxValue === 0 ? 1 : maxValue * 0.18;
-            return { min: 0, max: maxValue + upperPad };
-          }
-
-          if (minValue === maxValue) {
-            const pad = Math.abs(minValue) * 0.1 || 1;
-            return { min: minValue - pad, max: maxValue + pad };
-          }
-
-          const pad = (maxValue - minValue) * 0.18;
-          return { min: minValue - pad, max: maxValue + pad };
         }
 
         function findLastFiniteIndex(values) {
@@ -2569,11 +3255,6 @@
             }
           }
           return -1;
-        }
-
-        function getLastFiniteValue(values) {
-          const index = findLastFiniteIndex(values);
-          return index >= 0 ? values[index] : null;
         }
 
         function initializeMappingView() {
@@ -2841,6 +3522,13 @@
           return Number.isFinite(row[key]) ? row[key] : null;
         }
 
+        function setSortIndicator(indicatorElement, direction) {
+          if (!indicatorElement) {
+            return;
+          }
+          indicatorElement.innerHTML = SORT_ICONS[direction] || SORT_ICONS.none;
+        }
+
         function updateReconciliationSortHeaderState() {
           const headers = els.recMonthlyHead.querySelectorAll("th[data-key]");
           headers.forEach((header) => {
@@ -2851,14 +3539,14 @@
 
             if (isActive) {
               if (recState.sortDir === "asc") {
-                indicator.textContent = "↑";
+                setSortIndicator(indicator, "asc");
                 ariaSort = "ascending";
               } else {
-                indicator.textContent = "↓";
+                setSortIndicator(indicator, "desc");
                 ariaSort = "descending";
               }
             } else {
-              indicator.textContent = "↕";
+              setSortIndicator(indicator, "none");
             }
 
             header.setAttribute("aria-sort", ariaSort);
@@ -3026,6 +3714,7 @@
             els.mapFilterModel,
             ["__all__", ...models],
             mapState.filters.model_name,
+            { getOptionLabel: getDisplayModelOptionLabel },
           );
           populateSelectWithOptions(
             els.mapFilterField,
@@ -3118,7 +3807,7 @@
           const fieldFragment = document.createDocumentFragment();
           fieldRows.forEach((row) => {
             const tr = document.createElement("tr");
-            appendTextCell(tr, row.model_name);
+            appendTextCell(tr, toDisplayModelName(row.model_name));
             appendTextCell(tr, row.field_name);
             appendNumberCell(tr, formatInteger(row.total_rows));
             appendNumberCell(tr, formatInteger(row.applicable_rows));
@@ -3155,7 +3844,7 @@
               appendTextCell(tr, row.data_source);
               appendTextCell(tr, row.payer);
               appendTextCell(tr, row.plan);
-              appendTextCell(tr, row.model_name);
+              appendTextCell(tr, toDisplayModelName(row.model_name));
               appendTextCell(tr, row.field_name);
               appendNumberCell(tr, formatInteger(row.total_rows));
               appendNumberCell(tr, formatInteger(row.applicable_rows));
@@ -3168,12 +3857,18 @@
           els.mapDetailBody.replaceChildren(detailFragment);
         }
 
-        function populateSelectWithOptions(selectElement, options, selectedValue) {
+        function populateSelectWithOptions(selectElement, options, selectedValue, config = {}) {
+          const getOptionLabel =
+            typeof config.getOptionLabel === "function" ? config.getOptionLabel : null;
           const fragment = document.createDocumentFragment();
           options.forEach((optionValue) => {
             const option = document.createElement("option");
             option.value = optionValue;
-            option.textContent = optionValue === "__all__" ? "All" : optionValue || "(blank)";
+            option.textContent = getOptionLabel
+              ? getOptionLabel(optionValue)
+              : optionValue === "__all__"
+                ? "All"
+                : optionValue || "(blank)";
             fragment.appendChild(option);
           });
           selectElement.replaceChildren(fragment);
@@ -3195,6 +3890,21 @@
           td.className = "number";
           td.textContent = text || "--";
           rowElement.appendChild(td);
+        }
+
+        function toDisplayModelName(rawModelName) {
+          const normalizedModelName = String(rawModelName || "").trim();
+          if (normalizedModelName.startsWith("input_layer__")) {
+            return normalizedModelName.slice("input_layer__".length);
+          }
+          return normalizedModelName;
+        }
+
+        function getDisplayModelOptionLabel(optionValue) {
+          if (optionValue === "__all__") {
+            return "All";
+          }
+          return toDisplayModelName(optionValue) || "(blank)";
         }
 
         function parseYearMonthInt(value, fallbackYearMonth = "") {
@@ -3253,7 +3963,7 @@
             state.missingFields = [];
             showGenericError("CSV appears to be empty or missing data rows.");
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
-            renderRunFilter();
+            renderTerminologyStatusSummary();
             rebuildTerminologyDimensionFilters();
             renderTable([]);
             renderDetailPanel(null);
@@ -3273,7 +3983,7 @@
             state.payerFilter = "__all__";
             state.planFilter = "__all__";
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
-            renderRunFilter();
+            renderTerminologyStatusSummary();
             rebuildTerminologyDimensionFilters();
             renderMissingFieldsError(parsed.missingFields, parsed.detectedHeaders);
             renderTable([]);
@@ -3328,8 +4038,10 @@
           state.dataSourceFilter = "__all__";
           state.payerFilter = "__all__";
           state.planFilter = "__all__";
+          state.filterText = "";
+          state.modelFilter = "__all__";
+          els.tableFilter.value = "";
           syncRunIdToUrl(state.selectedRunId === "__all__" ? "" : state.selectedRunId);
-          renderRunFilter();
           rebuildTerminologyDimensionFilters();
           state.selectedRowId = null;
           applyView();
@@ -3711,10 +4423,11 @@
         }
 
         function formatMetricLabel(modelName, fieldName) {
-          if (modelName && fieldName) {
-            return `${modelName} / ${fieldName}`;
+          const displayModelName = toDisplayModelName(modelName);
+          if (displayModelName && fieldName) {
+            return `${displayModelName} / ${fieldName}`;
           }
-          return fieldName || modelName || "(unnamed metric)";
+          return fieldName || displayModelName || "(unnamed metric)";
         }
 
         function computeRunOptions(rows) {
@@ -3892,7 +4605,6 @@
         }
 
         function applyView() {
-          renderRunFilter();
           rebuildTerminologyDimensionFilters();
           state.runScopedRows = getRunScopedRows();
           rebuildTerminologyModelFilter(state.runScopedRows);
@@ -3911,6 +4623,7 @@
           }
 
           renderKpis(calculateKpis(state.runScopedRows));
+          renderTerminologyStatusSummary(filtered);
           renderTable(filtered);
           renderDetailPanel(getSelectedRow());
         }
@@ -3970,26 +4683,31 @@
             : "--";
         }
 
-        function renderRunFilter() {
-          const options = state.runOptions;
-          els.runFilterWrap.hidden = true;
-          els.runFilterSelect.disabled = true;
-
-          if (!options.length) {
-            els.runFilterSelect.replaceChildren();
+        function renderTerminologyStatusSummary(rows = null) {
+          if (!state.hasLoadedFile || state.missingFields.length > 0 || !Array.isArray(rows)) {
+            els.statusSummaryPass.textContent = "-- Pass";
+            els.statusSummaryFail.textContent = "-- Fail";
+            els.statusSummaryUnknown.textContent = "-- Unknown";
             return;
           }
 
-          const runIdOptions = ["__all__", ...options.map((option) => option.runId)];
-          const fragment = document.createDocumentFragment();
-          runIdOptions.forEach((runId) => {
-            const item = document.createElement("option");
-            item.value = runId;
-            item.textContent = runId === "__all__" ? "All" : runId;
-            fragment.appendChild(item);
+          let passCount = 0;
+          let failCount = 0;
+          let unknownCount = 0;
+
+          rows.forEach((row) => {
+            if (row.status === "Pass") {
+              passCount += 1;
+            } else if (row.status === "Fail") {
+              failCount += 1;
+            } else {
+              unknownCount += 1;
+            }
           });
-          els.runFilterSelect.replaceChildren(fragment);
-          els.runFilterSelect.value = state.selectedRunId;
+
+          els.statusSummaryPass.textContent = `${formatInteger(passCount)} Pass`;
+          els.statusSummaryFail.textContent = `${formatInteger(failCount)} Fail`;
+          els.statusSummaryUnknown.textContent = `${formatInteger(unknownCount)} Unknown`;
         }
 
         function rebuildTerminologyModelFilter(rows) {
@@ -3998,6 +4716,7 @@
             els.modelFilterSelect,
             ["__all__", ...models],
             state.modelFilter,
+            { getOptionLabel: getDisplayModelOptionLabel },
           );
           state.modelFilter = els.modelFilterSelect.value;
         }
@@ -4011,8 +4730,6 @@
 
           if (noDataLoaded) {
             els.emptyState.hidden = false;
-            els.emptyState.textContent =
-              "Load a CSV with Choose CSV or drag it into the drop zone to view results.";
             els.tableContainer.hidden = true;
           } else if (blockedBySchema) {
             els.emptyState.hidden = false;
@@ -4173,14 +4890,14 @@
 
             if (isActive) {
               if (state.sortDir === "asc") {
-                indicator.textContent = "↑";
+                setSortIndicator(indicator, "asc");
                 ariaSort = "ascending";
               } else {
-                indicator.textContent = "↓";
+                setSortIndicator(indicator, "desc");
                 ariaSort = "descending";
               }
             } else {
-              indicator.textContent = "↕";
+              setSortIndicator(indicator, "none");
             }
 
             header.setAttribute("aria-sort", ariaSort);
@@ -4190,24 +4907,35 @@
         function renderDetailPanel(row) {
           if (state.missingFields.length > 0 || !row) {
             els.chartTitle.textContent = "Select a metric";
+            els.chartTitle.classList.add("is-placeholder");
             els.detailRule.textContent =
               "Status rule: valid_rows_applicable_pct must be greater than or equal to 95%.";
             els.detailEmpty.hidden = false;
             els.detailContent.hidden = true;
+            setDetailCardStatusAccent("", false);
+            els.detailValidityPct.textContent = "--";
+            els.detailThreshold.textContent = "--";
+            els.detailMargin.textContent = "--";
             resetDistributionLegend();
             updateDetailChart(null);
             return;
           }
 
           els.chartTitle.textContent = row.metric;
+          els.chartTitle.classList.remove("is-placeholder");
           els.detailRule.textContent =
             "Status rule: valid_rows_applicable_pct must be greater than or equal to 95%.";
           els.detailEmpty.hidden = true;
           els.detailContent.hidden = false;
+          setDetailCardStatusAccent(row.status, true);
 
-          els.detailValidPct.textContent = formatPercent(row.valid_pct);
+          els.detailValidityPct.textContent = formatPercent(row.valid_pct);
           els.detailThreshold.textContent = formatPercent(row.threshold);
-          els.detailMargin.textContent = formatPctPointDelta(row.margin_pct_points);
+          els.detailMargin.textContent = formatMarginPctPoints(
+            row.margin_pct_points,
+            row.valid_pct,
+            row.threshold,
+          );
           els.detailTotalRows.textContent = formatInteger(row.denominator);
           els.detailApplicableRows.textContent = formatInteger(row.applicable_denominator);
           els.detailValidCount.textContent = formatInteger(row.valid_count);
@@ -4226,40 +4954,47 @@
             els.detailSourceStatus.textContent = "";
           }
 
+          const applicableDistribution = getApplicableDistributionPercents(row);
           const hasPercents =
-            Number.isFinite(row.valid_pct_total) &&
-            Number.isFinite(row.invalid_pct) &&
-            Number.isFinite(row.null_pct) &&
-            Number.isFinite(row.not_applicable_pct);
+            Number.isFinite(applicableDistribution.validPct) &&
+            Number.isFinite(applicableDistribution.invalidPct) &&
+            Number.isFinite(applicableDistribution.nullPct);
 
           if (!hasPercents) {
             resetDistributionLegend();
-            els.detailDecision.textContent =
-              "Distribution unavailable: valid, invalid, null, and not applicable percentages are required.";
+            setDetailDecisionSummary(
+              "Distribution unavailable: valid, invalid, and null percentages are required.",
+              "Unknown",
+            );
             updateDetailChart(null);
             return;
           }
 
-          els.legendValid.textContent = formatLegendValue(row.valid_pct_total, row.valid_count);
-          els.legendInvalid.textContent = formatLegendValue(row.invalid_pct, row.invalid_count);
-          els.legendNull.textContent = formatLegendValue(row.null_pct, row.null_count);
-          els.legendNotApplicable.textContent = formatLegendValue(
-            row.not_applicable_pct,
-            row.not_applicable_count,
+          els.legendValid.textContent = formatLegendValue(
+            applicableDistribution.validPct,
+            row.valid_count,
           );
-          els.detailDecision.textContent = formatValidDecisionSummary(
+          els.legendInvalid.textContent = formatLegendValue(
+            applicableDistribution.invalidPct,
+            row.invalid_count,
+          );
+          els.legendNull.textContent = formatLegendValue(
+            applicableDistribution.nullPct,
+            row.null_count,
+          );
+          const decisionSummary = formatValidDecisionSummary(
             row.status,
             row.valid_pct,
             row.threshold,
             row.margin_pct_points,
-            row.valid_count,
           );
+          setDetailDecisionSummary(decisionSummary.text, decisionSummary.status);
           updateDetailChart({
-            validPct: row.valid_pct_total,
-            invalidPct: row.invalid_pct,
-            nullPct: row.null_pct,
-            notApplicablePct: row.not_applicable_pct,
+            validPct: applicableDistribution.validPct,
+            invalidPct: applicableDistribution.invalidPct,
+            nullPct: applicableDistribution.nullPct,
             threshold: row.threshold,
+            status: decisionSummary.status,
           });
         }
 
@@ -4272,14 +5007,14 @@
             !payload ||
             !Number.isFinite(payload.validPct) ||
             !Number.isFinite(payload.invalidPct) ||
-            !Number.isFinite(payload.nullPct) ||
-            !Number.isFinite(payload.notApplicablePct)
+            !Number.isFinite(payload.nullPct)
           ) {
             state.detailChart.data.datasets[0].data[0] = 0;
             state.detailChart.data.datasets[1].data[0] = 0;
             state.detailChart.data.datasets[2].data[0] = 0;
-            state.detailChart.data.datasets[3].data[0] = 0;
             state.detailChart.options.plugins.thresholdLineMarker.threshold = null;
+            state.detailChart.options.plugins.thresholdLineMarker.status = "Unknown";
+            applyDetailChartSegmentStyles(state.detailChart);
             state.detailChart.update();
             return;
           }
@@ -4287,14 +5022,14 @@
           state.detailChart.data.datasets[0].data[0] = clampToPercent(payload.validPct * 100);
           state.detailChart.data.datasets[1].data[0] = clampToPercent(payload.invalidPct * 100);
           state.detailChart.data.datasets[2].data[0] = clampToPercent(payload.nullPct * 100);
-          state.detailChart.data.datasets[3].data[0] = clampToPercent(
-            payload.notApplicablePct * 100,
-          );
           state.detailChart.options.plugins.thresholdLineMarker.threshold = Number.isFinite(
             payload.threshold,
           )
             ? clampToPercent(payload.threshold * 100)
             : null;
+          state.detailChart.options.plugins.thresholdLineMarker.status =
+            payload.status || "Unknown";
+          applyDetailChartSegmentStyles(state.detailChart);
           state.detailChart.update();
         }
 
@@ -4302,9 +5037,20 @@
           els.legendValid.textContent = "--";
           els.legendInvalid.textContent = "--";
           els.legendNull.textContent = "--";
-          els.legendNotApplicable.textContent = "--";
-          els.detailDecision.textContent =
-            "Valid % threshold comparison appears after selecting a metric.";
+          setDetailDecisionSummary("Valid -- · UNKNOWN · threshold unavailable", "Unknown");
+        }
+
+        function getApplicableDistributionPercents(row) {
+          if (!Number.isFinite(row.applicable_denominator) || row.applicable_denominator <= 0) {
+            return { validPct: null, invalidPct: null, nullPct: null };
+          }
+
+          const denominator = row.applicable_denominator;
+          return {
+            validPct: clampPercent(row.valid_count / denominator),
+            invalidPct: clampPercent(row.invalid_count / denominator),
+            nullPct: clampPercent(row.null_count / denominator),
+          };
         }
 
         function formatLegendValue(percent, count) {
@@ -4314,29 +5060,181 @@
           return `${formatPercent(percent)} (${formatInteger(count)} rows)`;
         }
 
-        function formatValidDecisionSummary(
-          status,
-          validPct,
-          threshold,
-          marginPctPoints,
-          validCount,
-        ) {
-          const validText = Number.isFinite(validPct)
-            ? `${formatPercent(validPct)} (${formatInteger(validCount)} rows)`
-            : "--";
-          const thresholdText = Number.isFinite(threshold) ? formatPercent(threshold) : "--";
+        function setDetailCardStatusAccent(status, hasSelection) {
+          if (!els.detailCard) {
+            return;
+          }
 
+          els.detailCard.classList.remove(
+            "status-accent-pass",
+            "status-accent-fail",
+            "status-accent-unknown",
+          );
+
+          if (!hasSelection) {
+            return;
+          }
+
+          if (status === "Pass") {
+            els.detailCard.classList.add("status-accent-pass");
+          } else if (status === "Fail") {
+            els.detailCard.classList.add("status-accent-fail");
+          } else {
+            els.detailCard.classList.add("status-accent-unknown");
+          }
+        }
+
+        function formatMarginPctPoints(marginPctPoints, validPct, threshold) {
+          const margin = Number.isFinite(marginPctPoints)
+            ? marginPctPoints
+            : Number.isFinite(validPct) && Number.isFinite(threshold)
+              ? (validPct - threshold) * 100
+              : null;
+
+          if (!Number.isFinite(margin)) {
+            return "--";
+          }
+
+          const prefix = margin > 0 ? "+" : "";
+          return `${prefix}${margin.toFixed(1)} pp`;
+        }
+
+        function formatValidDecisionSummary(status, validPct, threshold, marginPctPoints) {
           if (!Number.isFinite(validPct) || !Number.isFinite(threshold)) {
-            return `Valid %: ${validText}. Threshold: ${thresholdText}.`;
+            return {
+              text: "Valid -- · UNKNOWN · threshold unavailable",
+              status: "Unknown",
+            };
+          }
+
+          let statusVariant = normalizeDecisionStatus(status);
+          if (statusVariant === "unknown") {
+            statusVariant = validPct >= threshold ? "pass" : "fail";
           }
 
           const margin = Number.isFinite(marginPctPoints)
             ? marginPctPoints
             : (validPct - threshold) * 100;
-          const distanceText = `${Math.abs(margin).toFixed(1)} pp ${
-            margin >= 0 ? "over" : "under"
-          } threshold`;
-          return `Valid %: ${validText}. Threshold: ${thresholdText}. Status: ${status} (${distanceText}).`;
+          const statusLabel = statusVariant === "pass" ? "PASS" : "FAIL";
+          return {
+            text: `Valid ${formatPercent(validPct)} · ${statusLabel} · ${Math.abs(margin).toFixed(
+              1,
+            )} pp ${margin >= 0 ? "above" : "below"} threshold`,
+            status: statusVariant === "pass" ? "Pass" : "Fail",
+          };
+        }
+
+        function normalizeDecisionStatus(status) {
+          if (String(status).toLowerCase() === "pass") {
+            return "pass";
+          }
+          if (String(status).toLowerCase() === "fail") {
+            return "fail";
+          }
+          return "unknown";
+        }
+
+        function getDecisionStatusColors(statusVariant) {
+          if (statusVariant === "pass") {
+            return {
+              background: getCssColorToken("--color-success-subtle"),
+              border: getCssColorToken("--color-success-500"),
+              text: getCssColorToken("--color-success-700"),
+            };
+          }
+          if (statusVariant === "fail") {
+            return {
+              background: getCssColorToken("--color-danger-subtle"),
+              border: getCssColorToken("--color-danger-500"),
+              text: getCssColorToken("--color-danger-700"),
+            };
+          }
+          return {
+            background: getCssColorToken("--color-warning-subtle"),
+            border: getCssColorToken("--color-warning-500"),
+            text: getCssColorToken("--color-warning-700"),
+          };
+        }
+
+        function setDetailDecisionSummary(summaryText, status) {
+          els.detailDecision.textContent = summaryText;
+          const statusVariant = normalizeDecisionStatus(status);
+          els.detailDecision.classList.remove("is-pass", "is-fail", "is-unknown");
+          if (statusVariant === "pass") {
+            els.detailDecision.classList.add("is-pass");
+          } else if (statusVariant === "fail") {
+            els.detailDecision.classList.add("is-fail");
+          } else {
+            els.detailDecision.classList.add("is-unknown");
+          }
+        }
+
+        function applyDetailChartSegmentStyles(chart) {
+          const segmentValues = chart.data.datasets.map((dataset) => Number(dataset.data[0]) || 0);
+          const visibleIndexes = segmentValues
+            .map((value, index) => (value > 0 ? index : -1))
+            .filter((index) => index >= 0);
+          const firstVisibleIndex = visibleIndexes[0];
+          const lastVisibleIndex = visibleIndexes[visibleIndexes.length - 1];
+          const hasSingleVisibleSegment = visibleIndexes.length === 1;
+          const segmentRadius = 8;
+
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const isVisible = segmentValues[datasetIndex] > 0;
+            if (!isVisible) {
+              dataset.borderRadius = 0;
+              dataset.borderWidth = 0;
+              return;
+            }
+
+            dataset.borderWidth = 1;
+            if (hasSingleVisibleSegment) {
+              dataset.borderRadius = {
+                topLeft: segmentRadius,
+                bottomLeft: segmentRadius,
+                topRight: segmentRadius,
+                bottomRight: segmentRadius,
+              };
+              return;
+            }
+
+            if (datasetIndex === firstVisibleIndex) {
+              dataset.borderRadius = {
+                topLeft: segmentRadius,
+                bottomLeft: segmentRadius,
+                topRight: 0,
+                bottomRight: 0,
+              };
+              return;
+            }
+
+            if (datasetIndex === lastVisibleIndex) {
+              dataset.borderRadius = {
+                topLeft: 0,
+                bottomLeft: 0,
+                topRight: segmentRadius,
+                bottomRight: segmentRadius,
+              };
+              return;
+            }
+
+            dataset.borderRadius = 0;
+          });
+        }
+
+        function drawRoundedRect(context, x, y, width, height, radius) {
+          const safeRadius = Math.min(radius, width / 2, height / 2);
+          context.beginPath();
+          context.moveTo(x + safeRadius, y);
+          context.lineTo(x + width - safeRadius, y);
+          context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+          context.lineTo(x + width, y + height - safeRadius);
+          context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+          context.lineTo(x + safeRadius, y + height);
+          context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+          context.lineTo(x, y + safeRadius);
+          context.quadraticCurveTo(x, y, x + safeRadius, y);
+          context.closePath();
         }
 
         function getApplicableRowsDescription(row) {
@@ -4600,41 +5498,6 @@
           return Number.isFinite(value) ? Math.round(value).toLocaleString() : "--";
         }
 
-        function formatCompactNumber(value) {
-          if (!Number.isFinite(value)) {
-            return "--";
-          }
-          return Number(value).toLocaleString(undefined, {
-            notation: "compact",
-            maximumFractionDigits: 1,
-          });
-        }
-
-        function formatCompactCurrency(value) {
-          if (!Number.isFinite(value)) {
-            return "--";
-          }
-          return Number(value).toLocaleString(undefined, {
-            style: "currency",
-            currency: "USD",
-            notation: "compact",
-            maximumFractionDigits: 1,
-          });
-        }
-
-        function formatCompactCurrencyWhole(value) {
-          if (!Number.isFinite(value)) {
-            return "--";
-          }
-          return Number(value).toLocaleString(undefined, {
-            style: "currency",
-            currency: "USD",
-            notation: "compact",
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          });
-        }
-
         function formatPercent(value) {
           return Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : "--";
         }
@@ -4661,14 +5524,6 @@
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
           });
-        }
-
-        function formatPctPointDelta(value) {
-          if (!Number.isFinite(value)) {
-            return "--";
-          }
-          const sign = value >= 0 ? "+" : "-";
-          return `${sign}${Math.abs(value).toFixed(1)} pp`;
         }
       })();
     </script>

@@ -2334,6 +2334,48 @@
           "members_with_claims",
           "pmpm_paid",
         ];
+        const RECONCILIATION_HEADERLESS_SCHEMAS = [
+          [
+            "run_id",
+            "run_ts",
+            "data_source",
+            "payer",
+            "plan",
+            "year_month_int",
+            "year_month",
+            "member_months",
+            "members",
+            "claims",
+            "claim_lines",
+            "paid_amount",
+            "paid_amount_without_enrollment",
+            "members_with_claims",
+            "pct_members_with_claims",
+            "claims_per_1000",
+            "pmpm_paid",
+            "pmpm_paid_without_enrollment",
+            "avg_paid_per_claim",
+          ],
+          [
+            "run_id",
+            "run_ts",
+            "data_source",
+            "payer",
+            "plan",
+            "year_month_int",
+            "year_month",
+            "member_months",
+            "members",
+            "claims",
+            "claim_lines",
+            "paid_amount",
+            "members_with_claims",
+            "pct_members_with_claims",
+            "claims_per_1000",
+            "pmpm_paid",
+            "avg_paid_per_claim",
+          ],
+        ];
         const RECONCILIATION_PMPM_MODES = Object.freeze({
           enrollmentJoin: "enrollment_join",
           withoutEnrollment: "without_enrollment",
@@ -3674,7 +3716,11 @@
         }
 
         function processReconciliationCsv(text) {
-          const parsed = parseCsvForRequiredFields(text, RECONCILIATION_REQUIRED_FIELDS);
+          const parsed = parseCsvForRequiredFields(
+            text,
+            RECONCILIATION_REQUIRED_FIELDS,
+            RECONCILIATION_HEADERLESS_SCHEMAS,
+          );
           if (parsed.dataRows.length < 1) {
             recState.rows = [];
             recState.filteredRows = [];
@@ -4695,7 +4741,11 @@
             .replace(/\s+/g, "_");
         }
 
-        function parseCsvForRequiredFields(text, requiredFields) {
+        function parseCsvForRequiredFields(
+          text,
+          requiredFields,
+          headerlessSchemas = [requiredFields],
+        ) {
           const parsedRows = parseCSV(text);
           if (!parsedRows.length) {
             return {
@@ -4719,7 +4769,12 @@
             };
           }
 
-          const inferredHeaders = inferHeaderlessHeaders(parsedRows, requiredFields, headerSet);
+          const inferredHeaders = inferHeaderlessHeaders(
+            parsedRows,
+            requiredFields,
+            headerSet,
+            headerlessSchemas,
+          );
           if (inferredHeaders) {
             return {
               normalizedHeaders: inferredHeaders,
@@ -4737,7 +4792,12 @@
           };
         }
 
-        function inferHeaderlessHeaders(parsedRows, requiredFields, headerSet) {
+        function inferHeaderlessHeaders(
+          parsedRows,
+          requiredFields,
+          headerSet,
+          schemaCandidates = [requiredFields],
+        ) {
           if (!parsedRows.length) {
             return null;
           }
@@ -4767,8 +4827,22 @@
             return null;
           }
 
-          const inferredHeaders = [...requiredFields];
-          for (let index = requiredFields.length; index < firstRow.length; index += 1) {
+          const exactSchema = schemaCandidates.find((schema) => firstRow.length === schema.length);
+          const longestSchema = schemaCandidates.reduce(
+            (currentLongest, schema) =>
+              !currentLongest || schema.length > currentLongest.length ? schema : currentLongest,
+            null,
+          );
+          const baseSchema =
+            exactSchema ||
+            (longestSchema && firstRow.length > longestSchema.length ? longestSchema : null);
+
+          if (!baseSchema) {
+            return null;
+          }
+
+          const inferredHeaders = [...baseSchema];
+          for (let index = baseSchema.length; index < firstRow.length; index += 1) {
             inferredHeaders.push(`extra_column_${index + 1}`);
           }
           return inferredHeaders;

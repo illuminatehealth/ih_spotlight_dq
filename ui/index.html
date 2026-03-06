@@ -753,8 +753,8 @@
         height: 34px;
         border: 1px solid var(--color-border);
         border-radius: var(--radius-pill);
-        background: var(--color-surface-soft);
-        color: var(--text);
+        background: var(--color-surface-elevated);
+        color: var(--color-text);
         cursor: pointer;
         transition:
           background-color 120ms ease,
@@ -763,8 +763,8 @@
       }
 
       .icon-button:hover {
-        background: var(--color-surface-selected);
-        border-color: var(--color-accent-soft);
+        background: var(--color-accent-subtle);
+        border-color: var(--color-accent-300);
         transform: translateY(-1px);
       }
 
@@ -774,29 +774,62 @@
         stroke: currentcolor;
       }
 
-      .toggle-group {
-        display: inline-flex;
-        flex-wrap: wrap;
-        gap: 6px;
+      .toggle-filter-box {
+        align-self: end;
       }
 
-      .toggle-button {
+      .toggle-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .toggle-switch-input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .toggle-switch-track {
+        position: relative;
+        width: 48px;
+        height: 28px;
         border: 1px solid var(--color-border);
-        border-radius: var(--radius-pill);
-        background: var(--color-surface-soft);
-        color: var(--text);
-        padding: 8px 12px;
-        font: inherit;
+        border-radius: 999px;
+        background: var(--color-surface-elevated);
+        transition:
+          background-color 140ms ease,
+          border-color 140ms ease;
+      }
+
+      .toggle-switch-track::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--color-surface);
+        box-shadow: var(--shadow-sm);
+        transition: transform 140ms ease;
+      }
+
+      .toggle-switch-input:checked + .toggle-switch-track {
+        background: var(--color-accent-strong);
+        border-color: var(--color-accent-strong);
+      }
+
+      .toggle-switch-input:checked + .toggle-switch-track::after {
+        transform: translateX(20px);
+      }
+
+      .toggle-switch-text {
+        color: var(--color-text-subtle);
         font-size: var(--text-sm);
         font-weight: 700;
-        line-height: var(--line-height-tight);
-        cursor: pointer;
-      }
-
-      .toggle-button[aria-pressed="true"] {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: var(--color-on-accent);
       }
 
       .table-note {
@@ -805,7 +838,7 @@
         border-radius: 0 var(--radius-md) var(--radius-md) 0;
         padding: 8px 12px;
         margin: 0 0 10px;
-        color: var(--color-text-subtle);
+        color: var(--color-muted);
         font-size: var(--text-xs);
       }
 
@@ -1788,26 +1821,20 @@
                 <label class="filter-label" for="recFilterPlan">Plan</label>
                 <select id="recFilterPlan" class="filter-select"></select>
               </div>
-              <div class="filter-box">
-                <span class="filter-label">PMPM chart mode</span>
-                <div class="toggle-group" role="group" aria-label="Reconciliation PMPM chart mode">
-                  <button
-                    type="button"
-                    class="toggle-button"
-                    data-pmpm-mode="enrollment_join"
-                    aria-pressed="true"
-                  >
-                    Enrollment join
-                  </button>
-                  <button
-                    type="button"
-                    class="toggle-button"
-                    data-pmpm-mode="without_enrollment"
-                    aria-pressed="false"
-                  >
-                    No enrollment join
-                  </button>
-                </div>
+              <div class="filter-box toggle-filter-box">
+                <label class="filter-label" for="recJoinToEnrollmentToggle"
+                  >Join to enrollment</label
+                >
+                <label class="toggle-switch">
+                  <input
+                    id="recJoinToEnrollmentToggle"
+                    class="toggle-switch-input"
+                    type="checkbox"
+                    checked
+                  />
+                  <span class="toggle-switch-track" aria-hidden="true"></span>
+                  <span id="recJoinToEnrollmentState" class="toggle-switch-text">Checked</span>
+                </label>
               </div>
               <div class="filter-box filter-box-span">
                 <label class="filter-label" for="recDateStart">year_month range</label>
@@ -2458,7 +2485,8 @@
           recFilterDataSource: document.getElementById("recFilterDataSource"),
           recFilterPayer: document.getElementById("recFilterPayer"),
           recFilterPlan: document.getElementById("recFilterPlan"),
-          recPmpmModeButtons: document.querySelectorAll("[data-pmpm-mode]"),
+          recJoinToEnrollmentToggle: document.getElementById("recJoinToEnrollmentToggle"),
+          recJoinToEnrollmentState: document.getElementById("recJoinToEnrollmentState"),
           recDateSlider: document.getElementById("recDateSlider"),
           recDateSelection: document.getElementById("recDateSelection"),
           recDateStart: document.getElementById("recDateStart"),
@@ -2707,19 +2735,12 @@
             });
           });
 
-          els.recPmpmModeButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-              const nextMode = button.dataset.pmpmMode;
-              if (
-                !Object.values(RECONCILIATION_PMPM_MODES).includes(nextMode) ||
-                nextMode === recState.pmpmMode
-              ) {
-                return;
-              }
-              recState.pmpmMode = nextMode;
-              updateReconciliationPmpmToggleState();
-              renderReconciliationView();
-            });
+          els.recJoinToEnrollmentToggle.addEventListener("change", () => {
+            recState.pmpmMode = els.recJoinToEnrollmentToggle.checked
+              ? RECONCILIATION_PMPM_MODES.enrollmentJoin
+              : RECONCILIATION_PMPM_MODES.withoutEnrollment;
+            updateReconciliationPmpmToggleState();
+            renderReconciliationView();
           });
 
           [els.recDateStart, els.recDateEnd].forEach((input) => {
@@ -3255,10 +3276,9 @@
         }
 
         function updateReconciliationPmpmToggleState() {
-          els.recPmpmModeButtons.forEach((button) => {
-            const isActive = button.dataset.pmpmMode === recState.pmpmMode;
-            button.setAttribute("aria-pressed", String(isActive));
-          });
+          const isEnrollmentJoin = recState.pmpmMode === RECONCILIATION_PMPM_MODES.enrollmentJoin;
+          els.recJoinToEnrollmentToggle.checked = isEnrollmentJoin;
+          els.recJoinToEnrollmentState.textContent = isEnrollmentJoin ? "Checked" : "Unchecked";
         }
 
         function initReconciliationTrendCards() {
@@ -3330,7 +3350,6 @@
               endLabel,
               canvasWrap,
               title,
-              value,
               summary,
               canvas,
               chart: null,
@@ -3364,7 +3383,6 @@
             card.metric = resolvedMetric;
             card.title.textContent = resolvedMetric.label;
             card.average.textContent = `Avg ${formatTrendValue(resolvedMetric.format, averageValue)}`;
-            card.value.textContent = card.average.textContent;
             updateTrendDeltaBadge(card, deltaPercent);
             updateTrendEdgeLabels(card, labels, finitePoints.length > 0);
             card.summary.textContent = buildTrendSummaryText({
@@ -3526,19 +3544,6 @@
             return row.pmpm_paid;
           }
           return null;
-        }
-
-        function formatTrendAxisTick(format, value) {
-          if (!Number.isFinite(value)) {
-            return "";
-          }
-          if (format === "currency_whole") {
-            return formatCompactCurrencyWhole(value);
-          }
-          if (format === "currency") {
-            return formatCompactCurrency(value);
-          }
-          return formatCompactNumber(value);
         }
 
         function formatTrendValue(format, value) {

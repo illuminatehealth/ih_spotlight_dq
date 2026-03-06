@@ -300,6 +300,19 @@
         font-size: 0.85em;
       }
 
+      .section-heading-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+
+      .section-heading-row .section-subtitle {
+        margin: 0;
+      }
+
       .filter-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -688,6 +701,18 @@
         flex-wrap: wrap;
       }
 
+      .toolbar-meta,
+      .table-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .toolbar-meta {
+        margin-left: auto;
+      }
+
       .filter-wrap {
         display: flex;
         align-items: center;
@@ -718,6 +743,60 @@
         margin: 0;
         color: var(--color-muted);
         font-size: var(--text-sm);
+      }
+
+      .icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-pill);
+        background: var(--color-surface-soft);
+        color: var(--text);
+        cursor: pointer;
+        transition:
+          background-color 120ms ease,
+          border-color 120ms ease,
+          transform 120ms ease;
+      }
+
+      .icon-button:hover {
+        background: var(--color-surface-selected);
+        border-color: var(--color-accent-soft);
+        transform: translateY(-1px);
+      }
+
+      .icon-button svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentcolor;
+      }
+
+      .toggle-group {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .toggle-button {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-pill);
+        background: var(--color-surface-soft);
+        color: var(--text);
+        padding: 8px 12px;
+        font: inherit;
+        font-size: var(--text-sm);
+        font-weight: 700;
+        line-height: var(--line-height-tight);
+        cursor: pointer;
+      }
+
+      .toggle-button[aria-pressed="true"] {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--color-on-accent);
       }
 
       .table-note {
@@ -1440,7 +1519,47 @@
                     />
                   </div>
                 </div>
-                <p id="rowCountText" class="count-text">0 rows</p>
+                <div class="toolbar-meta">
+                  <p id="rowCountText" class="count-text">0 rows</p>
+                  <div class="table-actions">
+                    <button
+                      type="button"
+                      class="icon-button"
+                      data-export-target="terminology-results"
+                      data-export-action="download"
+                      aria-label="Download terminology results as CSV"
+                      title="Download CSV"
+                    >
+                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path
+                          d="M8 2.5v7m0 0 2.5-2.5M8 9.5 5.5 7M3 11.5v1h10v-1"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.4"
+                        />
+                      </svg>
+                      <span class="sr-only">Download CSV</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-button"
+                      data-export-target="terminology-results"
+                      data-export-action="copy"
+                      aria-label="Copy terminology results as CSV"
+                      title="Copy CSV"
+                    >
+                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path
+                          d="M6 4.5h6.5v8H6zm-2.5 3H3V2.5h6.5V4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.4"
+                        />
+                      </svg>
+                      <span class="sr-only">Copy CSV</span>
+                    </button>
+                  </div>
+                </div>
               </div>
               <p class="table-note">
                 Valid % includes an in-cell bullet bar with a threshold marker. Failed metrics use
@@ -1669,6 +1788,27 @@
                 <label class="filter-label" for="recFilterPlan">Plan</label>
                 <select id="recFilterPlan" class="filter-select"></select>
               </div>
+              <div class="filter-box">
+                <span class="filter-label">PMPM chart mode</span>
+                <div class="toggle-group" role="group" aria-label="Reconciliation PMPM chart mode">
+                  <button
+                    type="button"
+                    class="toggle-button"
+                    data-pmpm-mode="enrollment_join"
+                    aria-pressed="true"
+                  >
+                    Enrollment join
+                  </button>
+                  <button
+                    type="button"
+                    class="toggle-button"
+                    data-pmpm-mode="without_enrollment"
+                    aria-pressed="false"
+                  >
+                    No enrollment join
+                  </button>
+                </div>
+              </div>
               <div class="filter-box filter-box-span">
                 <label class="filter-label" for="recDateStart">year_month range</label>
                 <div class="range-control">
@@ -1729,7 +1869,47 @@
           </div>
 
           <div class="card table-card">
-            <p class="section-subtitle">Monthly aggregated summary.</p>
+            <div class="section-heading-row">
+              <p class="section-subtitle">Monthly aggregated summary.</p>
+              <div class="table-actions">
+                <button
+                  type="button"
+                  class="icon-button"
+                  data-export-target="reconciliation-monthly"
+                  data-export-action="download"
+                  aria-label="Download reconciliation monthly summary as CSV"
+                  title="Download CSV"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M8 2.5v7m0 0 2.5-2.5M8 9.5 5.5 7M3 11.5v1h10v-1"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.4"
+                    />
+                  </svg>
+                  <span class="sr-only">Download CSV</span>
+                </button>
+                <button
+                  type="button"
+                  class="icon-button"
+                  data-export-target="reconciliation-monthly"
+                  data-export-action="copy"
+                  aria-label="Copy reconciliation monthly summary as CSV"
+                  title="Copy CSV"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M6 4.5h6.5v8H6zm-2.5 3H3V2.5h6.5V4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.4"
+                    />
+                  </svg>
+                  <span class="sr-only">Copy CSV</span>
+                </button>
+              </div>
+            </div>
             <div class="simple-table-wrap">
               <table id="recMonthlyTable" class="simple-table">
                 <thead>
@@ -1830,6 +2010,16 @@
                         ></span>
                       </button>
                     </th>
+                    <th scope="col" data-key="pmpm_paid">
+                      <button class="sort-button" type="button">
+                        pmpm_paid (join) <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
+                    <th scope="col" data-key="pmpm_paid_without_enrollment">
+                      <button class="sort-button" type="button">
+                        pmpm_paid (no join) <span class="sort-indicator">↕</span>
+                      </button>
+                    </th>
                     <th scope="col" data-key="members_with_claims">
                       <button class="sort-button" type="button">
                         members_with_claims
@@ -1927,7 +2117,47 @@
 
           <div class="dual-table-grid">
             <div class="card table-card">
-              <p class="section-subtitle">Field-level validity summary.</p>
+              <div class="section-heading-row">
+                <p class="section-subtitle">Field-level validity summary.</p>
+                <div class="table-actions">
+                  <button
+                    type="button"
+                    class="icon-button"
+                    data-export-target="mapping-field-summary"
+                    data-export-action="download"
+                    aria-label="Download field-level validity summary as CSV"
+                    title="Download CSV"
+                  >
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path
+                        d="M8 2.5v7m0 0 2.5-2.5M8 9.5 5.5 7M3 11.5v1h10v-1"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.4"
+                      />
+                    </svg>
+                    <span class="sr-only">Download CSV</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button"
+                    data-export-target="mapping-field-summary"
+                    data-export-action="copy"
+                    aria-label="Copy field-level validity summary as CSV"
+                    title="Copy CSV"
+                  >
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path
+                        d="M6 4.5h6.5v8H6zm-2.5 3H3V2.5h6.5V4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.4"
+                      />
+                    </svg>
+                    <span class="sr-only">Copy CSV</span>
+                  </button>
+                </div>
+              </div>
               <div class="simple-table-wrap">
                 <table id="mapFieldSummaryTable" class="simple-table">
                   <thead>
@@ -1948,7 +2178,47 @@
             </div>
 
             <div class="card table-card">
-              <p class="section-subtitle">Detail rows at model grain (first 1500 rows).</p>
+              <div class="section-heading-row">
+                <p class="section-subtitle">Detail rows at model grain (first 1500 rows).</p>
+                <div class="table-actions">
+                  <button
+                    type="button"
+                    class="icon-button"
+                    data-export-target="mapping-detail"
+                    data-export-action="download"
+                    aria-label="Download mapping detail rows as CSV"
+                    title="Download CSV"
+                  >
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path
+                        d="M8 2.5v7m0 0 2.5-2.5M8 9.5 5.5 7M3 11.5v1h10v-1"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.4"
+                      />
+                    </svg>
+                    <span class="sr-only">Download CSV</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button"
+                    data-export-target="mapping-detail"
+                    data-export-action="copy"
+                    aria-label="Copy mapping detail rows as CSV"
+                    title="Copy CSV"
+                  >
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path
+                        d="M6 4.5h6.5v8H6zm-2.5 3H3V2.5h6.5V4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.4"
+                      />
+                    </svg>
+                    <span class="sr-only">Copy CSV</span>
+                  </button>
+                </div>
+              </div>
               <div class="simple-table-wrap">
                 <table id="mapDetailTable" class="simple-table">
                   <thead>
@@ -2037,6 +2307,10 @@
           "members_with_claims",
           "pmpm_paid",
         ];
+        const RECONCILIATION_PMPM_MODES = Object.freeze({
+          enrollmentJoin: "enrollment_join",
+          withoutEnrollment: "without_enrollment",
+        });
         const RECONCILIATION_TREND_METRICS = [
           { key: "pmpm_paid", label: "PMPM paid", format: "currency" },
           { key: "paid_amount", label: "Paid amount", format: "currency_whole" },
@@ -2107,9 +2381,11 @@
           sortKey: "year_month",
           sortDir: "asc",
           trendCards: {},
+          renderedMonthlyRows: [],
           dateStartIndex: 0,
           dateEndIndex: 0,
           hasDateRangeSelection: false,
+          pmpmMode: RECONCILIATION_PMPM_MODES.enrollmentJoin,
         };
 
         const mapState = {
@@ -2124,6 +2400,8 @@
             model_name: "__all__",
             field_name: "__all__",
           },
+          renderedFieldRows: [],
+          renderedDetailRows: [],
         };
 
         const els = {
@@ -2180,6 +2458,7 @@
           recFilterDataSource: document.getElementById("recFilterDataSource"),
           recFilterPayer: document.getElementById("recFilterPayer"),
           recFilterPlan: document.getElementById("recFilterPlan"),
+          recPmpmModeButtons: document.querySelectorAll("[data-pmpm-mode]"),
           recDateSlider: document.getElementById("recDateSlider"),
           recDateSelection: document.getElementById("recDateSelection"),
           recDateStart: document.getElementById("recDateStart"),
@@ -2204,6 +2483,7 @@
           mapKpiNonNullRateApplicable: document.getElementById("mapKpiNonNullRateApplicable"),
           mapFieldSummaryBody: document.getElementById("mapFieldSummaryBody"),
           mapDetailBody: document.getElementById("mapDetailBody"),
+          exportButtons: document.querySelectorAll("[data-export-target][data-export-action]"),
         };
 
         init();
@@ -2277,6 +2557,7 @@
           populateSelectWithOptions(els.modelFilterSelect, ["__all__"], state.modelFilter);
           initializeReconciliationView();
           initializeMappingView();
+          updateReconciliationPmpmToggleState();
           updateActiveView(VIEWS.terminology);
           renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
           renderTerminologyStatusSummary();
@@ -2426,6 +2707,21 @@
             });
           });
 
+          els.recPmpmModeButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              const nextMode = button.dataset.pmpmMode;
+              if (
+                !Object.values(RECONCILIATION_PMPM_MODES).includes(nextMode) ||
+                nextMode === recState.pmpmMode
+              ) {
+                return;
+              }
+              recState.pmpmMode = nextMode;
+              updateReconciliationPmpmToggleState();
+              renderReconciliationView();
+            });
+          });
+
           [els.recDateStart, els.recDateEnd].forEach((input) => {
             input.addEventListener("input", () => {
               const startIndex = Number(els.recDateStart.value);
@@ -2478,6 +2774,12 @@
               mapState.filters.model_name = els.mapFilterModel.value;
               mapState.filters.field_name = els.mapFilterField.value;
               renderMappingView();
+            });
+          });
+
+          els.exportButtons.forEach((button) => {
+            button.addEventListener("click", async () => {
+              await handleTableExport(button);
             });
           });
         }
@@ -2952,6 +3254,13 @@
           renderReconciliationView();
         }
 
+        function updateReconciliationPmpmToggleState() {
+          els.recPmpmModeButtons.forEach((button) => {
+            const isActive = button.dataset.pmpmMode === recState.pmpmMode;
+            button.setAttribute("aria-pressed", String(isActive));
+          });
+        }
+
         function initReconciliationTrendCards() {
           const grid = els.recTrendGrid;
           if (!grid) {
@@ -3020,6 +3329,8 @@
               startLabel,
               endLabel,
               canvasWrap,
+              title,
+              value,
               summary,
               canvas,
               chart: null,
@@ -3035,6 +3346,8 @@
               return;
             }
 
+            const resolvedMetric = resolveReconciliationMetric(metric);
+
             const labels = monthlyRows.map(
               (row) => row.year_month || formatYearMonth(row.year_month_int),
             );
@@ -3048,11 +3361,14 @@
             const priorValue = latestIndex > 0 ? values[latestIndex - 1] : null;
             const deltaPercent = computeTrendDeltaPercent(latestValue, priorValue);
 
-            card.average.textContent = `Avg ${formatTrendValue(metric.format, averageValue)}`;
+            card.metric = resolvedMetric;
+            card.title.textContent = resolvedMetric.label;
+            card.average.textContent = `Avg ${formatTrendValue(resolvedMetric.format, averageValue)}`;
+            card.value.textContent = card.average.textContent;
             updateTrendDeltaBadge(card, deltaPercent);
             updateTrendEdgeLabels(card, labels, finitePoints.length > 0);
             card.summary.textContent = buildTrendSummaryText({
-              metric,
+              metric: resolvedMetric,
               values,
               latestValue,
               minValue,
@@ -3064,12 +3380,35 @@
               return;
             }
 
+            chart.data.datasets[0].label = resolvedMetric.label;
             chart.data.labels = labels;
             chart.data.datasets[0].data = values.map((value) =>
               Number.isFinite(value) ? value : null,
             );
+            const yBounds = computeTrendYAxisBounds(values);
+            chart.options.scales.y.min = yBounds ? yBounds.min : undefined;
+            chart.options.scales.y.max = yBounds ? yBounds.max : undefined;
+            chart.options.scales.y.title.text = resolvedMetric.label;
+            card.canvas.setAttribute(
+              "aria-label",
+              `${resolvedMetric.label} monthly line chart. Exact values are listed in the summary text below.`,
+            );
             chart.update();
           });
+        }
+
+        function resolveReconciliationMetric(metric) {
+          if (metric.key !== "pmpm_paid") {
+            return metric;
+          }
+
+          return {
+            ...metric,
+            label:
+              recState.pmpmMode === RECONCILIATION_PMPM_MODES.withoutEnrollment
+                ? "PMPM paid (no enrollment join)"
+                : "PMPM paid (enrollment join)",
+          };
         }
 
         function ensureTrendChart(card) {
@@ -3160,12 +3499,46 @@
 
         function getReconciliationTrendValue(metricKey, row) {
           if (metricKey === "pmpm_paid") {
-            if (!Number.isFinite(row.member_months) || row.member_months <= 0) {
-              return null;
-            }
-            return row.paid_amount / row.member_months;
+            return getReconciliationPmpmValue(row, recState.pmpmMode);
           }
           return Number.isFinite(row[metricKey]) ? row[metricKey] : null;
+        }
+
+        function getReconciliationPmpmValue(row, mode) {
+          if (!Number.isFinite(row.member_months) || row.member_months <= 0) {
+            return null;
+          }
+
+          if (mode === RECONCILIATION_PMPM_MODES.withoutEnrollment) {
+            if (Number.isFinite(row.paid_amount_without_enrollment)) {
+              return row.paid_amount_without_enrollment / row.member_months;
+            }
+            if (Number.isFinite(row.pmpm_paid_without_enrollment)) {
+              return row.pmpm_paid_without_enrollment;
+            }
+            return null;
+          }
+
+          if (Number.isFinite(row.paid_amount)) {
+            return row.paid_amount / row.member_months;
+          }
+          if (Number.isFinite(row.pmpm_paid)) {
+            return row.pmpm_paid;
+          }
+          return null;
+        }
+
+        function formatTrendAxisTick(format, value) {
+          if (!Number.isFinite(value)) {
+            return "";
+          }
+          if (format === "currency_whole") {
+            return formatCompactCurrencyWhole(value);
+          }
+          if (format === "currency") {
+            return formatCompactCurrency(value);
+          }
+          return formatCompactNumber(value);
         }
 
         function formatTrendValue(format, value) {
@@ -3179,6 +3552,30 @@
             return formatCurrency(value);
           }
           return formatInteger(value);
+        }
+
+        function computeTrendYAxisBounds(values) {
+          const finiteValues = values.filter((value) => Number.isFinite(value));
+          if (!finiteValues.length) {
+            return null;
+          }
+
+          const minValue = Math.min(...finiteValues);
+          const maxValue = Math.max(...finiteValues);
+          const hasNegative = finiteValues.some((value) => value < 0);
+
+          if (!hasNegative) {
+            const upperPad = maxValue === 0 ? 1 : maxValue * 0.18;
+            return { min: 0, max: maxValue + upperPad };
+          }
+
+          if (minValue === maxValue) {
+            const pad = Math.abs(minValue) * 0.1 || 1;
+            return { min: minValue - pad, max: maxValue + pad };
+          }
+
+          const pad = (maxValue - minValue) * 0.18;
+          return { min: minValue - pad, max: maxValue + pad };
         }
 
         function computeTrendDeltaPercent(latestValue, priorValue) {
@@ -3315,10 +3712,12 @@
               claims: parseNumber(row.claims) ?? 0,
               claim_lines: parseNumber(row.claim_lines) ?? 0,
               paid_amount: parseNumber(row.paid_amount) ?? 0,
+              paid_amount_without_enrollment: parseNumber(row.paid_amount_without_enrollment),
               members_with_claims: parseNumber(row.members_with_claims) ?? 0,
               pct_members_with_claims: parsePercent(row.pct_members_with_claims),
               claims_per_1000: parseNumber(row.claims_per_1000),
               pmpm_paid: parseNumber(row.pmpm_paid),
+              pmpm_paid_without_enrollment: parseNumber(row.pmpm_paid_without_enrollment),
               avg_paid_per_claim: parseNumber(row.avg_paid_per_claim),
             });
           }
@@ -3383,6 +3782,7 @@
               claims: 0,
               claim_lines: 0,
               paid_amount: 0,
+              paid_amount_without_enrollment: 0,
               members_with_claims: 0,
             };
             current.member_months += row.member_months || 0;
@@ -3390,6 +3790,9 @@
             current.claims += row.claims || 0;
             current.claim_lines += row.claim_lines || 0;
             current.paid_amount += row.paid_amount || 0;
+            if (Number.isFinite(row.paid_amount_without_enrollment)) {
+              current.paid_amount_without_enrollment += row.paid_amount_without_enrollment;
+            }
             current.members_with_claims += row.members_with_claims || 0;
             monthlyMap.set(key, current);
           });
@@ -3516,6 +3919,12 @@
         }
 
         function getReconciliationMonthlySortValue(row, key) {
+          if (key === "pmpm_paid") {
+            return getReconciliationPmpmValue(row, RECONCILIATION_PMPM_MODES.enrollmentJoin);
+          }
+          if (key === "pmpm_paid_without_enrollment") {
+            return getReconciliationPmpmValue(row, RECONCILIATION_PMPM_MODES.withoutEnrollment);
+          }
           if (key === "pct_members_with_claims") {
             return row.member_months > 0 ? row.members_with_claims / row.member_months : null;
           }
@@ -3601,8 +4010,10 @@
           renderReconciliationTrends(monthlyRows);
           updateReconciliationSortHeaderState();
 
+          const sortedMonthlyRows = sortReconciliationMonthlyRows(monthlyRows);
+          recState.renderedMonthlyRows = sortedMonthlyRows;
           const monthlyFragment = document.createDocumentFragment();
-          sortReconciliationMonthlyRows(monthlyRows).forEach((row) => {
+          sortedMonthlyRows.forEach((row) => {
             const tr = document.createElement("tr");
             appendTextCell(tr, getYearMonthLabel(row));
             appendNumberCell(tr, formatInteger(row.member_months));
@@ -3610,6 +4021,18 @@
             appendNumberCell(tr, formatInteger(row.claims));
             appendNumberCell(tr, formatInteger(row.claim_lines));
             appendNumberCell(tr, formatCurrencyWhole(row.paid_amount));
+            appendNumberCell(
+              tr,
+              formatCurrency(
+                getReconciliationPmpmValue(row, RECONCILIATION_PMPM_MODES.enrollmentJoin),
+              ),
+            );
+            appendNumberCell(
+              tr,
+              formatCurrency(
+                getReconciliationPmpmValue(row, RECONCILIATION_PMPM_MODES.withoutEnrollment),
+              ),
+            );
             appendNumberCell(tr, formatInteger(row.members_with_claims));
             const pctMembers =
               row.member_months > 0 ? row.members_with_claims / row.member_months : null;
@@ -3804,6 +4227,7 @@
             }
             return left.field_name.localeCompare(right.field_name);
           });
+          mapState.renderedFieldRows = fieldRows;
           const fieldFragment = document.createDocumentFragment();
           fieldRows.forEach((row) => {
             const tr = document.createElement("tr");
@@ -3822,7 +4246,7 @@
           els.mapFieldSummaryBody.replaceChildren(fieldFragment);
 
           const detailFragment = document.createDocumentFragment();
-          [...filteredRows]
+          const detailRows = [...filteredRows]
             .sort((left, right) => {
               if (left.data_source !== right.data_source) {
                 return left.data_source.localeCompare(right.data_source);
@@ -3838,23 +4262,231 @@
               }
               return left.field_name.localeCompare(right.field_name);
             })
-            .slice(0, 1500)
-            .forEach((row) => {
-              const tr = document.createElement("tr");
-              appendTextCell(tr, row.data_source);
-              appendTextCell(tr, row.payer);
-              appendTextCell(tr, row.plan);
-              appendTextCell(tr, toDisplayModelName(row.model_name));
-              appendTextCell(tr, row.field_name);
-              appendNumberCell(tr, formatInteger(row.total_rows));
-              appendNumberCell(tr, formatInteger(row.applicable_rows));
-              appendNumberCell(tr, formatInteger(row.not_applicable_rows));
-              appendNumberCell(tr, formatInteger(row.null_rows));
-              appendNumberCell(tr, formatInteger(row.non_null_rows));
-              appendNumberCell(tr, formatPercent(row.non_null_rows_pct));
-              detailFragment.appendChild(tr);
-            });
+            .slice(0, 1500);
+          mapState.renderedDetailRows = detailRows;
+          detailRows.forEach((row) => {
+            const tr = document.createElement("tr");
+            appendTextCell(tr, row.data_source);
+            appendTextCell(tr, row.payer);
+            appendTextCell(tr, row.plan);
+            appendTextCell(tr, toDisplayModelName(row.model_name));
+            appendTextCell(tr, row.field_name);
+            appendNumberCell(tr, formatInteger(row.total_rows));
+            appendNumberCell(tr, formatInteger(row.applicable_rows));
+            appendNumberCell(tr, formatInteger(row.not_applicable_rows));
+            appendNumberCell(tr, formatInteger(row.null_rows));
+            appendNumberCell(tr, formatInteger(row.non_null_rows));
+            appendNumberCell(tr, formatPercent(row.non_null_rows_pct));
+            detailFragment.appendChild(tr);
+          });
           els.mapDetailBody.replaceChildren(detailFragment);
+        }
+
+        async function handleTableExport(button) {
+          const target = button.dataset.exportTarget;
+          const action = button.dataset.exportAction;
+          const payload = getTableExportPayload(target);
+          if (!payload) {
+            showGenericError("Unable to prepare CSV export for this table.");
+            return;
+          }
+
+          const csv = convertRowsToCsv(payload.headers, payload.rows);
+          if (!csv) {
+            showGenericError("No rows are available to export for the current table.");
+            return;
+          }
+
+          if (action === "download") {
+            downloadCsvFile(csv, payload.filename);
+            hideErrorBanner();
+            return;
+          }
+
+          const copied = await copyTextToClipboard(csv);
+          if (copied) {
+            hideErrorBanner();
+            return;
+          }
+
+          showGenericError("Copy to clipboard failed. Use the download button to save the CSV.");
+        }
+
+        function getTableExportPayload(target) {
+          if (target === "terminology-results") {
+            return {
+              filename: "terminology_results.csv",
+              headers: ["metric", "valid_pct_applicable", "status"],
+              rows: state.filteredRows.map((row) => [
+                row.metric,
+                formatPercent(row.valid_pct),
+                row.status,
+              ]),
+            };
+          }
+
+          if (target === "reconciliation-monthly") {
+            return {
+              filename: "reconciliation_monthly_summary.csv",
+              headers: [
+                "year_month",
+                "member_months",
+                "members",
+                "claims",
+                "claim_lines",
+                "paid_amount",
+                "pmpm_paid_enrollment_join",
+                "pmpm_paid_without_enrollment",
+                "members_with_claims",
+                "pct_members_with_claims",
+              ],
+              rows: recState.renderedMonthlyRows.map((row) => [
+                getYearMonthLabel(row),
+                formatInteger(row.member_months),
+                formatInteger(row.members),
+                formatInteger(row.claims),
+                formatInteger(row.claim_lines),
+                formatCurrencyWhole(row.paid_amount),
+                formatCurrency(
+                  getReconciliationPmpmValue(row, RECONCILIATION_PMPM_MODES.enrollmentJoin),
+                ),
+                formatCurrency(
+                  getReconciliationPmpmValue(row, RECONCILIATION_PMPM_MODES.withoutEnrollment),
+                ),
+                formatInteger(row.members_with_claims),
+                formatPercent(
+                  row.member_months > 0 ? row.members_with_claims / row.member_months : null,
+                ),
+              ]),
+            };
+          }
+
+          if (target === "mapping-field-summary") {
+            return {
+              filename: "mapping_field_summary.csv",
+              headers: [
+                "model_name",
+                "field_name",
+                "total_rows",
+                "applicable_rows",
+                "non_null_rows",
+                "null_rows",
+                "not_applicable_rows",
+                "non_null_rate_applicable",
+              ],
+              rows: mapState.renderedFieldRows.map((row) => [
+                row.model_name,
+                row.field_name,
+                formatInteger(row.total_rows),
+                formatInteger(row.applicable_rows),
+                formatInteger(row.non_null_rows),
+                formatInteger(row.null_rows),
+                formatInteger(row.not_applicable_rows),
+                formatPercent(
+                  row.applicable_rows > 0 ? row.non_null_rows / row.applicable_rows : null,
+                ),
+              ]),
+            };
+          }
+
+          if (target === "mapping-detail") {
+            return {
+              filename: "mapping_detail_rows.csv",
+              headers: [
+                "data_source",
+                "payer",
+                "plan",
+                "model_name",
+                "field_name",
+                "total_rows",
+                "applicable_rows",
+                "not_applicable_rows",
+                "null_rows",
+                "non_null_rows",
+                "non_null_rows_pct",
+              ],
+              rows: mapState.renderedDetailRows.map((row) => [
+                row.data_source,
+                row.payer,
+                row.plan,
+                row.model_name,
+                row.field_name,
+                formatInteger(row.total_rows),
+                formatInteger(row.applicable_rows),
+                formatInteger(row.not_applicable_rows),
+                formatInteger(row.null_rows),
+                formatInteger(row.non_null_rows),
+                formatPercent(row.non_null_rows_pct),
+              ]),
+            };
+          }
+
+          return null;
+        }
+
+        function convertRowsToCsv(headers, rows) {
+          if (!Array.isArray(headers) || !headers.length || !Array.isArray(rows) || !rows.length) {
+            return "";
+          }
+
+          const lines = [headers.map(escapeCsvCell).join(",")];
+          rows.forEach((row) => {
+            lines.push(row.map(escapeCsvCell).join(","));
+          });
+          return lines.join("\r\n");
+        }
+
+        function escapeCsvCell(value) {
+          const text = String(value ?? "");
+          if (/[",\r\n]/.test(text)) {
+            return `"${text.replace(/"/g, '""')}"`;
+          }
+          return text;
+        }
+
+        function downloadCsvFile(text, filename) {
+          const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        }
+
+        async function copyTextToClipboard(text) {
+          if (navigator.clipboard?.writeText) {
+            try {
+              await navigator.clipboard.writeText(text);
+              return true;
+            } catch {
+              return fallbackCopyTextToClipboard(text);
+            }
+          }
+
+          return fallbackCopyTextToClipboard(text);
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "true");
+          textarea.className = "sr-only";
+          document.body.appendChild(textarea);
+          textarea.select();
+          textarea.setSelectionRange(0, textarea.value.length);
+
+          let copied = false;
+          try {
+            copied = document.execCommand("copy");
+          } catch {
+            copied = false;
+          }
+
+          textarea.remove();
+          return copied;
         }
 
         function populateSelectWithOptions(selectElement, options, selectedValue, config = {}) {

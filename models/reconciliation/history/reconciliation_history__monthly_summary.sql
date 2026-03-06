@@ -26,10 +26,12 @@
         claims,
         claim_lines,
         paid_amount,
+        paid_amount_without_enrollment,
         members_with_claims,
         pct_members_with_claims,
         claims_per_1000,
         pmpm_paid,
+        pmpm_paid_without_enrollment,
         avg_paid_per_claim,
         tuva_last_run
     from {{ ref('reconciliation__monthly_summary') }}
@@ -49,10 +51,12 @@
         claims,
         claim_lines,
         paid_amount,
+        paid_amount_without_enrollment,
         members_with_claims,
         pct_members_with_claims,
         claims_per_1000,
         pmpm_paid,
+        pmpm_paid_without_enrollment,
         avg_paid_per_claim,
         tuva_last_run
     from {{ ref('reconciliation__monthly_summary') }}

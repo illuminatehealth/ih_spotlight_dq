@@ -93,6 +93,20 @@ month_ranges as (
         plan_name,
         min(year_month_int) as min_year_month_int,
         max(year_month_int) as max_year_month_int
+    from medical_claims_normalized
+    group by
+        data_source,
+        payer,
+        plan_name
+
+    union all
+
+    select
+        data_source,
+        payer,
+        plan_name,
+        min(year_month_int) as min_year_month_int,
+        max(year_month_int) as max_year_month_int
     from medical_claims_with_enrollment
     group by
         data_source,
@@ -142,6 +156,21 @@ member_month_agg as (
         year_month_int
 ),
 
+medical_claim_metrics_all_agg as (
+    select
+        data_source,
+        payer,
+        plan_name,
+        year_month_int,
+        sum(paid_amount) as paid_amount_without_enrollment
+    from medical_claims_normalized
+    group by
+        data_source,
+        payer,
+        plan_name,
+        year_month_int
+),
+
 medical_claim_metrics_agg as (
     select
         data_source,
@@ -173,6 +202,7 @@ select
     coalesce(c.claims, 0) as claims,
     coalesce(c.claim_lines, 0) as claim_lines,
     coalesce(c.paid_amount, 0) as paid_amount,
+    coalesce(ca.paid_amount_without_enrollment, 0) as paid_amount_without_enrollment,
     coalesce(c.members_with_claims, 0) as members_with_claims,
     cast(coalesce(c.members_with_claims, 0) as {{ dbt.type_numeric() }})
         / nullif(cast(coalesce(m.member_months, 0) as {{ dbt.type_numeric() }}), 0) as pct_members_with_claims,
@@ -180,6 +210,8 @@ select
         / nullif(cast(coalesce(m.member_months, 0) as {{ dbt.type_numeric() }}), 0) as claims_per_1000,
     cast(coalesce(c.paid_amount, 0) as {{ dbt.type_numeric() }})
         / nullif(cast(coalesce(m.member_months, 0) as {{ dbt.type_numeric() }}), 0) as pmpm_paid,
+    cast(coalesce(ca.paid_amount_without_enrollment, 0) as {{ dbt.type_numeric() }})
+        / nullif(cast(coalesce(m.member_months, 0) as {{ dbt.type_numeric() }}), 0) as pmpm_paid_without_enrollment,
     cast(coalesce(c.paid_amount, 0) as {{ dbt.type_numeric() }})
         / nullif(cast(coalesce(c.claims, 0) as {{ dbt.type_numeric() }}), 0) as avg_paid_per_claim,
     {{ dq_run_ts() }} as tuva_last_run
@@ -195,3 +227,8 @@ left join medical_claim_metrics_agg as c
     and s.payer = c.payer
     and s.plan_name = c.plan_name
     and s.year_month_int = c.year_month_int
+left join medical_claim_metrics_all_agg as ca
+    on s.data_source = ca.data_source
+    and s.payer = ca.payer
+    and s.plan_name = ca.plan_name
+    and s.year_month_int = ca.year_month_int

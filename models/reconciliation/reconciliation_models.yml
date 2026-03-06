@@ -50,7 +50,9 @@ models:
       - name: claim_lines
         description: Total claim line count.
       - name: paid_amount
-        description: Sum of paid_amount across claim lines.
+        description: Sum of paid_amount across claim lines after inner joining claims to enrollment.
+      - name: paid_amount_without_enrollment
+        description: Sum of paid_amount across claim lines without inner joining claims to enrollment.
       - name: members_with_claims
         description: Distinct members with at least one claim in the same month.
       - name: pct_members_with_claims
@@ -58,7 +60,9 @@ models:
       - name: claims_per_1000
         description: Claims per 1,000 member months.
       - name: pmpm_paid
-        description: Paid amount per member month.
+        description: Paid amount per member month after inner joining claims to enrollment.
+      - name: pmpm_paid_without_enrollment
+        description: Paid amount per member month without inner joining claims to enrollment.
       - name: avg_paid_per_claim
         description: Average paid amount per claim.
       - name: tuva_last_run

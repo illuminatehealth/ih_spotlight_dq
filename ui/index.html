@@ -1430,8 +1430,13 @@
           <h1 class="title">Data Quality Results</h1>
         </div>
         <div class="controls">
-          <label for="csvInput" class="button">Choose CSV</label>
-          <input id="csvInput" type="file" accept=".csv,text/csv" class="sr-only" />
+          <label for="csvInput" class="button">Choose CSV/TSV</label>
+          <input
+            id="csvInput"
+            type="file"
+            accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain"
+            class="sr-only"
+          />
         </div>
       </header>
 
@@ -1485,7 +1490,8 @@
         >
           <div class="card table-card">
             <p class="section-subtitle">
-              Load CSV exported from <code>spotlight.dq_results__terminology_field_summary</code>.
+              Load CSV or TSV exported from
+              <code>spotlight.dq_results__terminology_field_summary</code>.
             </p>
             <div class="filter-grid rec-filter-grid">
               <div class="filter-box">
@@ -1802,7 +1808,7 @@
         >
           <div class="card table-card">
             <p class="section-subtitle">
-              Load CSV exported from <code>spotlight.reconciliation__monthly_summary</code>.
+              Load CSV or TSV exported from <code>spotlight.reconciliation__monthly_summary</code>.
             </p>
             <div class="filter-grid rec-filter-grid">
               <div class="filter-box">
@@ -2097,7 +2103,8 @@
         >
           <div class="card table-card">
             <p class="section-subtitle">
-              Load CSV exported from <code>spotlight.dq_results__input_layer_field_summary</code>.
+              Load CSV or TSV exported from
+              <code>spotlight.dq_results__input_layer_field_summary</code>.
             </p>
             <div class="filter-grid five">
               <div class="filter-box">
@@ -2272,7 +2279,7 @@
       </main>
     </div>
     <div id="pageDropOverlay" class="page-drop-overlay" aria-hidden="true" hidden>
-      <p class="page-drop-overlay-label">Drop CSV to load it into the current view</p>
+      <p class="page-drop-overlay-label">Drop CSV or TSV to load it into the current view</p>
     </div>
 
     <script src="vendor/chart.js/chart.umd.js"></script>
@@ -3217,7 +3224,7 @@
             handleCsvText(text);
           };
           reader.onerror = () => {
-            showGenericError("Unable to read file. Please choose a UTF-8 CSV file.");
+            showGenericError("Unable to read file. Please choose a UTF-8 CSV or TSV file.");
           };
           reader.readAsText(file, "UTF-8");
         }
@@ -3725,7 +3732,7 @@
             recState.rows = [];
             recState.filteredRows = [];
             renderReconciliationView();
-            showGenericError("Reconciliation CSV appears to be empty or missing data rows.");
+            showGenericError("Reconciliation file appears to be empty or missing data rows.");
             return;
           }
 
@@ -4100,7 +4107,7 @@
             mapState.filteredRows = [];
             renderMappingView();
             showGenericError(
-              "Input layer field summary CSV appears to be empty or missing data rows.",
+              "Input layer field summary file appears to be empty or missing data rows.",
             );
             return;
           }
@@ -4644,7 +4651,7 @@
             state.payerFilter = "__all__";
             state.planFilter = "__all__";
             state.missingFields = [];
-            showGenericError("CSV appears to be empty or missing data rows.");
+            showGenericError("File appears to be empty or missing data rows.");
             renderKpis({ totalRows: null, overallNullPct: null, overallInvalidPct: null });
             renderTerminologyStatusSummary();
             rebuildTerminologyDimensionFilters();

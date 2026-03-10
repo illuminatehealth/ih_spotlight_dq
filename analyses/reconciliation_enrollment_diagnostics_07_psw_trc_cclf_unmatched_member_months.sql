@@ -1,0 +1,61 @@
+-- For PSW_TRC_CCLF only, show unmatched member-month detail so you can inspect
+-- the payer/plan/month combinations that fail the reconciliation enrollment join.
+
+with claims as (
+    select
+        mc.data_source,
+        mc.payer,
+        mc.[plan] as plan_name,
+        mc.person_id,
+        mc.claim_id,
+        mc.paid_amount,
+        coalesce(mc.claim_line_start_date, mc.claim_start_date) as claim_date,
+        year(coalesce(mc.claim_line_start_date, mc.claim_start_date)) * 100
+            + month(coalesce(mc.claim_line_start_date, mc.claim_start_date)) as claim_year_month_int
+    from core.medical_claim as mc
+    where mc.data_source = 'PSW_TRC_CCLF'
+      and coalesce(mc.claim_line_start_date, mc.claim_start_date) is not null
+      and mc.paid_amount is not null
+      and year(coalesce(mc.claim_line_start_date, mc.claim_start_date)) * 100
+            + month(coalesce(mc.claim_line_start_date, mc.claim_start_date)) < 202401
+),
+enrollment as (
+    select distinct
+        mm.data_source,
+        mm.payer,
+        mm.[plan] as plan_name,
+        mm.person_id,
+        try_convert(int, mm.year_month) as year_month_int
+    from core.member_months as mm
+    where mm.data_source = 'PSW_TRC_CCLF'
+      and try_convert(int, mm.year_month) is not null
+),
+unmatched_claims as (
+    select
+        c.*
+    from claims as c
+    left join enrollment as e
+        on c.data_source = e.data_source
+        and c.payer = e.payer
+        and c.plan_name = e.plan_name
+        and c.person_id = e.person_id
+        and c.claim_year_month_int = e.year_month_int
+    where e.person_id is null
+)
+select
+    claim_year_month_int,
+    payer,
+    plan_name,
+    person_id,
+    sum(paid_amount) as unmatched_paid_amount,
+    count(*) as unmatched_claim_lines,
+    count(distinct claim_id) as unmatched_claims,
+    min(claim_date) as first_claim_date,
+    max(claim_date) as last_claim_date
+from unmatched_claims
+group by
+    claim_year_month_int,
+    payer,
+    plan_name,
+    person_id
+order by unmatched_paid_amount desc, claim_year_month_int, person_id;
